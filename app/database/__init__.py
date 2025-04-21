@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class DatabaseManagerSession:
+class DatabaseSessionManager:
     def __init__(self, configs: dict) -> None:
         self._base = Base
         self.configs = configs
