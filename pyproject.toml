@@ -8,7 +8,10 @@ dependencies = [
     "alembic>=1.15.2",
     "fastapi[standard]>=0.115.12",
     "mkdocs>=1.6.1",
+    "psycopg2>=2.9.10",
+    "sqlalchemy>=2.0.40",
+    "sqlalchemy-utils>=0.41.2",
 ]
 
 [tool.uv.workspace]
-members = ["alembic"]
+members = []
