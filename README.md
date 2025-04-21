@@ -5,6 +5,7 @@ Userverse is an open-source platform designed to make managing users, organizati
 ## Directory Overview
 
 ```bash
+|── alembic
 ├── app
 │   ├── database
 │   ├── logic
