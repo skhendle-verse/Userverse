@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 class RecordNotFoundError(Exception):
     """Custom exception for record not found errors."""
+
     def __init__(self, model_name: str, record_id: Any):
         super().__init__(f"No {model_name} found with id={record_id}")
 
@@ -115,7 +116,9 @@ class BaseModel(Base):
             raise RecordNotFoundError(cls.__name__, record_id)
 
     @classmethod
-    def bulk_create(cls, session: Session, records: List[Dict[str, Any]]) -> Dict[str, str]:
+    def bulk_create(
+        cls, session: Session, records: List[Dict[str, Any]]
+    ) -> Dict[str, str]:
         """
         Bulk create records for a model.
         """
@@ -147,13 +150,17 @@ class BaseModel(Base):
             json_field[key] = value
             setattr(record, column_name, json_field)
             session.commit()
-            logger.info(f"Updated JSON field '{column_name}' for {cls.__name__} with id={record_id}")
+            logger.info(
+                f"Updated JSON field '{column_name}' for {cls.__name__} with id={record_id}"
+            )
             return cls.to_dict(record)
         except NoResultFound:
             raise RecordNotFoundError(cls.__name__, record_id)
 
     @staticmethod
-    def _get_pagination_metadata(total_records: int, limit: int, offset: int) -> Dict[str, int]:
+    def _get_pagination_metadata(
+        total_records: int, limit: int, offset: int
+    ) -> Dict[str, int]:
         """
         Generate pagination metadata.
         """

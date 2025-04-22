@@ -25,8 +25,7 @@ class DatabaseSessionManager:
         self._session.configure(bind=self.engine)
 
     def _configure_engine(self):
-        url = self.configs["main_database_url"]
-        # print(f"Database URL: {url}")
+        url = self.configs["database_url"]
         if not database_exists(url):
             create_database(url)
 
