@@ -2,7 +2,7 @@ import traceback
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
-from app.configs import configs
+# Models
 from app.models.app_error import AppErrorModel
 from app.models.user.user import (
     TokenResponseModel,
@@ -13,16 +13,51 @@ from app.models.user.user import (
 )
 from app.models.user.messages import UserResponseMessages
 
+# security
 from app.security.basic_auth import get_basic_auth_credentials
 from app.security.jwt import get_current_user_from_jwt_token
-from app.utils.app_error import AppError
 
+# utils
+from app.utils.app_error import AppError
 
 # logic
 from app.logic.user.user import UserService
 
 router = APIRouter()
 tag = "User Management"
+
+
+@router.patch(
+    "/user/login",
+    tags=[tag],
+    responses={
+        202: {"model": TokenResponseModel},
+        400: {"model": AppErrorModel},
+        500: {"model": AppErrorModel},
+    },
+)
+def user_login_api(
+    credentials: UserLogin = Depends(get_basic_auth_credentials),
+):
+    """
+    User login.
+    """
+    try:
+        response = UserService().user_login(user_credentials=credentials)
+        return JSONResponse(
+            status_code=status.HTTP_202_ACCEPTED,
+            content={
+                "message": UserResponseMessages.USER_LOGGED_IN.value,
+                "data": response.model_dump(),
+            },
+        )
+    except Exception as e:
+        traceback.print_exc()
+        raise AppError(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message=UserResponseMessages.INVALID_CREDENTIALS.value,
+            error=str(e),
+        )
 
 
 @router.post(
@@ -93,39 +128,6 @@ def get_user_api(
         raise AppError(
             status_code=status.HTTP_400_BAD_REQUEST,
             message=UserResponseMessages.INVALID_REQUEST_MESSAGE.value,
-            error=str(e),
-        )
-
-
-@router.patch(
-    "/user/login",
-    tags=[tag],
-    responses={
-        202: {"model": TokenResponseModel},
-        400: {"model": AppErrorModel},
-        500: {"model": AppErrorModel},
-    },
-)
-def login_user_api(
-    credentials: UserLogin = Depends(get_basic_auth_credentials),
-):
-    """
-    User login.
-    """
-    try:
-        response = UserService().user_login(user_credentials=credentials)
-        return JSONResponse(
-            status_code=status.HTTP_202_ACCEPTED,
-            content={
-                "message": UserResponseMessages.USER_LOGGED_IN.value,
-                "data": response.model_dump(),
-            },
-        )
-    except Exception as e:
-        traceback.print_exc()
-        raise AppError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            message=UserResponseMessages.INVALID_CREDENTIALS.value,
             error=str(e),
         )
 

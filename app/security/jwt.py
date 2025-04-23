@@ -1,12 +1,12 @@
-from datetime import datetime, timedelta, timezone
+import jwt
 import traceback
-from app.configs import configs
+from datetime import datetime, timedelta, timezone
 from fastapi import status, Security
 from fastapi.security import APIKeyHeader
 
-import jwt
-from typing import Dict
-
+# app imports
+from app.configs import configs
+from app.models.security import SecurityResponseMessage
 from app.models.user.user import TokenResponseModel, UserRead
 from app.utils.app_error import AppError
 
@@ -19,7 +19,7 @@ class JWTManager:
         self.SESSION_TIMEOUT = int(jwt_config.get("IMEOUT", 15))
         self.REFRESH_TIMEOUT = int(jwt_config.get("REFRESH_TIMEOUT", 60))
 
-    def sign_jwt(self, user: UserRead) -> Dict[str, str]:
+    def sign_jwt(self, user: UserRead) -> TokenResponseModel:
         now = datetime.now(timezone.utc)
         access_expire = now + timedelta(minutes=self.SESSION_TIMEOUT)
         refresh_expire = now + timedelta(minutes=self.REFRESH_TIMEOUT)
@@ -63,45 +63,47 @@ class JWTManager:
             if not user:
                 raise AppError(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    message="User data missing in token",
+                    message=SecurityResponseMessage.MISSING_USER_DATA.value,
                 )
             if decoded.get("type") != "access":
                 raise AppError(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    message="Invalid token type",
+                    message=SecurityResponseMessage.INVALID_TOKEN.value
+                    + " for access token",
                 )
             return UserRead(**user)
         except jwt.ExpiredSignatureError:
             raise AppError(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                message="Token has expired",
+                message=SecurityResponseMessage.EXPIRED_TOKEN.value,
             )
         except jwt.InvalidTokenError:
             raise AppError(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                message="Invalid token",
+                message=SecurityResponseMessage.INVALID_TOKEN.value,
             )
         except Exception:
             traceback.print_exc()
             raise AppError(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                message="Error decoding token",
+                message=SecurityResponseMessage.ERROR_DECODING.value,
             )
 
-    def refresh_token(self, refresh_token: str) -> Dict[str, str]:
+    def refresh_token(self, refresh_token: str) -> TokenResponseModel:
         try:
             decoded = self.decode_token(refresh_token)
             if decoded.get("type") != "refresh":
                 raise AppError(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    message="Invalid token type for refresh",
+                    message=SecurityResponseMessage.INVALID_TOKEN.value
+                    + " for refresh token",
                 )
 
             user = decoded.get("user")
             if not user:
                 raise AppError(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    message="User data missing in token",
+                    message=SecurityResponseMessage.MISSING_USER_DATA.value,
                 )
 
             return self.signJWT(user)
@@ -121,22 +123,22 @@ async def get_current_user_from_jwt_token(
     if authorization is None:
         raise AppError(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            message="Invalid Request",
-            error="Missing Authorization Headers, {'Authorization': 'Bearer TOKEN'}",
+            message=SecurityResponseMessage.INVALID_REQUEST.value,
+            error=SecurityResponseMessage.MISSING_AUTHORIZATION_HEADER.value,
         )
 
     try:
         auth_type, TOKEN = authorization.split(" ")
-        if auth_type != "Bearer":
+        if auth_type.strip().lower() != "bearer":
             raise AppError(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                message="Invalid Request",
-                error="Missing Authorization TYPE, {'Authorization': 'Bearer TOKEN'}",
+                message=SecurityResponseMessage.INVALID_REQUEST.value,
+                error=SecurityResponseMessage.MISSING_AUTHORIZATION_HEADER.value,
             )
     except Exception as e:
         raise AppError(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            message="Invalid Request",
+            message=SecurityResponseMessage.INVALID_REQUEST.value,
             error=str(e),
         )
 
