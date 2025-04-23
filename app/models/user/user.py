@@ -1,6 +1,6 @@
 import re
-from typing import Optional
-from pydantic import BaseModel, EmailStr, field_validator
+from typing import Optional, Literal
+from pydantic import BaseModel, EmailStr, field_validator, Field
 from app.utils.hash_password import hash_password
 
 
@@ -57,3 +57,14 @@ class UserRead(BaseModel):
     last_name: Optional[str] = None
     email: EmailStr
     phone_number: Optional[str] = None
+
+
+class TokenResponseModel(BaseModel):
+    access_token: str = Field(..., description="JWT access token")
+    access_token_expiration: str = Field(
+        ..., description="Access token expiration time in 'YYYY-MM-DD HH:MM:SS' format"
+    )
+    refresh_token: str = Field(..., description="JWT refresh token")
+    refresh_token_expiration: str = Field(
+        ..., description="Refresh token expiration time in 'YYYY-MM-DD HH:MM:SS' format"
+    )

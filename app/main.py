@@ -1,12 +1,10 @@
-from app.utils.app_error import AppError
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.configs import configs
-
-# NOTE: Do not call any router that uses the accounting API in this file
 from app.routers.user import user
+from app.utils.app_error import AppError
 
 origins = configs.get("cor_origins", ["*"])
 app = FastAPI()

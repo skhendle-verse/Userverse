@@ -3,12 +3,18 @@
     "database": {
         "host": "localhost",
         "port": 5432,
-        "username": "user",
-        "password": "password",
-        "name": "sample_db",
+        "username": "sandile",
+        "password": "Password123",
+        "name": "userverse",
         "type": "postgresql"
     },
     "cor_origins": [
         "*"
-    ]
+    ],
+    "jwt": {
+        "SECRET": "your_jwt_secret",
+        "ALGORITHM": "HS256",
+        "TIMEOUT": 30,
+        "REFRESH_TIMEOUT": 60
+    }
 }

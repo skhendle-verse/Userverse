@@ -1,20 +1,27 @@
 from fastapi import status
 
 # utils
+from app.security.jwt import JWTManager
 from app.utils.app_error import AppError
 
 # repository
 from app.logic.user.repository.user import UserRepository
 
 # models
-from app.models.user.user import UserCreate, UserUpdate, UserRead, UserLogin
+from app.models.user.user import (
+    UserCreate,
+    UserUpdate,
+    UserRead,
+    UserLogin,
+    TokenResponseModel,
+)
 from app.models.user.messages import UserResponseMessages
 
 
 class UserService:
 
     @staticmethod
-    def user_login(user_credentials: UserLogin) -> UserRead:
+    def user_login(user_credentials: UserLogin) -> TokenResponseModel:
         user_repository = UserRepository()
         user = user_repository.get_user_by_email(
             user_credentials.email, user_credentials.password
@@ -24,7 +31,7 @@ class UserService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 message=UserResponseMessages.INVALID_CREDENTIALS.value,
             )
-        return user
+        return JWTManager().sign_jwt(user)
 
     @staticmethod
     def get_user(user_id: int = None, user_email: str = None) -> UserRead:

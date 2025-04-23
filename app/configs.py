@@ -11,4 +11,5 @@ configs = {
     "environment": environment,
     "database_url": DatabaseConfig.get_connection_string(data, environment),
     "cor_origins": data.get("cors_origins", ["*"]),
+    "jwt": data.get("jwt", {}),
 }

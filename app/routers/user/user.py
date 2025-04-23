@@ -4,11 +4,19 @@ from fastapi.responses import JSONResponse
 
 from app.configs import configs
 from app.models.app_error import AppErrorModel
-from app.models.user.user import UserLogin, UserCreate, UserRead, UserUpdate
+from app.models.user.user import (
+    TokenResponseModel,
+    UserLogin,
+    UserCreate,
+    UserRead,
+    UserUpdate,
+)
+from app.models.user.messages import UserResponseMessages
 
 from app.security.basic_auth import get_basic_auth_credentials
+from app.security.jwt import get_current_user_from_jwt_token
 from app.utils.app_error import AppError
-from app.models.user.messages import UserResponseMessages
+
 
 # logic
 from app.logic.user.user import UserService
@@ -66,13 +74,13 @@ def create_user_api(
     },
 )
 def get_user_api(
-    jwt_token: UserLogin = Depends(get_basic_auth_credentials),
+    user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
     """
     Get user details.
     """
     try:
-        response = UserService().get_user(user_email=jwt_token.email)
+        response = UserService().get_user(user_email=user.email)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content={
@@ -93,7 +101,7 @@ def get_user_api(
     "/user/login",
     tags=[tag],
     responses={
-        202: {"model": UserRead},
+        202: {"model": TokenResponseModel},
         400: {"model": AppErrorModel},
         500: {"model": AppErrorModel},
     },
@@ -133,17 +141,17 @@ def login_user_api(
     },
 )
 def update_user_api(
-    user: UserUpdate,
-    jwt_token: UserLogin = Depends(get_basic_auth_credentials),
+    user_updates: UserUpdate,
+    user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
     """
     Update user details.
     """
     try:
-        user_db = UserService().get_user(user_email=jwt_token.email)
+        user_db = UserService().get_user(user_email=user.email)
         response = UserService().update_user(
             user_id=user_db.id,
-            user_data=user,
+            user_data=user_updates,
         )
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,

@@ -41,8 +41,6 @@ class UserRepository:
                     message=UserResponseMessages.USER_NOT_FOUND.value,
                 )
 
-            print(f"Password: {password}")
-            print(f"User Password: {user.password}")
             if password and user.password != password:
                 raise AppError(
                     status_code=status.HTTP_401_UNAUTHORIZED,
