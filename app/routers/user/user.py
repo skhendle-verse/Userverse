@@ -31,6 +31,9 @@ def create_user_api(
     user: UserCreate,
     credentials: UserLogin = Depends(get_basic_auth_credentials),
 ):
+    """
+    Create a new user.
+    """
     try:
         response = UserService().create_user(
             user_credentials=credentials,
@@ -65,6 +68,9 @@ def create_user_api(
 def get_user_api(
     jwt_token: UserLogin = Depends(get_basic_auth_credentials),
 ):
+    """
+    Get user details.
+    """
     try:
         response = UserService().get_user(user_email=jwt_token.email)
         return JSONResponse(
@@ -95,12 +101,15 @@ def get_user_api(
 def login_user_api(
     credentials: UserLogin = Depends(get_basic_auth_credentials),
 ):
+    """
+    User login.
+    """
     try:
         response = UserService().user_login(user_credentials=credentials)
         return JSONResponse(
             status_code=status.HTTP_202_ACCEPTED,
             content={
-                "message": UserResponseMessages.USER_LOGIN_SUCCESS.value,
+                "message": UserResponseMessages.USER_LOGGED_IN.value,
                 "data": response.model_dump(),
             },
         )
@@ -127,9 +136,13 @@ def update_user_api(
     user: UserUpdate,
     jwt_token: UserLogin = Depends(get_basic_auth_credentials),
 ):
+    """
+    Update user details.
+    """
     try:
+        user_db = UserService().get_user(user_email=jwt_token.email)
         response = UserService().update_user(
-            user_id=jwt_token.id,
+            user_id=user_db.id,
             user_data=user,
         )
         return JSONResponse(

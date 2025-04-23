@@ -6,6 +6,8 @@ class UserResponseMessages(str, Enum):
     USER_CREATION_FAILED = "User creation failed"
     USER_ALREADY_EXISTS = "User already exists"
 
+    
+
     USER_NOT_FOUND = "User not found"
     USER_FOUND = "User found"
     USER_UPDATED = "User updated successfully"

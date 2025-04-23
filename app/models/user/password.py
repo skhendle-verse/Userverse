@@ -1,7 +1,7 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr, validator
+from pydantic import BaseModel, EmailStr, field_validator
 
-from app.utils.hash_password import pwd_context
+from app.utils.hash_password import hash_password
 
 
 class PasswordResetRequest(BaseModel):
@@ -17,6 +17,6 @@ class PasswordResetConfirm(BaseModel):
     token: str  # from OTP validation step
     new_password: str
 
-    @validator("new_password", pre=True)
+    @field_validator("password")
     def hash_password(cls, v: str) -> str:
-        return pwd_context.hash(v)
+        return hash_password(v)

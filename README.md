@@ -1,23 +1,28 @@
 # Userverse
-Userverse is an open-source platform designed to make managing users, organizations, and their relationships simple and efficient. It’s built for developers, communities, and organizations who want a free, flexible, and secure way to handle user and organization management without relying on closed or proprietary systems.
 
+Userverse is an open-source platform designed to make managing users, organizations, and their relationships simple and efficient. It’s built for developers, communities, and organizations who want a free, flexible, and secure way to handle user and organization management without relying on closed or proprietary systems.
 
 ## Directory Overview
 
 ```bash
-|── alembic
+├── alembic
+│   └── versions
 ├── app
 │   ├── database
 │   ├── logic
-│   │   ├── repositories
-│   │   └── services
+│   │   └── user
+│   │       └── repository
 │   ├── middleware
 │   ├── models
+│   │   └── user
 │   ├── routers
+│   │   └── user
 │   ├── security
 │   └── utils
 ├── docs
 │   └── images
+├── scripts
+│   └── versions
 └── tests
 ```
 

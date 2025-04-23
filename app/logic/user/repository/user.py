@@ -8,7 +8,7 @@ from app.database import DatabaseSessionManager
 from app.database.user import User
 
 # models
-from app.models.user.user import UserCreate, UserUpdate, UserRead, UserLogin
+from app.models.user.user import UserRead
 from app.models.user.messages import UserResponseMessages
 
 
@@ -41,6 +41,8 @@ class UserRepository:
                     message=UserResponseMessages.USER_NOT_FOUND.value,
                 )
 
+            print(f"Password: {password}")
+            print(f"User Password: {user.password}")
             if password and user.password != password:
                 raise AppError(
                     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -88,4 +90,4 @@ class UserRepository:
             )
 
     def delete_user(self, user_id):
-        return self.user_repository.delete_user(user_id)
+        pass
