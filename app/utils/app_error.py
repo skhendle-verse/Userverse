@@ -18,12 +18,12 @@ class AppError(HTTPException):
         message: Optional[str] = "Request failed, please try again.",
         error: Optional[str] = None,
         log_error: bool = True,
-        depth: int = 2,
+        depth: int = 3,
     ):
         # Capture the caller's details
         caller_details = self.get_caller_details(depth)
         # Prepare the error detail
-        detail = {
+        details = {
             "message": message,
             "error": error or f"An error occurred, {caller_details}",
         }
@@ -35,7 +35,7 @@ class AppError(HTTPException):
             )
             # self.log_exception()
 
-        super().__init__(status_code, detail=detail)
+        super().__init__(status_code, detail=details)
 
     @staticmethod
     def get_caller_details(depth):

@@ -7,5 +7,8 @@
         "password": "password",
         "name": "sample_db",
         "type": "postgresql"
-    }
+    },
+    "cor_origins": [
+        "*"
+    ]
 }

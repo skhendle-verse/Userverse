@@ -1,7 +1,8 @@
 from fastapi import Depends, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from app.utils.app_error import AppError
-from app.models.user import UserLogin
+from app.models.user.user import UserLogin
+
 security = HTTPBasic()
 
 
