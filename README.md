@@ -30,8 +30,8 @@ Userverse is an open-source platform designed to make managing users, organizati
     - Initialization and session management for the database (e.g. engine setup, session factory).
 
 ### logic
-    - repositories: Data-access layer abstracting CRUD operations and queries.
     - services: Business logic and use-case implementations (e.g. user registration, OTP flows).
+    - repositories: Data-access layer abstracting CRUD operations and queries.
 
 ### middleware
     - Custom FastAPI/Starlette middleware (CORS, logging, error handling).
