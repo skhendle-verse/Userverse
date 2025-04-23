@@ -5,6 +5,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from typing import Any, Dict, List, Optional, Union
 import logging
 
+from sqlalchemy.ext.mutable import MutableDict
+
+
 from . import Base  # Ensure this points to your declarative base
 
 # Configure logging
@@ -26,8 +29,9 @@ class BaseModel(Base):
     _created_at = Column(DateTime(), nullable=False, server_default=func.now())
     _updated_at = Column(DateTime(), nullable=True, onupdate=func.now())
     _closed_at = Column(DateTime(), nullable=True)
-    primary_meta_data = Column(JSON, default={})
-    secondary_meta_data = Column(JSON, default={})
+    # ✅ Use MutableDict here:
+    primary_meta_data = Column(MutableDict.as_mutable(JSON), default=dict)
+    secondary_meta_data = Column(MutableDict.as_mutable(JSON), default=dict)
 
     @staticmethod
     def to_dict(obj: Any) -> Dict[str, Any]:
@@ -137,18 +141,24 @@ class BaseModel(Base):
         key: str,
         value: Union[str, int, list, dict],
     ) -> Dict[str, Any]:
-        """
-        Updates a specific key in a JSON field of a model record.
-        """
         try:
             record = session.query(cls).filter_by(id=record_id).one()
-            json_field = getattr(record, column_name, {})
+
+            # Check if the column exists
+            if not hasattr(record, column_name):
+                raise ValueError(f"Column {column_name} does not exist on the model.")
+
+            json_field = getattr(record, column_name)
+
+            # MutableDict takes care of tracking, no need to reassign:
+            if json_field is None:
+                json_field = {}
+                setattr(record, column_name, json_field)
 
             if not isinstance(json_field, dict):
                 raise ValueError(f"Column {column_name} is not a JSON field.")
 
-            json_field[key] = value
-            setattr(record, column_name, json_field)
+            json_field[key] = value  # Automatic change tracking by MutableDict
             session.commit()
             logger.info(
                 f"Updated JSON field '{column_name}' for {cls.__name__} with id={record_id}"

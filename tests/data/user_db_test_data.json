@@ -1,0 +1,50 @@
+{
+    "create_user": {
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "john.doe@example.com",
+        "phone_number": "1234567890",
+        "password": "securepassword"
+    },
+    "get_user_by_id": {
+        "email": "jane@example.com",
+        "password": "pass"
+    },
+    "get_user_by_email": {
+        "email": "agent@example.com",
+        "password": "agentpass"
+    },
+    "update_user": {
+        "email": "updatable@example.com",
+        "password": "1234",
+        "update_fields": {
+            "first_name": "Updated"
+        }
+    },
+    "delete_user": {
+        "email": "delete@example.com",
+        "password": "deletepass"
+    },
+    "json_field_update": {
+        "email": "jsonfield@example.com",
+        "password": "jsonpass",
+        "json_update": {
+            "column": "primary_meta_data",
+            "key": "role",
+            "value": "admin"
+        }
+    },
+    "invalid_json_field": {
+        "email": "invalidjson@example.com",
+        "password": "jsonpass",
+        "json_update": {
+            "column": "non_existent_column",
+            "key": "key",
+            "value": "value"
+        }
+    },
+    "not_found_tests": {
+        "nonexistent_id": 999,
+        "nonexistent_email": "nonexistent@example.com"
+    }
+}
