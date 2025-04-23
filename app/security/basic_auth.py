@@ -1,28 +1,17 @@
-from fastapi import Depends, status, Security, Header
-from fastapi.security import HTTPBasic, HTTPBasicCredentials, APIKeyHeader
-from email_validator import validate_email, EmailNotValidError
-from app.configs import get_configs
-from app.exceptions import AppError
-from app.features.agent_auth_service.model import AgentLoginModel
-import jwt
-from typing import Optional
-
-from datetime import datetime
-
+from fastapi import Depends, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from app.utils.app_error import AppError
+from app.models.user import UserLogin
 security = HTTPBasic()
-configs = get_configs()
 
 
-def validate_email_format(email: str):
-    try:
-        valid = validate_email(email)
-        return valid.email
-    except EmailNotValidError as e:
-        raise AppError(status_code=400, message="Invalid Email Format", error=str(e))
-
-
-def authenticate_user(credentials: HTTPBasicCredentials = Depends(security)):
-    email = validate_email_format(credentials.username)
+def get_basic_auth_credentials(credentials: HTTPBasicCredentials = Depends(security)):
+    email = credentials.username
+    if not email:
+        raise AppError("Invalid credentials", status_code=status.HTTP_401_UNAUTHORIZED)
     password = credentials.password
-    inputs = AgentLoginModel(email=email, password=password)
+    if not password:
+        raise AppError("Invalid credentials", status_code=status.HTTP_401_UNAUTHORIZED)
+
+    inputs = UserLogin(email=credentials.username, password=password)
     return inputs

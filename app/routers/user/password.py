@@ -1,54 +1,62 @@
 import traceback
 from fastapi import APIRouter, Depends, status
 from app.configs import configs
-from app.database import DatabaseSessionManager
+from app.models.user.user import UserLogin
+from app.models.user.password import PasswordResetRequest, OTPValidationRequest, PasswordResetConfirm
+
+from app.security.basic_auth import get_basic_auth_credentials
 from app.utils.app_error import AppError
-
+from app.models.user.errors import UserErrorMessages
 router = APIRouter()
-tag = "Reset Password"
+tag = "User Password Management"
 
 
-# b TODO: add the correct import for the CompanySecurityModel
-@router.get("/company", tags=[tag])
-def get_company_api(
-    company: CompanySecurityModel = Depends(authenticate_company),
-    user: dict = Depends(get_current_user),
+# This should trigger the sending of an email
+@router.patch("/user/password-reset-request", tags=[tag], response_model=str)
+def password_reset_request_api(
+    user: PasswordResetRequest,
 ):
     try:
         pass
     except Exception as e:
+        traceback.print_exc()
         raise AppError(
             status_code=status.HTTP_400_BAD_REQUEST,
-            message=invalid_request_message,
+            message=UserErrorMessages.PASSWORD_RESET_FAILED.value,
             error=str(e),
         )
 
-
-@router.patch("/company", tags=[tag])
-def update_company_api(
-    company: CompanySecurityModel = Depends(authenticate_company),
-    user: dict = Depends(get_current_user),
+# This should validate the OTP sent to the email, 
+# and return a token for the next step
+@router.patch("/user/password-reset-validate-otp", tags=[tag], response_model=str)
+def password_reset_validate_otp_api(
+    user: OTPValidationRequest,
 ):
     try:
         pass
     except Exception as e:
+        traceback.print_exc()
         raise AppError(
             status_code=status.HTTP_400_BAD_REQUEST,
-            message=invalid_request_message,
+            message=UserErrorMessages.EMAIL_VERIFICATION_FAILED.value,
             error=str(e),
         )
 
-
-@router.delete("/company", tags=[tag])
-def delete_company_api(
-    company: CompanySecurityModel = Depends(authenticate_company),
-    user: dict = Depends(get_current_user),
+# This should update the password, username is the token from the previous step  
+@router.patch("/user/password-reset-confirm", tags=[tag], response_model=str)
+def password_reset_confirm_api(
+    credentials: UserLogin = Depends(get_basic_auth_credentials),
 ):
     try:
+        update_password =  PasswordResetConfirm(
+            token=credentials.username,
+            new_password=credentials.password
+        )
         pass
     except Exception as e:
+        traceback.print_exc()
         raise AppError(
             status_code=status.HTTP_400_BAD_REQUEST,
-            message=invalid_request_message,
+            message=UserErrorMessages.PASSWORD_RESET_FAILED.value,
             error=str(e),
         )
