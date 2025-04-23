@@ -9,6 +9,7 @@ dependencies = [
     "black>=25.1.0",
     "fastapi[standard]>=0.115.12",
     "mkdocs>=1.6.1",
+    "passlib>=1.7.4",
     "psycopg2>=2.9.10",
     "pydantic>=2.11.3",
     "sqlalchemy>=2.0.40",
