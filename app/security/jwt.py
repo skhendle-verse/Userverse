@@ -1,128 +1,114 @@
-# The goal of this file is to check whether the reques tis authorized or not [ verification of the proteced route]
-from fastapi import Security, Header, Request, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, APIKeyHeader
-from app.configs import get_configs
-from app.configs import get_configs
-from app.utils.app_error import AppError
+from datetime import datetime, timedelta, timezone
+import traceback
+from app.configs import configs
+from fastapi import HTTPException, status
 import jwt
-from typing import Optional
-
-from datetime import datetime
+from typing import Dict, Any
 
 
-configs = get_configs()
-JWT_SECRET = configs.get("SECRET")
-JWT_ALGORITHM = configs.get("ALGORITHM")
+class JWTManager:
+    def __init__(self):
+        self.JWT_SECRET = configs.get("SECRET", "secret1234")
+        self.JWT_ALGORITHM = configs.get("ALGORITHM", "HS256")
+        self.SESSION_TIMEOUT = int(configs.get("SESSION_TIMEOUT", 15))  # in minutes
+        self.REFRESH_TIMEOUT = int(
+            configs.get("REFRESH_SESSION_TIMEOUT", 60)
+        )  # 7 days default
 
+    def signJWT(self, user: dict) -> Dict[str, str]:
+        now = datetime.now(timezone.utc)
+        access_expire = now + timedelta(minutes=self.SESSION_TIMEOUT)
+        refresh_expire = now + timedelta(minutes=self.REFRESH_TIMEOUT)
 
-def decodeJWT(token: str, verify_options: bool = True) -> dict:
-    try:
-        decoded_token = jwt.decode(
-            token,
-            JWT_SECRET,
-            algorithms=[JWT_ALGORITHM],
-            # verify=verify_options,
-            options={"verify_signature": verify_options},
+        access_payload = {
+            "user": user,
+            "type": "access",
+            "exp": access_expire,
+        }
+
+        refresh_payload = {
+            "user": user,
+            "type": "refresh",
+            "exp": refresh_expire,
+        }
+
+        access_token = jwt.encode(
+            payload=access_payload,
+            key=self.JWT_SECRET,
+            algorithm=self.JWT_ALGORITHM,
         )
-        expire = datetime.strptime(decoded_token["expires"], "%Y-%m-%d %H:%M:%S")
-
-        if verify_options:
-            if datetime.utcnow() >= expire:
-                raise jwt.ExpiredSignatureError
-
-        return decoded_token
-    except jwt.ExpiredSignatureError as e:
-        pass
-        # raise AppError(
-        #     status_code=status.HTTP_410_GONE,
-        #     message="Token has expired.",
-        #     error=str(e),
-        # )
-    except jwt.InvalidTokenError as e:
-        raise AppError(
-            status_code=status.HTTP_410_GONE,
-            message="Invalid token.",
-            error=str(e),
-        )
-    except Exception as e:
-        raise AppError(
-            status_code=status.HTTP_410_GONE,
-            message="Token Validation Error, Please Try Again",
-            error=str(e),
+        refresh_token = jwt.encode(
+            payload=refresh_payload,
+            key=self.JWT_SECRET,
+            algorithm=self.JWT_ALGORITHM,
         )
 
+        return {
+            "access_token": access_token,
+            "access_token_expiration": access_expire.strftime("%Y-%m-%d %H:%M:%S"),
+            "refresh_token": refresh_token,
+            "refresh_token_expiration": refresh_expire.strftime("%Y-%m-%d %H:%M:%S"),
+        }
 
-async def get_current_user(
-    auth: str = Security(APIKeyHeader(name="Authorization")),
-) -> dict:
-
-    if auth is None:
-        raise AppError(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            message="Invalid Request",
-            error="Missing Authorization Headers, {'Authorization': 'Bearer TOKEN'}",
-        )
-
-    try:
-        auth_type, TOKEN = auth.split(" ")
-        if auth_type != "Bearer":
-            raise AppError(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                message="Invalid Request",
-                error="Missing Authorization TYPE, {'Authorization': 'Bearer TOKEN'}",
+    def decode_token(self, token: str) -> Dict[str, Any]:
+        try:
+            decoded = jwt.decode(
+                token, self.JWT_SECRET, algorithms=[self.JWT_ALGORITHM]
             )
-    except Exception as e:
-        raise AppError(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            message="Invalid Request",
-            error=str(e),
-        )
+            return decoded
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
+            )
+        except jwt.InvalidTokenError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+            )
+        except Exception:
+            traceback.print_exc()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error decoding token",
+            )
 
-    current_user = decodeJWT(token=TOKEN).get("user", {})
-
-    return current_user
-
-
-# define the APIKeyHeader dependency
-async def api_key_dependency(expired_token: Optional[str] = Header(None)):
-    current_user = decodeJWT(
-        token=expired_token,
-        verify_options=False,
-    ).get("user", {})
-
-    return current_user
-
-
-class JWTBearer(HTTPBearer):
-    def __init__(self, auto_error: bool = False):
-        super(JWTBearer, self).__init__(auto_error=auto_error)
-
-    async def __call__(self, request: Request):
-        credentials: HTTPAuthorizationCredentials = await super(
-            JWTBearer, self
-        ).__call__(request)
-        if credentials:
-            if not credentials.scheme == "Bearer":
-                raise AppError(
+    def refresh_token(self, refresh_token: str) -> Dict[str, str]:
+        try:
+            decoded = self.decode_token(refresh_token)
+            if decoded.get("type") != "refresh":
+                raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    message="Invalid Authentication Scheme.",
+                    detail="Invalid token type for refresh",
                 )
-            if not self.verify_jwt(credentials.credentials):
-                raise AppError(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    message="Invalid Auth Token.",
+
+            user = decoded.get("user")
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="User data missing in token",
                 )
-            return credentials.credentials
-        else:
-            raise AppError(
-                status_code=status.HTTP_401_UNAUTHORIZED, message="Invalid Auth Token."
+
+            return self.signJWT(user)
+
+        except Exception as e:
+            traceback.print_exc()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
             )
 
-    def verify_jwt(self, jwtoken: str) -> bool:
-        isTokenValid: bool = False
+        except Exception as e:
+            traceback.print_exc()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            )
 
-        payload = decodeJWT(jwtoken)
 
-        if payload:
-            isTokenValid = True
-        return isTokenValid
+if __name__ == "__main__":
+    # Example usage:
+    tokens = JWTManager().signJWT({"id": 123, "email": "agent@example.com"})
+    print("Generated Tokens:", tokens)
+
+    # Later, to refresh:
+    new_tokens = JWTManager().refresh_token(tokens["refresh_token"])
+    print("Refreshed Tokens:", new_tokens)
+
+    # uv run -m app.security.jwt

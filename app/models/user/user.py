@@ -4,7 +4,9 @@ from pydantic import BaseModel, EmailStr, field_validator
 from app.utils.hash_password import hash_password
 
 
-PHONE_NUMBER_REGEX = re.compile(r"^\+?\d{10,15}$")  # Allows optional "+" and 10-15 digits
+PHONE_NUMBER_REGEX = re.compile(
+    r"^\+?\d{10,15}$"
+)  # Allows optional "+" and 10-15 digits
 
 
 class UserLogin(BaseModel):
@@ -29,7 +31,9 @@ class UserUpdate(BaseModel):
     @field_validator("phone_number")
     def validate_phone_number(cls, v: Optional[str]) -> Optional[str]:
         if v and not PHONE_NUMBER_REGEX.match(v):
-            raise ValueError("Invalid phone number format. Must be 10-15 digits, optional leading '+'.")
+            raise ValueError(
+                "Invalid phone number format. Must be 10-15 digits, optional leading '+'."
+            )
         return v
 
 
@@ -41,7 +45,9 @@ class UserCreate(BaseModel):
     @field_validator("phone_number")
     def validate_phone_number(cls, v: Optional[str]) -> Optional[str]:
         if v and not PHONE_NUMBER_REGEX.match(v):
-            raise ValueError("Invalid phone number format. Must be 10-15 digits, optional leading '+'.")
+            raise ValueError(
+                "Invalid phone number format. Must be 10-15 digits, optional leading '+'."
+            )
         return v
 
 

@@ -1,8 +1,7 @@
-from sqlalchemy import Column, JSON, String, Integer, DateTime
+from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import relationship, backref, Session
 from sqlalchemy.exc import NoResultFound
 from .base_model import BaseModel
-import datetime
 
 
 class User(BaseModel):
