@@ -6,7 +6,7 @@ from fastapi.security import APIKeyHeader
 
 # app imports
 from app.configs import configs
-from app.models.security import SecurityResponseMessage
+from app.models.security_messages import SecurityResponseMessages
 from app.models.user.user import TokenResponseModel, UserRead
 from app.utils.app_error import AppError
 
@@ -63,30 +63,30 @@ class JWTManager:
             if not user:
                 raise AppError(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    message=SecurityResponseMessage.MISSING_USER_DATA.value,
+                    message=SecurityResponseMessages.MISSING_USER_DATA.value,
                 )
             if decoded.get("type") != "access":
                 raise AppError(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    message=SecurityResponseMessage.INVALID_TOKEN.value
+                    message=SecurityResponseMessages.INVALID_TOKEN.value
                     + " for access token",
                 )
             return UserRead(**user)
         except jwt.ExpiredSignatureError:
             raise AppError(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                message=SecurityResponseMessage.EXPIRED_TOKEN.value,
+                message=SecurityResponseMessages.EXPIRED_TOKEN.value,
             )
         except jwt.InvalidTokenError:
             raise AppError(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                message=SecurityResponseMessage.INVALID_TOKEN.value,
+                message=SecurityResponseMessages.INVALID_TOKEN.value,
             )
         except Exception:
             traceback.print_exc()
             raise AppError(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                message=SecurityResponseMessage.ERROR_DECODING.value,
+                message=SecurityResponseMessages.ERROR_DECODING.value,
             )
 
     def refresh_token(self, refresh_token: str) -> TokenResponseModel:
@@ -95,7 +95,7 @@ class JWTManager:
             if decoded.get("type") != "refresh":
                 raise AppError(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    message=SecurityResponseMessage.INVALID_TOKEN.value
+                    message=SecurityResponseMessages.INVALID_TOKEN.value
                     + " for refresh token",
                 )
 
@@ -103,7 +103,7 @@ class JWTManager:
             if not user:
                 raise AppError(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    message=SecurityResponseMessage.MISSING_USER_DATA.value,
+                    message=SecurityResponseMessages.MISSING_USER_DATA.value,
                 )
 
             return self.signJWT(user)
@@ -123,8 +123,8 @@ async def get_current_user_from_jwt_token(
     if authorization is None:
         raise AppError(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            message=SecurityResponseMessage.INVALID_REQUEST.value,
-            error=SecurityResponseMessage.MISSING_AUTHORIZATION_HEADER.value,
+            message=SecurityResponseMessages.INVALID_REQUEST.value,
+            error=SecurityResponseMessages.MISSING_AUTHORIZATION_HEADER.value,
         )
 
     try:
@@ -132,13 +132,13 @@ async def get_current_user_from_jwt_token(
         if auth_type.strip().lower() != "bearer":
             raise AppError(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                message=SecurityResponseMessage.INVALID_REQUEST.value,
-                error=SecurityResponseMessage.MISSING_AUTHORIZATION_HEADER.value,
+                message=SecurityResponseMessages.INVALID_REQUEST.value,
+                error=SecurityResponseMessages.MISSING_AUTHORIZATION_HEADER.value,
             )
     except Exception as e:
         raise AppError(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            message=SecurityResponseMessage.INVALID_REQUEST.value,
+            message=SecurityResponseMessages.INVALID_REQUEST.value,
             error=str(e),
         )
 
