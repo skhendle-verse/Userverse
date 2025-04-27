@@ -33,7 +33,7 @@ def test_get_user_by_email(test_session):
     user_data = TEST_DATA["get_user_by_email"]
     created_user = User.create(test_session, **user_data)
     result = User.get_user_by_email(test_session, user_data["email"])
-    assert result.email == user_data["email"]
+    assert result.email == created_user["email"]
 
 def test_update_user(test_session):
     user_data = TEST_DATA["update_user"]

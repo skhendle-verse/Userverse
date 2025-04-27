@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 # Models
 from app.models.app_error import AppErrorModel
+from app.models.generic_response import GenericResponseModel
 from app.models.user.user import (
     TokenResponseModel,
     UserLogin,
@@ -30,6 +31,7 @@ tag = "User Management"
 @router.patch(
     "/user/login",
     tags=[tag],
+    status_code=status.HTTP_202_ACCEPTED,
     responses={
         202: {"model": TokenResponseModel},
         400: {"model": AppErrorModel},
@@ -63,9 +65,9 @@ def user_login_api(
 @router.post(
     "/user",
     tags=[tag],
-    response_model=UserRead,
+    status_code=status.HTTP_201_CREATED,
     responses={
-        201: {"model": UserRead},
+        201: {"model": GenericResponseModel[UserRead]},
         400: {"model": AppErrorModel},
         500: {"model": AppErrorModel},
     },
@@ -102,8 +104,9 @@ def create_user_api(
 @router.get(
     "/user",
     tags=[tag],
+    status_code=status.HTTP_200_OK,
     responses={
-        200: {"model": UserRead},
+        200: {"model": GenericResponseModel[UserRead]},
         400: {"model": AppErrorModel},
         500: {"model": AppErrorModel},
     },
@@ -136,8 +139,9 @@ def get_user_api(
     "/user",
     tags=[tag],
     response_model=UserRead,
+    status_code=status.HTTP_201_CREATED,
     responses={
-        202: {"model": UserRead},
+        201: {"model": GenericResponseModel[UserRead]},
         400: {"model": AppErrorModel},
         500: {"model": AppErrorModel},
     },
