@@ -78,32 +78,30 @@ def test_create_user_two_success_and_unique_key_fail():
     )
     assert response.status_code in [400, 422]
     json_data = response.json()
-    print(f"Duplicate user creation response: {json_data.keys()}")
     assert "message" in json_data or "detail" in json_data
     assert json_data["message"] == UserResponseMessages.USER_CREATION_FAILED.value
 
 
 def test_create_user_missing_name_should_fail():
     """Test user creation failure when first_name is missing"""
-    user = TEST_DATA["missing_name"]
-    headers = get_basic_auth_header(username="user.one@email.com", password="secureONE")
+    data = TEST_DATA["missing_name"]
+    user = TEST_DATA["user_two"]
+    headers = get_basic_auth_header(username=user["email"], password=user["password"])
 
-    response = client.post("/user", json=user, headers=headers)
+    response = client.post("/user", json=data, headers=headers)
     assert response.status_code in [400, 422]
 
     json_data = response.json()
-    print(f"Missing name response: {json_data}")
     assert "message" in json_data or "detail" in json_data
 
 
 def test_create_user_invalid_phone_should_fail():
     """Test user creation failure when phone number is invalid"""
-    user = TEST_DATA["invalid_phone"]
-    headers = get_basic_auth_header(username="user.one@email.com", password="secureONE")
-
-    response = client.post("/user", json=user, headers=headers)
+    data = TEST_DATA["invalid_phone"]
+    user = TEST_DATA["user_two"]
+    headers = get_basic_auth_header(username=user["email"], password=user["password"])
+    response = client.post("/user", json=data, headers=headers)
     assert response.status_code in [400, 422]
 
     json_data = response.json()
-    print(f"Invalid phone response: {json_data}")
     assert "message" in json_data or "detail" in json_data
