@@ -1,0 +1,26 @@
+{
+    "user_one": {
+        "email": "user.one@email.com",
+        "password": "secureONE"
+    },
+    "user_two": {
+        "email": "user.two@email.com",
+        "password": "secureTwo"
+    },
+    "valid_user": {
+        "first_name": "John",
+        "last_name": "Doe",
+        "phone_number": "1234567890"
+    },
+    "missing_email": {
+        "first_name": "John",
+        "last_name": "Doe",
+        "phone_number": "1234567890"
+    },
+    "invalid_email": {
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "invalid-email",
+        "phone_number": "1234567890"
+    }
+}
