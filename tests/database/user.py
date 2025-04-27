@@ -6,7 +6,7 @@ from app.database.user import User
 from app.database.base_model import RecordNotFoundError
 
 # Load the test data from JSON file
-with open("tests/data/user_db_test_data.json") as f:
+with open("tests/data/database/user_db_test_data.json") as f:
     TEST_DATA = json.load(f)
 
 @pytest.fixture(scope="function")
