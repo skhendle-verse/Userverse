@@ -1,3 +1,8 @@
+
+[![Build Status](https://github.com/skhendle-verse/Userverse/actions/workflows/testing-build.yml/badge.svg)](https://github.com/skhendle-verse/Userverse/actions/workflows/testing-build.yml)
+[![codecov](https://codecov.io/gh/skhendle-verse/Userverse/branch/main/graph/badge.svg)](https://codecov.io/gh/skhendle-verse/Userverse)
+
+
 # Userverse
 
 Userverse is an open-source platform designed to make managing users, organizations, and their relationships simple and efficient. It’s built for developers, communities, and organizations who want a free, flexible, and secure way to handle user and organization management without relying on closed or proprietary systems.
