@@ -1,4 +1,4 @@
-from tests.http.client import client
+from tests.http.conftest import client
 
 def test_read_main():
     response = client.get("/")

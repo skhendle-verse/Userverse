@@ -1,16 +1,11 @@
-import json
 from app.models.user.messages import UserResponseMessages
-from tests.http.client import client
+from tests.http.conftest import client
 from tests.utils.basic_auth import get_basic_auth_header
 
-# Load the test data from JSON file
-with open("tests/data/http/user.json") as f:
-    TEST_DATA = json.load(f)
 
-
-def test_user_login_success():
+def test_user_login_success(test_data):
     """Test user login with valid credentials"""
-    user_one = TEST_DATA["user_one"]
+    user_one = test_data["user_one"]
     response = client.patch(
         "/user/login",
         headers=get_basic_auth_header(
@@ -33,9 +28,9 @@ def test_user_login_success():
     assert "token_type" in token_data
     assert token_data["token_type"] == "bearer"
 
-def test_user_login_invalid_credentials():
+def test_user_login_invalid_credentials(test_data):
     """Test user login with invalid credentials"""
-    user_one = TEST_DATA["user_one"]
+    user_one = test_data["user_one"]
     payload = {
         "email": user_one["email"],
         "password": "wrong_password",

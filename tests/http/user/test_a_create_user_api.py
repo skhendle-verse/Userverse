@@ -1,16 +1,12 @@
-import json
 from app.models.user.messages import UserResponseMessages
-from tests.http.client import client
+from tests.http.conftest import client
 from tests.utils.basic_auth import get_basic_auth_header
 
-# Load the test data from JSON file
-with open("tests/data/http/user.json") as f:
-    TEST_DATA = json.load(f)
 
 
-def test_create_user_one_success():
+def test_create_user_one_success(test_data):
     """Test user creation with valid payload (user one)"""
-    use_one = TEST_DATA["user_one"]
+    use_one = test_data["user_one"]
     payload = {
         "first_name": use_one["first_name"],
         "last_name": use_one["last_name"],
@@ -38,9 +34,9 @@ def test_create_user_one_success():
     assert user_data["last_name"] == use_one["last_name"]
 
 
-def test_create_user_two_success_and_unique_key_fail():
+def test_create_user_two_success_and_unique_key_fail(test_data):
     """Test user creation with valid payload (user two), and then attempt to create the same user again"""
-    use_two = TEST_DATA["user_two"]
+    use_two = test_data["user_two"]
     payload = {
         "first_name": use_two["first_name"],
         "last_name": use_two["last_name"],
@@ -82,10 +78,10 @@ def test_create_user_two_success_and_unique_key_fail():
     assert json_data["message"] == UserResponseMessages.USER_CREATION_FAILED.value
 
 
-def test_create_user_missing_name_should_fail():
+def test_create_user_missing_name_should_fail(test_data):
     """Test user creation failure when first_name is missing"""
-    data = TEST_DATA["missing_name"]
-    user = TEST_DATA["user_two"]
+    data = test_data["missing_name"]
+    user = test_data["user_two"]
     headers = get_basic_auth_header(username=user["email"], password=user["password"])
 
     response = client.post("/user", json=data, headers=headers)
@@ -95,10 +91,10 @@ def test_create_user_missing_name_should_fail():
     assert "message" in json_data or "detail" in json_data
 
 
-def test_create_user_invalid_phone_should_fail():
+def test_create_user_invalid_phone_should_fail(test_data):
     """Test user creation failure when phone number is invalid"""
-    data = TEST_DATA["invalid_phone"]
-    user = TEST_DATA["user_two"]
+    data = test_data["invalid_phone"]
+    user = test_data["user_two"]
     headers = get_basic_auth_header(username=user["email"], password=user["password"])
     response = client.post("/user", json=data, headers=headers)
     assert response.status_code in [400, 422]
