@@ -15,8 +15,7 @@ jobs:
 
       - name: Install uv (latest release)
         run: |
-          curl -Ls https://github.com/astral-sh/uv/releases/latest/download/uv-x86_64-unknown-linux-gnu.tar.gz | tar xz
-          sudo mv uv /usr/local/bin/uv
+          wget -qO- https://astral.sh/uv/install.sh | sh
           uv --version
 
       - name: Install Python 3.12 with uv and create venv

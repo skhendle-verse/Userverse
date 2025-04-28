@@ -60,9 +60,7 @@ class UserRead(BaseModel):
 
 
 class TokenResponseModel(BaseModel):
-    token_type: Literal["bearer"] = Field(
-        "bearer", description="Type of the token"
-    )
+    token_type: Literal["bearer"] = Field("bearer", description="Type of the token")
     access_token: str = Field(..., description="JWT access token")
     access_token_expiration: str = Field(
         ..., description="Access token expiration time in 'YYYY-MM-DD HH:MM:SS' format"

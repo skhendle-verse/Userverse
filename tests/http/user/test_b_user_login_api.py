@@ -11,7 +11,7 @@ def test_user_login_success(test_data):
         headers=get_basic_auth_header(
             username=user_one["email"],
             password=user_one["password"],
-        )
+        ),
     )
     assert response.status_code in [200, 201, 202]
     json_data = response.json()
@@ -28,6 +28,7 @@ def test_user_login_success(test_data):
     assert "token_type" in token_data
     assert token_data["token_type"] == "bearer"
 
+
 def test_user_login_invalid_credentials(test_data):
     """Test user login with invalid credentials"""
     user_one = test_data["user_one"]
@@ -41,7 +42,7 @@ def test_user_login_invalid_credentials(test_data):
         headers=get_basic_auth_header(
             username=user_one["email"],
             password="wrong_password",
-        )
+        ),
     )
     assert response.status_code in [400, 422]
     json_data = response.json()
@@ -50,5 +51,3 @@ def test_user_login_invalid_credentials(test_data):
     assert "message" in json_data
     assert json_data["message"] == UserResponseMessages.INVALID_CREDENTIALS.value
     assert "error" in json_data
-
-

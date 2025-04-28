@@ -3,7 +3,6 @@ from tests.http.conftest import client
 from tests.utils.basic_auth import get_basic_auth_header
 
 
-
 def test_create_user_one_success(test_data):
     """Test user creation with valid payload (user one)"""
     use_one = test_data["user_one"]
@@ -18,7 +17,7 @@ def test_create_user_one_success(test_data):
         headers=get_basic_auth_header(
             username=use_one["email"],
             password=use_one["password"],
-        )
+        ),
     )
     assert response.status_code in [200, 201]
     json_data = response.json()
@@ -48,7 +47,7 @@ def test_create_user_two_success_and_unique_key_fail(test_data):
         headers=get_basic_auth_header(
             username=use_two["email"],
             password=use_two["password"],
-        )
+        ),
     )
     assert response.status_code in [200, 201]
     json_data = response.json()
@@ -70,7 +69,7 @@ def test_create_user_two_success_and_unique_key_fail(test_data):
         headers=get_basic_auth_header(
             username=use_two["email"],
             password=use_two["password"],
-        )
+        ),
     )
     assert response.status_code in [400, 422]
     json_data = response.json()

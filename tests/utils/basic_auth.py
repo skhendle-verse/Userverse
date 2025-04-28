@@ -1,5 +1,6 @@
 import base64
 
+
 def get_basic_auth_header(username: str, password: str) -> dict:
     """
     Generate the Basic Auth header for HTTP requests.

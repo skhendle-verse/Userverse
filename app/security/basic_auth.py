@@ -12,10 +12,16 @@ def get_basic_auth_credentials(credentials: HTTPBasicCredentials = Depends(secur
     try:
         email = credentials.username
         if not email:
-            raise AppError(SecurityResponseMessages.INVALID_CREDENTIALS_MESSAGE.value, status_code=status.HTTP_401_UNAUTHORIZED)
+            raise AppError(
+                SecurityResponseMessages.INVALID_CREDENTIALS_MESSAGE.value,
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
         password = credentials.password
         if not password:
-            raise AppError(SecurityResponseMessages.INVALID_CREDENTIALS_MESSAGE.value, status_code=status.HTTP_401_UNAUTHORIZED)
+            raise AppError(
+                SecurityResponseMessages.INVALID_CREDENTIALS_MESSAGE.value,
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
 
         inputs = UserLogin(email=credentials.username, password=password)
         return inputs

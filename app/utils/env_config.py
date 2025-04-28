@@ -27,9 +27,8 @@ class EnvironmentManager:
         environment = os.getenv("ENVIRONMENT")
         if environment:
             return environment
-        
+
         if config_data and "environment" in config_data:
             return config_data["environment"]
-
 
         return "development"

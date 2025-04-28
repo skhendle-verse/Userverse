@@ -5,17 +5,17 @@ from app.models.user.messages import UserResponseMessages
 
 
 def test_update_user_success(login_token_user_two, test_data):
-    """ Test updating user information successfully."""
+    """Test updating user information successfully."""
     user_two = test_data["user_two"]
     update_data = test_data["update_user"]
     # Assuming the login_token is valid and corresponds to user_one
     headers = {"Authorization": f"Bearer {login_token_user_two}"}
     updated_first_name = user_two["first_name"] + " " + update_data["first_name"]
     updated_last_name = user_two["last_name"] + " " + update_data["last_name"]
-    payload = { 
+    payload = {
         "first_name": updated_first_name,
         "last_name": updated_last_name,
-        "password": update_data["password"]
+        "password": update_data["password"],
     }
     response = client.patch(
         "/user",
@@ -38,18 +38,18 @@ def test_update_user_success(login_token_user_two, test_data):
 
 
 def test_update_user_fail_with_invalid_token(test_data):
-    """ Test updating user information with an invalid token."""
+    """Test updating user information with an invalid token."""
     user_two = test_data["user_two"]
     update_data = test_data["update_user"]
     # Assuming the login_token is valid and corresponds to user_one
     headers = {"Authorization": "Bearer invalid_token"}
     updated_first_name = user_two["first_name"] + " " + update_data["first_name"]
     updated_last_name = user_two["last_name"] + " " + update_data["last_name"]
-    payload = { 
+    payload = {
         "first_name": updated_first_name,
         "last_name": updated_last_name,
-        "password": update_data["password"]
-    }    
+        "password": update_data["password"],
+    }
     response = client.patch(
         "/user",
         json=payload,
