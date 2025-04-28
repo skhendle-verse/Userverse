@@ -9,7 +9,7 @@ class DatabaseConfig:
         Returns the connection string for the database.
         """
         url = ""
-        if environment == "prod":
+        if environment in ("prod", "production"):
             db_config = configs.get("database", {})
             db_type = db_config.get("type")
             host = db_config.get("host")

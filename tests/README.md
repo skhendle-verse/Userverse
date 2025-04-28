@@ -15,6 +15,8 @@ Unit testing for db models
 TODO: Setup a testing config, to avoid comflicts with dev db
 
 ```bash
+# assign a value to TEST_ENVIRONMENT, which help trigger creation of testing.db
+(userverse) $: export TEST_ENVIRONMENT=True
 
 # Main route testing
 (userverse) $: pytest -v tests/http/test_main.py

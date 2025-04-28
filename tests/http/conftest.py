@@ -26,3 +26,20 @@ def login_token(test_data):
     json_data = response.json()
     token = json_data["data"]["access_token"]
     return token
+
+
+@pytest.fixture
+def login_token_user_two(test_data):
+    """Fixture to log in the user and provide the Bearer token for tests."""
+    user_two = test_data["user_two"]
+    response = client.patch(
+        "/user/login",
+        headers=get_basic_auth_header(
+            username=user_two["email"],
+            password=user_two["password"],
+        )
+    )
+    assert response.status_code in [200, 201, 202]
+    json_data = response.json()
+    token = json_data["data"]["access_token"]
+    return token
