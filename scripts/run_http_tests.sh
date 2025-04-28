@@ -34,9 +34,17 @@ check_and_run_tests() {
     fi
 }
 
+# # Start testing sections using the helper function
+# check_and_run_tests "🧪 Main route testing..." "tests/http/test_main.py"
+# check_and_run_tests "🔐 Security testing..." "tests/http/test_security.py"
+# check_and_run_tests "👤 Create user testing..." "tests/http/user/test_a_create_user_api.py"
+# check_and_run_tests "🔑 User login testing..." "tests/http/user/test_b_user_login_api.py"
+# check_and_run_tests "📥 Get user testing..." "tests/http/user/test_c_get_user.py"
+# check_and_run_tests "✏️ Update user testing..." "tests/http/user/test_d_update_user_api.py"
+
 echo "-----------------------------------------"
 echo "📄 Generating Coverage Report Summary:"
-pytest --cov=app --cov-report=term-missing
+pytest --cov=app --cov-report=term-missing --cov-report=xml
 
 echo "========================================="
 echo "✅ HTTP integration tests completed!"
