@@ -1,0 +1,30 @@
+{
+    "user_one": {
+        "first_name": "John",
+        "last_name": "Doe",
+        "phone_number": "1234567890",
+        "email": "user.one@email.com",
+        "password": "secureONE"
+    },
+    "user_two": {
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "phone_number": "0987654321",
+        "email": "user.two@email.com",
+        "password": "secureTwo"
+    },
+    "missing_name": {
+        "last_name": "Doe",
+        "phone_number": "1234567890"
+    },
+    "invalid_phone": {
+        "first_name": "John",
+        "last_name": "Doe",
+        "phone_number": "invalid_phone"
+    },
+    "update_user": {
+        "first_name": "Updated",
+        "last_name": "Updated",
+        "password": "updatedPassword"
+    }
+}

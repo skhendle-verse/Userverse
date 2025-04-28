@@ -1,0 +1,47 @@
+name: CI - HTTP Integration Tests with uv
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv (latest release)
+        run: |
+          wget -qO- https://astral.sh/uv/install.sh | sh
+          uv --version
+
+      - name: Install Python 3.12 with uv and create venv
+        run: |
+          uv python install 3.12
+          uv venv  # This creates .venv folder
+          echo "✅ Virtual environment created at .venv"
+      
+      - name: Activate venv and sync dependencies
+        run: |
+          source .venv/bin/activate
+          uv sync
+          uv pip list  # Optional: List installed packages for debug
+
+      - name: Run HTTP Integration Tests
+        run: |
+          source .venv/bin/activate
+          ./scripts/run_http_tests.sh
+
+      - name: Generate Coverage Report (optional)
+        run: |
+          source .venv/bin/activate
+          pytest --cov=app --cov-report=term-missing --cov-report=xml
+
+      - name: Upload Coverage Report (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml

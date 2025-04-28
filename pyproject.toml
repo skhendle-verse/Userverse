@@ -4,4 +4,21 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "alembic>=1.15.2",
+    "black>=25.1.0",
+    "fastapi[standard]>=0.115.12",
+    "httpx>=0.28.1",
+    "mkdocs>=1.6.1",
+    "passlib>=1.7.4",
+    "psycopg2>=2.9.10",
+    "pydantic>=2.11.3",
+    "pyjwt>=2.10.1",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "sqlalchemy>=2.0.40",
+    "sqlalchemy-utils>=0.41.2",
+]
+
+[tool.uv.workspace]
+members = []
