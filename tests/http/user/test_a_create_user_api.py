@@ -3,7 +3,7 @@ from tests.http.conftest import client
 from tests.utils.basic_auth import get_basic_auth_header
 
 
-def test_create_user_one_success(test_data):
+def test_a_create_user_one_success(test_data):
     """Test user creation with valid payload (user one)"""
     use_one = test_data["user_one"]
     payload = {
@@ -33,7 +33,7 @@ def test_create_user_one_success(test_data):
     assert user_data["last_name"] == use_one["last_name"]
 
 
-def test_create_user_two_success_and_unique_key_fail(test_data):
+def test_b_create_user_two_success_and_unique_key_fail(test_data):
     """Test user creation with valid payload (user two), and then attempt to create the same user again"""
     use_two = test_data["user_two"]
     payload = {
@@ -77,7 +77,7 @@ def test_create_user_two_success_and_unique_key_fail(test_data):
     assert json_data["message"] == UserResponseMessages.USER_CREATION_FAILED.value
 
 
-def test_create_user_missing_name_should_fail(test_data):
+def test_c_create_user_missing_name_should_fail(test_data):
     """Test user creation failure when first_name is missing"""
     data = test_data["missing_name"]
     user = test_data["user_two"]
@@ -90,7 +90,7 @@ def test_create_user_missing_name_should_fail(test_data):
     assert "message" in json_data or "detail" in json_data
 
 
-def test_create_user_invalid_phone_should_fail(test_data):
+def test_d_create_user_invalid_phone_should_fail(test_data):
     """Test user creation failure when phone number is invalid"""
     data = test_data["invalid_phone"]
     user = test_data["user_two"]

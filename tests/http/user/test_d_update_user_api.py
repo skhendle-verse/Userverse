@@ -4,7 +4,7 @@ from tests.http.client import client
 from app.models.user.messages import UserResponseMessages
 
 
-def test_update_user_success(login_token_user_two, test_data):
+def test_a_update_user_success(login_token_user_two, test_data):
     """Test updating user information successfully."""
     user_two = test_data["user_two"]
     update_data = test_data["update_user"]
@@ -37,7 +37,7 @@ def test_update_user_success(login_token_user_two, test_data):
     assert json_response["data"]["phone_number"] == user_two["phone_number"]
 
 
-def test_update_user_fail_with_invalid_token(test_data):
+def test_b_update_user_fail_with_invalid_token(test_data):
     """Test updating user information with an invalid token."""
     user_two = test_data["user_two"]
     update_data = test_data["update_user"]
