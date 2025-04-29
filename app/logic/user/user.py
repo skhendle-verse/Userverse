@@ -76,6 +76,3 @@ class UserService:
             )
         user_repository = UserRepository()
         return user_repository.update_user(user_id, data)
-
-    def delete_user(self, user_id):
-        pass

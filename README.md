@@ -1,7 +1,7 @@
 
 [![Build Status](https://github.com/skhendle-verse/Userverse/actions/workflows/testing-build.yml/badge.svg)](https://github.com/skhendle-verse/Userverse/actions/workflows/testing-build.yml)
-[![codecov](https://codecov.io/gh/skhendle-verse/Userverse/branch/main/graph/badge.svg)](https://codecov.io/gh/skhendle-verse/Userverse)
 
+[![codecov](https://codecov.io/gh/skhendle-verse/Userverse/graph/badge.svg?token=8SIX9ONX0A)](https://codecov.io/gh/skhendle-verse/Userverse)
 
 # Userverse
 
@@ -24,37 +24,41 @@ Userverse is an open-source platform designed to make managing users, organizati
 │   │   └── user
 │   ├── security
 │   └── utils
+├── coverage_reports
 ├── docs
 │   └── images
 ├── scripts
 │   └── versions
 └── tests
+    ├── data
+    │   ├── database
+    │   └── http
+    ├── database
+    ├── http
+    │   └── user
+    └── utils
 ```
 
-### database
-    - Initialization and session management for the database (e.g. engine setup, session factory).
+### Database
+ - Database initialization, connection management, and session handling (engine setup, session factory)
+### Logic
+ - Services: Core business logic implementation (user registration, authentication flows)
+ - Repositories: Data access layer for database operations with clean abstractions
+### Middleware
+ - Request/response processing components (CORS configuration, logging, error handlers)
+### Models
+ - Pydantic schema definitions for data validation and API documentation
 
-### logic
-    - services: Business logic and use-case implementations (e.g. user registration, OTP flows).
-    - repositories: Data-access layer abstracting CRUD operations and queries.
+### Routers
+ - API endpoint definitions organized by resource domain (users, auth, etc.)
 
-### middleware
-    - Custom FastAPI/Starlette middleware (CORS, logging, error handling).
+### Security
+ - Authentication mechanisms and authorization controls (JWT, password hashing)
+### Utils
+ - Shared helper functions and third-party integrations (email, OTP generation)
 
-### models
-    - Pyndatic models defining API schema entities.
+### Docs
+ - Technical documentation assets including diagrams and implementation guides
 
-### routers/API 
-    - Route definitions grouped by resource (e.g. auth.py, users.py).
-
-### security
-    - Authentication/authorization utilities (JWT, password hashing, token refresh).
-
-### utils/Shared 
-    - Helper functions and integrations (email, OTP generation, etc.).
-
-## docs
-    - Diagrams and visuals supporting documentation.
-
-## tests
-    - Unit and integration tests mirroring the app/ structure.
+### Tests
+ - Comprehensive test suite mirroring application structure for unit and integration testing
