@@ -1,7 +1,7 @@
 
 [![Build Status](https://github.com/skhendle-verse/Userverse/actions/workflows/testing-build.yml/badge.svg)](https://github.com/skhendle-verse/Userverse/actions/workflows/testing-build.yml)
-[![codecov](https://codecov.io/gh/skhendle-verse/Userverse/branch/main/graph/badge.svg)](https://codecov.io/gh/skhendle-verse/Userverse)
 
+[![codecov](https://codecov.io/gh/skhendle-verse/Userverse/graph/badge.svg?token=8SIX9ONX0A)](https://codecov.io/gh/skhendle-verse/Userverse)
 
 # Userverse
 
