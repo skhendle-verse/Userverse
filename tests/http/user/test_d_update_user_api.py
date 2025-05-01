@@ -4,7 +4,7 @@ from tests.http.client import client
 from app.models.user.messages import UserResponseMessages
 
 
-def test_a_update_user_success(login_token_user_two, test_data):
+def test_a_update_user_success(client, login_token_user_two, test_data):
     """Test updating user information successfully."""
     user_two = test_data["user_two"]
     update_data = test_data["update_user"]

@@ -3,7 +3,7 @@ from tests.http.conftest import client
 from tests.utils.basic_auth import get_basic_auth_header
 
 
-def test_user_login_success(test_data):
+def test_user_login_success(client, test_data):
     """Test user login with valid credentials"""
     user_one = test_data["user_one"]
     response = client.patch(
@@ -29,7 +29,7 @@ def test_user_login_success(test_data):
     assert token_data["token_type"] == "bearer"
 
 
-def test_user_login_invalid_credentials(test_data):
+def test_user_login_invalid_credentials(client, test_data):
     """Test user login with invalid credentials"""
     user_one = test_data["user_one"]
     payload = {
