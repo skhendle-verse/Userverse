@@ -21,6 +21,8 @@ class EnvironmentManager:
         # Check for TEST_ENVIRONMENT in environment variables
         test_environment = os.getenv("TEST_ENVIRONMENT", "").lower() == "true"
 
+        print(f"TEST_ENVIRONMENT: {test_environment}")
+
         if test_environment:
             return "test_environment"
 
