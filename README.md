@@ -62,3 +62,66 @@ Userverse is an open-source platform designed to make managing users, organizati
 
 ### Tests
  - Comprehensive test suite mirroring application structure for unit and integration testing
+
+# 📘 Running the Userverse API
+
+This project uses **FastAPI**, **Uvicorn**, and a dynamic configuration system with support for both CLI and hot-reload development.
+
+---
+
+## 🚀 Development Mode with Auto-Reload
+
+Use `uvicorn` in **factory mode** to support reload and dynamic config loading via environment variables:
+
+```bash
+# Set environment variables and run the app
+ENV=development JSON_CONFIG_PATH=config/dev.json \
+uvicorn app.main:create_app --factory --reload --host 0.0.0.0 --port 8500
+```
+
+✅ This supports live code reload and is ideal for development workflows.
+
+---
+
+## ⚙️ Production or CLI Mode (No Reload)
+
+Use the built-in CLI to run the app with full control over config, port, and worker count:
+
+```bash
+
+uv run -m app.main --port 8500 \
+  --env production \
+  --config sample-config.json \
+  --port 8500 \
+  --workers 4
+```
+
+✅ This mode supports scaling with Uvicorn workers and does not enable reload.
+
+---
+
+## 🧾 Notes
+
+| Mode        | How to Run | Supports Reload |
+|-------------|------------|-----------------|
+| Dev/Hot Reload | `uvicorn app.main:create_app --factory --reload` | ✅ |
+| CLI Script | `python app/main.py --config ...` | ❌ |
+
+---
+
+## 📁 Config Example
+
+Your JSON config should look like:
+
+```json
+{
+  "environment": "development",
+  "cor_origins": {
+    "allowed": ["*"],
+    "blocked": []
+  },
+  "version": "1.0.0",
+  "name": "Userverse",
+  "description": "Backend API"
+}
+```

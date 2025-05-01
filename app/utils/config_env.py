@@ -15,20 +15,32 @@ class EnvironmentManager:
                                           Defaults to None.
 
         Returns:
-            str: The current environment (e.g., 'development', 'production', 'testing').
+            str: The current environment (e.g., 'development', 'production', 'stagging','testing').
 
         """
         # Check for TEST_ENVIRONMENT in environment variables
-        test_environment = os.getenv("TEST_ENVIRONMENT")
+        test_environment = os.getenv("TEST_ENVIRONMENT", "").lower() == "true"
 
         if test_environment:
-            return "testing"
+            return "test_environment"
 
-        environment = os.getenv("ENVIRONMENT")
-        if environment:
-            return environment
+        # Check for ENVIRONMENT
+        # In the provided configuration data
+        # or in the environment variables
 
-        if config_data and "environment" in config_data:
-            return config_data["environment"]
+        if config_data:
+            env = config_data.get("env", "").lower()
+            if env:
+                return env
+            env = config_data.get("environment", "").lower()
+            if env:
+                return env
+
+        env = os.getenv("env", "").lower()
+        if env:
+            return env
+        env = os.getenv("environment", "").lower()
+        if env:
+            return env
 
         return "development"
