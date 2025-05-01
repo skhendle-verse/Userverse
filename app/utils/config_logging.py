@@ -1,16 +1,17 @@
-# my_app/logging_config.py
-
 import logging.config
+import multiprocessing
 
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
+
     "formatters": {
         "default": {
-            "format": "[%(asctime)s] [%(levelname)s] %(name)s: %(message)s",
+            "format": "[%(asctime)s] [PID %(process)d] [%(levelname)s] %(name)s: %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
+
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
@@ -25,19 +26,29 @@ LOGGING_CONFIG = {
             "level": "DEBUG",
         },
     },
-    # Configure the root logger
+
     "root": {
-        "level": "DEBUG",  # or INFO
+        "level": "DEBUG",
         "handlers": ["console", "file"],
     },
-    # Module-specific logging (still available if needed)
+
     "loggers": {
         "uvicorn": {
-            "level": "WARNING",
+            "level": "INFO",
             "handlers": ["console", "file"],
             "propagate": False,
         },
-        # Optional app-specific configs can go here
+        "uvicorn.error": {
+            "level": "INFO",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
+        "uvicorn.access": {
+            "level": "WARNING",  # Change to INFO for detailed request logs
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
+        # Optional custom loggers can go here
     },
 }
 
@@ -49,3 +60,7 @@ def setup_logging():
     if not _initialized:
         logging.config.dictConfig(LOGGING_CONFIG)
         _initialized = True
+
+        # Optional: show startup message with PID
+        logger = logging.getLogger(__name__)
+        logger.info(f"✅ Logging configured [PID {multiprocessing.current_process().pid}]")

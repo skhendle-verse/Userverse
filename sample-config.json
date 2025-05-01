@@ -1,0 +1,30 @@
+{
+    "database": {
+        "HOST": "localhost",
+        "PORT": 5432,
+        "USERNAME": "sandile",
+        "PASSWORD": "Password123",
+        "NAME": "userverse",
+        "TYPE": "postgresql"
+    },
+    "cor_origins": {
+        "allowed": [
+            "*"
+        ],
+        "blocked": [
+            "http://localhost:30XX"
+        ]
+    },
+    "email": {
+        "USERNAME": "your_email@example.com",
+        "PASSWORD": "your_email_password",
+        "SMTP_HOST": "smtp.example.com",
+        "SMTP_PORT": 587
+    },
+    "jwt": {
+        "SECRET": "your_jwt_secret",
+        "ALGORITHM": "HS256",
+        "TIMEOUT": 30,
+        "REFRESH_TIMEOUT": 60
+    }
+}

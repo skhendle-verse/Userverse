@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 25px;
+        }
+
+        .header img {
+            width: 10%;
+            height: 60px;
+        }
+
+        .header h1 {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .button {
+            background-color: rgba(8, 37, 64, 0.90);
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background-color: rgba(8, 37, 64, 1);
+        }
+
+        a,
+        a:hover,
+        a:focus,
+        a:active {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        h1, h3, p {
+            color: #5c5b5f;
+        }
+
+        .content {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% block content %}{% endblock %}
+</body>
+</html>

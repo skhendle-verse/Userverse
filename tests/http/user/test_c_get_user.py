@@ -3,7 +3,7 @@ from tests.http.client import client
 from app.models.user.messages import UserResponseMessages
 
 
-def test_get_user_success(login_token, test_data):
+def test_get_user_success(client, login_token, test_data):
     """Test fetching user details with valid token"""
     user = test_data["user_one"]
     # Assuming the login_token is valid and corresponds to user_one
