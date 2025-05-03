@@ -11,7 +11,7 @@ def send_email(to: str, subject: str, html_body: str):
     if not email_config:
         logging.warning("Email configuration not found.")
         soup = BeautifulSoup(html_body, "html.parser")
-        print("\n",soup.get_text(separator="\n", strip=True), "\n")
+        print("\n", soup.get_text(separator="\n", strip=True), "\n")
         return
 
     username = email_config.get("USERNAME")

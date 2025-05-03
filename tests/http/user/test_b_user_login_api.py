@@ -46,9 +46,9 @@ def test_user_login_invalid_credentials(client, test_data):
     )
     assert response.status_code in [400, 422]
     json_data = response.json()
-    assert 'detail' in json_data
+    assert "detail" in json_data
     json_details = json_data["detail"]
 
-    assert "message" in json_details 
+    assert "message" in json_details
     assert "error" in json_details
     assert json_details["message"] == UserResponseMessages.INVALID_CREDENTIALS.value

@@ -12,7 +12,6 @@ from app.models.user.user import UserRead
 from app.models.user.messages import UserResponseMessages
 
 
-
 class UserRepository:
     def __init__(self):
         self.db_manager = DatabaseSessionManager()

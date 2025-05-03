@@ -47,8 +47,9 @@ def create_app() -> FastAPI:
             content={
                 "details": {
                     "message": "An error occurred, please try again.",
-                    "error": str(exc)+", path:" + str(request.scope.get("path")),
-            },}
+                    "error": str(exc) + ", path:" + str(request.scope.get("path")),
+                },
+            },
         )
 
     app.include_router(user.router)

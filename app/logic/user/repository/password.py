@@ -12,6 +12,7 @@ from app.database.user import User
 from app.models.user.user import UserRead
 from app.models.user.messages import UserResponseMessages
 
+
 class UserPasswordRepository:
     """
     This class handles user password management, including updating,
@@ -32,7 +33,7 @@ class UserPasswordRepository:
                     status_code=status.HTTP_404_NOT_FOUND,
                     message=UserResponseMessages.USER_NOT_FOUND.value,
                 )
-            
+
             user.update_json_field(
                 session=session,
                 record_id=user.id,
@@ -42,6 +43,5 @@ class UserPasswordRepository:
                     "password_reset_token": token,
                     "created_at": datetime.now(timezone.utc).isoformat(),
                 },
-                
             )
             session.commit()

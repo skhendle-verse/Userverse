@@ -1,15 +1,20 @@
 import string, random
+
+# models
+from app.logic.mailer import MailService
+from app.models.generic_response import GenericResponseModel
+
 # repository
 from app.logic.user.repository.user import UserRepository
 from app.logic.user.repository.password import UserPasswordRepository
-# UTILS 
+
+# UTILS
 from app.utils.app_error import AppError
 from app.utils.email.renderer import render_email_template
 from app.utils.email.sender import send_email
 
 
-
-class UserPasswordService:  
+class UserPasswordService:
     SEND_OTP_EMAIL_TEMPLATE = "reset_user_password.html"
 
     @classmethod
@@ -18,34 +23,35 @@ class UserPasswordService:
         return "".join(random.choice(characters) for _ in range(length))
 
     @classmethod
-    def request_password_reset(cls, user_email):
-        
+    def request_password_reset(cls, user_email:str) -> GenericResponseModel:
+        """
+        Request a password reset by sending an OTP to the user's email.
+        """
+        # check if user exists
         user_repository = UserRepository()
         user = user_repository.get_user_by_email(user_email)
         if not user:
             raise ValueError("User not found")
-        token = cls.generate_random_string()
-
-        # Add token to the database 
-        # in user primary_meta_data field 
-        # for validation later
+        # reset token
+        token = cls.generate_random_string(length=6)
+        # populate the token in the database for the user
         user_password_repository = UserPasswordRepository()
         user_password_repository.update_password_reset_token(
             user_email=user.email,
             token=token,
         )
-
         # send email
-        email_template = render_email_template(
-            cls.SEND_OTP_EMAIL_TEMPLATE,
-            {
-                "user_name": user.first_name,
+        MailService.send_template_email(
+            to=user.email,
+            subject="Password Reset OTP",
+            template_name=cls.SEND_OTP_EMAIL_TEMPLATE,
+            context={
+                "user_name": user.first_name + " " + user.last_name,
                 "otp": token,
             },
         )
-        send_email(
-            to=user.email,
-            subject="Password Reset OTP",
-            html_body=email_template,
+
+        return GenericResponseModel(
+            message="OTP sent to email",
+            data=None,
         )
-        return "OTP sent to email"

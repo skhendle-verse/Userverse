@@ -73,10 +73,10 @@ def test_b_create_user_two_success_and_unique_key_fail(client, test_data):
     )
     assert response.status_code in [400, 422]
     json_data = response.json()
-    assert 'detail' in json_data
+    assert "detail" in json_data
     json_details = json_data["detail"]
 
-    assert "message" in json_details 
+    assert "message" in json_details
     assert "error" in json_details
     assert json_details["message"] == UserResponseMessages.USER_CREATION_FAILED.value
 
