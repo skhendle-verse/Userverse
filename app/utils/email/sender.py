@@ -9,6 +9,8 @@ def send_email(to: str, subject: str, html_body: str):
 
     if not email_config:
         logging.warning("Email configuration not found.")
+        # TODO: fic loggin , this should be logged for dev purpsoes
+        print("\n%s\n", html_body)
         logging.info("\n%s\n", html_body)
         return
 

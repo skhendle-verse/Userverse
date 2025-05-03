@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.configs import ConfigLoader
 from app.middleware.logging import LogRouteMiddleware
 from app.routers.user import user
+from app.routers.user import password
 from app.utils.app_error import AppError
 
 import os
@@ -39,14 +40,19 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    @app.exception_handler(AppError)
-    async def app_error_handler(request: Request, exc: AppError):
+    @app.exception_handler(Exception)
+    async def app_error_handler(request: Request, exc: Exception):
         return JSONResponse(
-            status_code=exc.status_code,
-            content=exc.detail,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "details": {
+                    "message": "An error occurred, please try again.",
+                    "error": str(exc)+", path:" + str(request.scope.get("path")),
+            },}
         )
 
     app.include_router(user.router)
+    app.include_router(password.router)
 
     @app.get("/")
     async def root():

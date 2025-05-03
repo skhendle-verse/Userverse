@@ -15,7 +15,7 @@ class OTPValidationRequest(BaseModel):
 
 class PasswordResetConfirm(BaseModel):
     token: str  # from OTP validation step
-    new_password: str
+    password: str
 
     @field_validator("password")
     def hash_password(cls, v: str) -> str:
