@@ -18,8 +18,8 @@
     "email": {
         "USERNAME": "your_email@example.com",
         "PASSWORD": "your_email_password",
-        "SMTP_HOST": "smtp.example.com",
-        "SMTP_PORT": 587
+        "HOST": "smtp.example.com",
+        "PORT": 587
     },
     "jwt": {
         "SECRET": "your_jwt_secret",
