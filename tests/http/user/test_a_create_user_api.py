@@ -81,26 +81,26 @@ def test_b_create_user_two_success_and_unique_key_fail(client, test_data):
     assert json_details["message"] == UserResponseMessages.USER_CREATION_FAILED.value
 
 
-# def test_c_create_user_missing_name_should_fail(client, test_data):
-#     """Test user creation failure when first_name is missing"""
-#     data = test_data["missing_name"]
-#     user = test_data["user_two"]
-#     headers = get_basic_auth_header(username=user["email"], password=user["password"])
+def test_c_create_user_missing_name_should_fail(client, test_data):
+    """Test user creation failure when first_name is missing"""
+    data = test_data["missing_name"]
+    user = test_data["user_two"]
+    headers = get_basic_auth_header(username=user["email"], password=user["password"])
 
-#     response = client.post("/user", json=data, headers=headers)
-#     assert response.status_code in [400, 422]
+    response = client.post("/user", json=data, headers=headers)
+    assert response.status_code in [400, 422]
 
-#     json_data = response.json()
-#     assert "message" in json_data or "detail" in json_data
+    json_data = response.json()
+    assert "message" in json_data or "detail" in json_data
 
 
-# def test_d_create_user_invalid_phone_should_fail(client, test_data):
-#     """Test user creation failure when phone number is invalid"""
-#     data = test_data["invalid_phone"]
-#     user = test_data["user_two"]
-#     headers = get_basic_auth_header(username=user["email"], password=user["password"])
-#     response = client.post("/user", json=data, headers=headers)
-#     assert response.status_code in [400, 422]
+def test_d_create_user_invalid_phone_should_fail(client, test_data):
+    """Test user creation failure when phone number is invalid"""
+    data = test_data["invalid_phone"]
+    user = test_data["user_two"]
+    headers = get_basic_auth_header(username=user["email"], password=user["password"])
+    response = client.post("/user", json=data, headers=headers)
+    assert response.status_code in [400, 422]
 
-#     json_data = response.json()
-#     assert "message" in json_data or "detail" in json_data
+    json_data = response.json()
+    assert "message" in json_data or "detail" in json_data
