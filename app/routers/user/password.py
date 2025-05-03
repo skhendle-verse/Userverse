@@ -25,11 +25,10 @@ def password_reset_request_api(
     user: PasswordResetRequest,
 ):
     try:
+        password_reset_response = UserPasswordService().request_password_reset(user.email)
         return JSONResponse(
             status_code=status.HTTP_202_ACCEPTED,
-            content={
-                "message": UserPasswordService().request_password_reset(user.email),
-            },
+            content=password_reset_response.model_dump(),
         )
     except AppError as e:
         raise e

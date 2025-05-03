@@ -6,9 +6,10 @@ from app.configs import configs
 
 
 def send_email(to: str, subject: str, html_body: str):
+    environment = configs.get("environment")
     email_config = configs.get("email", {})
 
-    if not email_config:
+    if not email_config or environment == "test_environment":
         logging.warning("Email configuration not found.")
         soup = BeautifulSoup(html_body, "html.parser")
         print("\n", soup.get_text(separator="\n", strip=True), "\n")
