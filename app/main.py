@@ -14,7 +14,6 @@ import uvicorn
 
 def create_app() -> FastAPI:
 
-
     json_config_path = os.getenv("JSON_CONFIG_PATH", None)
     # load configs
     loader = ConfigLoader(
@@ -68,47 +67,45 @@ def create_app() -> FastAPI:
 
 
 @click.command()
-@click.option(
-    "--port",
-    default=8500,
-    type=int,
-    help="Port to run the server on."
-)
-@click.option(
-    "--host",
-    default="0.0.0.0",
-    type=str,
-    help="Host to run the server on."
-)
+@click.option("--port", default=8500, type=int, help="Port to run the server on.")
+@click.option("--host", default="0.0.0.0", type=str, help="Host to run the server on.")
 @click.option(
     "--env",
     default="development",
     type=click.Choice(["development", "production", "testing"]),
-    help="Environment to run the server in."
+    help="Environment to run the server in.",
 )
 @click.option(
     "--reload",
     is_flag=True,
-    help="Reload the server on code change (for development only)."
+    help="Reload the server on code change (for development only).",
 )
 @click.option(
     "--workers",
     default=1,
     type=int,
-    help="Number of Uvicorn worker processes (ignored in reload mode)."
+    help="Number of Uvicorn worker processes (ignored in reload mode).",
 )
 @click.option(
     "--config",
     "json_config_path",
     default=None,
     type=click.Path(exists=True, dir_okay=False, readable=True),
-    help="Path to a custom JSON configuration file."
+    help="Path to a custom JSON configuration file.",
 )
-def main(port: int, host: str, env: str, reload: bool, workers: int, json_config_path: str | None):
+def main(
+    port: int,
+    host: str,
+    env: str,
+    reload: bool,
+    workers: int,
+    json_config_path: str | None,
+):
     """
     Main entry point for the FastAPI application.
     """
     from app.utils.config_logging import setup_logging
+
     setup_logging()
 
     # Export env for use inside create_app()
@@ -118,7 +115,9 @@ def main(port: int, host: str, env: str, reload: bool, workers: int, json_config
 
     # Validation note: reload mode doesn't support workers > 1
     if reload and workers > 1:
-        click.echo("⚠️ Reload mode does not support multiple workers. Ignoring --workers.")
+        click.echo(
+            "⚠️ Reload mode does not support multiple workers. Ignoring --workers."
+        )
         workers = 1
 
     # Launch using factory to ensure consistent app creation
@@ -129,9 +128,8 @@ def main(port: int, host: str, env: str, reload: bool, workers: int, json_config
         host=host,
         port=port,
         reload=reload,
-        workers=workers
+        workers=workers,
     )
-
 
 
 if __name__ == "__main__":

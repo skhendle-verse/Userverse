@@ -1,6 +1,4 @@
 from sqlalchemy import create_engine
-
-# from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy.orm import sessionmaker, declarative_base
 from app.configs import configs

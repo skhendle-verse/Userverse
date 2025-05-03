@@ -3,6 +3,7 @@ from app.main import create_app
 
 # Optionally set config path for test context
 import os
+
 os.environ["ENV"] = "testing"
 
 
