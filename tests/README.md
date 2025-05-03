@@ -30,5 +30,7 @@ TODO: Setup a testing config, to avoid comflicts with dev db
 (userverse) $: pytest -v tests/http/user/test_c_get_user.py
 # Update user testing
 (userverse) $: pytest -v tests/http/user/test_d_update_user_api.py
+# Reset Password: Get OTP
+(userverse) $: pytest -v tests/http/user/test_e_password_reset_request.py
 
 ```

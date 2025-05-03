@@ -6,11 +6,13 @@ from tests.utils.basic_auth import get_basic_auth_header
 from fastapi.testclient import TestClient
 from app.main import create_app
 
+
 @pytest.fixture(scope="session")
 def client():
     os.environ["ENV"] = "testing"
     app = create_app()
     return TestClient(app)
+
 
 @pytest.fixture(scope="session")
 def test_data():

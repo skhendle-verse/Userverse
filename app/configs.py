@@ -111,6 +111,4 @@ class ConfigLoader:
 # Load configuration
 configs = ConfigLoader(json_config_path="sample-config.json").get_config()
 logger = logging.getLogger(__name__)
-print(f"\n Configuration loaded: {configs} \n")
-
 logger.warning("Configuration loaded successfully.")

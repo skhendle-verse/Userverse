@@ -92,6 +92,7 @@ Use the built-in CLI to run the app with full control over config, port, and wor
 uv run -m app.main --port 8500 \
   --env production \
   --config sample-config.json \
+  --host 0.0.0.0 \
   --port 8500 \
   --workers 4
 ```
@@ -100,14 +101,6 @@ uv run -m app.main --port 8500 \
 
 ---
 
-## 🧾 Notes
-
-| Mode        | How to Run | Supports Reload |
-|-------------|------------|-----------------|
-| Dev/Hot Reload | `uvicorn app.main:create_app --factory --reload` | ✅ |
-| CLI Script | `python app/main.py --config ...` | ❌ |
-
----
 
 ## 📁 Config Example
 

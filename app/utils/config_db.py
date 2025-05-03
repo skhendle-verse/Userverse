@@ -14,7 +14,7 @@ class DatabaseConfig:
             str: The connection string for the database.
         """
         if environment == "test_environment":
-            return f"sqlite:///testing_{environment}.db"
+            return f"sqlite:///{environment}.db"
 
         db_config = configs.get("database", {})
         if db_config:

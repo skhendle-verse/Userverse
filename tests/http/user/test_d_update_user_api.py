@@ -57,5 +57,9 @@ def test_b_update_user_fail_with_invalid_token(test_data):
     )
     assert response.status_code == 401
     json_response = response.json()
-    assert "message" in json_response
-    assert json_response["message"] == SecurityResponseMessages.INVALID_TOKEN.value
+    assert "detail" in json_response
+    json_details = json_response["detail"]
+
+    assert "message" in json_details
+    assert "error" in json_details
+    assert json_details["message"] == SecurityResponseMessages.INVALID_TOKEN.value

@@ -1,23 +1,57 @@
+import string, random
+
+# models
+from app.logic.mailer import MailService
+from app.models.generic_response import GenericResponseModel
+
+# repository
+from app.logic.user.repository.user import UserRepository
+from app.logic.user.repository.password import UserPasswordRepository
+
+# UTILS
+from app.utils.app_error import AppError
+from app.utils.email.renderer import render_email_template
+from app.utils.email.sender import send_email
+
+
 class UserPasswordService:
-    def __init__(self, user_repository, password_hash_service):
-        self.user_repository = user_repository
-        self.password_hash_service = password_hash_service
+    SEND_OTP_EMAIL_TEMPLATE = "reset_user_password.html"
 
-    def update_password(self, user_id, new_password):
-        hashed_password = self.password_hash_service.hash_password(new_password)
-        self.user_repository.update_user_password(user_id, hashed_password)
+    @classmethod
+    def generate_random_string(cls, length=10):
+        characters = string.ascii_letters + string.digits
+        return "".join(random.choice(characters) for _ in range(length))
 
-    def verify_password(self, user_id, password):
-        user = self.user_repository.get_user(user_id)
+    @classmethod
+    def request_password_reset(cls, user_email:str) -> GenericResponseModel:
+        """
+        Request a password reset by sending an OTP to the user's email.
+        """
+        # check if user exists
+        user_repository = UserRepository()
+        user = user_repository.get_user_by_email(user_email)
         if not user:
             raise ValueError("User not found")
-        return self.password_hash_service.verify_password(password, user.password)
+        # reset token
+        token = cls.generate_random_string(length=6)
+        # populate the token in the database for the user
+        user_password_repository = UserPasswordRepository()
+        user_password_repository.update_password_reset_token(
+            user_email=user.email,
+            token=token,
+        )
+        # send email
+        MailService.send_template_email(
+            to=user.email,
+            subject="Password Reset OTP",
+            template_name=cls.SEND_OTP_EMAIL_TEMPLATE,
+            context={
+                "user_name": user.first_name + " " + user.last_name,
+                "otp": token,
+            },
+        )
 
-    def reset_password(self, user_id, new_password):
-        hashed_password = self.password_hash_service.hash_password(new_password)
-        self.user_repository.update_user_password(user_id, hashed_password)
-
-    def change_password(self, user_id, old_password, new_password):
-        if not self.verify_password(user_id, old_password):
-            raise ValueError("Old password is incorrect")
-        self.update_password(user_id, new_password)
+        return GenericResponseModel(
+            message="OTP sent to email",
+            data=None,
+        )

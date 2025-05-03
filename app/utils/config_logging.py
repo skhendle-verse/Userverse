@@ -4,14 +4,12 @@ import multiprocessing
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
-
     "formatters": {
         "default": {
             "format": "[%(asctime)s] [PID %(process)d] [%(levelname)s] %(name)s: %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
-
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
@@ -26,12 +24,10 @@ LOGGING_CONFIG = {
             "level": "DEBUG",
         },
     },
-
     "root": {
         "level": "DEBUG",
         "handlers": ["console", "file"],
     },
-
     "loggers": {
         "uvicorn": {
             "level": "INFO",
@@ -63,4 +59,6 @@ def setup_logging():
 
         # Optional: show startup message with PID
         logger = logging.getLogger(__name__)
-        logger.info(f"✅ Logging configured [PID {multiprocessing.current_process().pid}]")
+        logger.info(
+            f"✅ Logging configured [PID {multiprocessing.current_process().pid}]"
+        )
