@@ -148,4 +148,3 @@ async def get_current_user_from_jwt_token(
     current_user = JWTManager().decode_token(TOKEN)
 
     return current_user
-

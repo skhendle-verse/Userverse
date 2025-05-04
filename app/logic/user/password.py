@@ -92,4 +92,3 @@ class UserPasswordService:
             message="Invalid OTP",
             error="Invalid OTP, does not match or expired",
         )
-        

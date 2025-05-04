@@ -23,6 +23,7 @@ def test_data():
         data = json.load(f)
     return data
 
+
 # Get user row based on email, and extract OTP
 @pytest.fixture
 def get_user_one_otp(test_data):
@@ -34,9 +35,7 @@ def get_user_one_otp(test_data):
     user = session.query(User).filter_by(email=email).first()
     if user:
         password_reset_data = user.primary_meta_data.get("password_reset", {})
-        return password_reset_data.get(
-                "password_reset_token"
-            )
+        return password_reset_data.get("password_reset_token")
     return None
 
 

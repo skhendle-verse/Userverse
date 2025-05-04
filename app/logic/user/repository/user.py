@@ -88,4 +88,4 @@ class UserRepository:
             )
 
     def delete_user(self, user_id):
-        pass
+        raise NotImplementedError("Delete user method not implemented")

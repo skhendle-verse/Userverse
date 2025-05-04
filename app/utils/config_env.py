@@ -20,7 +20,7 @@ class EnvironmentManager:
         """
         # Check for TEST_ENVIRONMENT in environment variables
         test_environment = os.getenv("TEST_ENVIRONMENT", "").lower() == "true"
-        
+
         if test_environment:
             return "test_environment"
 
