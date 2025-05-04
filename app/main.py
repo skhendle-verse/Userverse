@@ -43,7 +43,7 @@ def create_app() -> FastAPI:
     @app.exception_handler(Exception)
     async def app_error_handler(request: Request, exc: Exception):
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
                 "details": {
                     "message": "An error occurred, please try again.",
