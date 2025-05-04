@@ -5,7 +5,7 @@ from fastapi import status, Security
 from fastapi.security import APIKeyHeader
 
 # app imports
-from app.configs import configs
+from app.configs import ConfigLoader
 from app.models.security_messages import SecurityResponseMessages
 from app.models.user.user import TokenResponseModel, UserRead
 from app.utils.app_error import AppError
@@ -13,6 +13,9 @@ from app.utils.app_error import AppError
 
 class JWTManager:
     def __init__(self):
+        # load configs
+        loader = ConfigLoader()
+        configs = loader.get_config()
         jwt_config = configs.get("jwt", {})
         self.JWT_SECRET = jwt_config.get("SECRET", "secret1234")
         self.JWT_ALGORITHM = jwt_config.get("ALGORITHM", "HS256")

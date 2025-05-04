@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 
-
-class AppErrorModel(BaseModel):
+class DetailModel(BaseModel):
     message: str
-    details: str
+    error: str
+
+class AppErrorResponseModel(BaseModel):
+    detail: DetailModel

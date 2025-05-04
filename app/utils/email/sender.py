@@ -2,10 +2,13 @@ import logging
 from bs4 import BeautifulSoup
 from email.message import EmailMessage
 import smtplib
-from app.configs import configs
+from app.configs import ConfigLoader
 
 
 def send_email(to: str, subject: str, html_body: str):
+    # load configs
+    loader = ConfigLoader(    )
+    configs = loader.get_config()
     environment = configs.get("environment")
     email_config = configs.get("email", {})
 

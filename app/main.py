@@ -6,7 +6,6 @@ from app.configs import ConfigLoader
 from app.middleware.logging import LogRouteMiddleware
 from app.routers.user import user
 from app.routers.user import password
-from app.utils.app_error import AppError
 
 import os
 import click
