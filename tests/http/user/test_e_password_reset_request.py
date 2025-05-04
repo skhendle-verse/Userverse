@@ -6,7 +6,7 @@ from tests.http.conftest import client
 def test_password_reset_success(client, test_data):
     """Test password reset with valid user email"""
     user_one = test_data["user_one"]
-    
+
     response = client.patch(
         "/user/password-reset/request",
         json={"email": user_one["email"]},
@@ -16,7 +16,7 @@ def test_password_reset_success(client, test_data):
     json_data = response.json()
 
     assert "message" in json_data
-    assert json_data["message"] == 'OTP sent to email'
+    assert json_data["message"] == "OTP sent to email"
 
     assert "data" in json_data
     assert json_data["data"] is None
@@ -25,7 +25,7 @@ def test_password_reset_success(client, test_data):
 def test_password_reset_user_not_found(client):
     """Test password reset with unknown email"""
     unknown_email = "unknown@example.com"
-    
+
     response = client.patch(
         "/user/password-reset/request",
         json={"email": unknown_email},

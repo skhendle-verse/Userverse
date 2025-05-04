@@ -32,19 +32,15 @@ def test_user_login_success(client, test_data):
 def test_user_login_invalid_credentials(client, test_data):
     """Test user login with invalid credentials"""
     user_one = test_data["user_one"]
-    payload = {
-        "email": user_one["email"],
-        "password": "wrong_password",
-    }
+    
     response = client.patch(
         "/user/login",
-        json=payload,
         headers=get_basic_auth_header(
             username=user_one["email"],
             password="wrong_password",
         ),
     )
-    assert response.status_code in [400, 422]
+    assert response.status_code == 401
     json_data = response.json()
     assert "detail" in json_data
     json_details = json_data["detail"]

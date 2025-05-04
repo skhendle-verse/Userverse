@@ -58,7 +58,8 @@ class UserService:
         }
         return user_repository.create_user(data)
 
-    def update_user(self, user_id, user_data: UserUpdate):
+    @classmethod
+    def update_user(cls, user_id, user_data: UserUpdate):
         data = {}
         if user_data.first_name:
             data["first_name"] = user_data.first_name

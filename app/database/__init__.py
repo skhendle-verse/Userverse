@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy.orm import sessionmaker, declarative_base
-from app.configs import configs
+from app.utils.configs import ConfigLoader
 
 Base = declarative_base()
 
@@ -15,6 +15,9 @@ logger = logging.getLogger(__name__)
 class DatabaseSessionManager:
     def __init__(self) -> None:
         self._base = Base
+        # load configs
+        loader = ConfigLoader()
+        configs = loader.get_config()
         self.configs = configs
 
         from .user import User

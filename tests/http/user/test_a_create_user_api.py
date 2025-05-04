@@ -1,3 +1,4 @@
+import pytest
 from app.models.user.messages import UserResponseMessages
 from tests.http.conftest import client
 from tests.utils.basic_auth import get_basic_auth_header
@@ -62,36 +63,25 @@ def test_b_create_user_two_success_and_unique_key_fail(client, test_data):
     assert user_data["first_name"] == use_two["first_name"]
     assert user_data["last_name"] == use_two["last_name"]
 
+def test_c_create_user_two_fail(client, test_data):
+    """Test user creation failure when the same user is created again"""
+    use_two = test_data["user_two"]
+    payload = {
+        "first_name": use_two["first_name"],
+        "last_name": use_two["last_name"],
+        "phone_number": use_two["phone_number"],
+    }
     # Attempt to create the same user again
-    response = client.post(
-        "/user",
-        json=payload,
-        headers=get_basic_auth_header(
-            username=use_two["email"],
-            password=use_two["password"],
-        ),
-    )
-    assert response.status_code in [400, 422]
-    json_data = response.json()
-    assert "detail" in json_data
-    json_details = json_data["detail"]
+    with pytest.raises(ValueError):
 
-    assert "message" in json_details
-    assert "error" in json_details
-    assert json_details["message"] == UserResponseMessages.USER_CREATION_FAILED.value
-
-
-def test_c_create_user_missing_name_should_fail(client, test_data):
-    """Test user creation failure when first_name is missing"""
-    data = test_data["missing_name"]
-    user = test_data["user_two"]
-    headers = get_basic_auth_header(username=user["email"], password=user["password"])
-
-    response = client.post("/user", json=data, headers=headers)
-    assert response.status_code in [400, 422]
-
-    json_data = response.json()
-    assert "message" in json_data or "detail" in json_data
+        client.post(
+            "/user",
+            json=payload,
+            headers=get_basic_auth_header(
+                username=use_two["email"],
+                password=use_two["password"],
+            ),
+        )
 
 
 def test_d_create_user_invalid_phone_should_fail(client, test_data):

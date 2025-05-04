@@ -2,11 +2,10 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.configs import ConfigLoader
+from app.utils.configs import ConfigLoader
 from app.middleware.logging import LogRouteMiddleware
 from app.routers.user import user
 from app.routers.user import password
-from app.utils.app_error import AppError
 
 import os
 import click
@@ -15,11 +14,8 @@ import uvicorn
 
 def create_app() -> FastAPI:
 
-    json_config_path = os.getenv("JSON_CONFIG_PATH", None)
     # load configs
-    loader = ConfigLoader(
-        json_config_path=json_config_path,
-    )
+    loader = ConfigLoader()
     configs = loader.get_config()
 
     cor_origins = configs.get("cor_origins", {})
@@ -43,7 +39,7 @@ def create_app() -> FastAPI:
     @app.exception_handler(Exception)
     async def app_error_handler(request: Request, exc: Exception):
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
                 "details": {
                     "message": "An error occurred, please try again.",

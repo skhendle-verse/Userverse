@@ -6,7 +6,7 @@ Unit testing for db models
 
 ```bash
 # User Model testing
-(userverse) $: pytest -v tests/database/user.py -s
+(userverse) $: pytest -v tests/database/test_a_user.py -s
 
 ```
 
@@ -32,5 +32,18 @@ TODO: Setup a testing config, to avoid comflicts with dev db
 (userverse) $: pytest -v tests/http/user/test_d_update_user_api.py
 # Reset Password: Get OTP
 (userverse) $: pytest -v tests/http/user/test_e_password_reset_request.py
+
+```
+
+## Utils
+
+Unit testing for app Utils
+
+```bash
+# Render templates testing
+(userverse) $: pytest -v tests/utils/email/test_renderer.py -s
+
+# Send email testing
+(userverse) $: pytest -v tests/utils/email/test_senderer.py -s
 
 ```

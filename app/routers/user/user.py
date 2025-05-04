@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
 # Models
-from app.models.app_error import AppErrorModel
+from app.models.app_error import AppErrorResponseModel
 from app.models.generic_response import GenericResponseModel
 from app.models.user.user import (
     TokenResponseModel,
@@ -34,8 +34,8 @@ tag = "User Management"
     status_code=status.HTTP_202_ACCEPTED,
     responses={
         202: {"model": TokenResponseModel},
-        400: {"model": AppErrorModel},
-        500: {"model": AppErrorModel},
+        400: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
     },
 )
 def user_login_api(
@@ -53,13 +53,10 @@ def user_login_api(
                 "data": response.model_dump(),
             },
         )
+    except AppError as e:
+        raise e
     except Exception as e:
-        traceback.print_exc()
-        raise AppError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            message=UserResponseMessages.INVALID_CREDENTIALS.value,
-            error=str(e),
-        )
+        raise e
 
 
 @router.post(
@@ -68,8 +65,8 @@ def user_login_api(
     status_code=status.HTTP_201_CREATED,
     responses={
         201: {"model": GenericResponseModel[UserRead]},
-        400: {"model": AppErrorModel},
-        500: {"model": AppErrorModel},
+        400: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
     },
 )
 def create_user_api(
@@ -91,13 +88,10 @@ def create_user_api(
                 "data": response.model_dump(),
             },
         )
+    except AppError as e:
+        raise e
     except Exception as e:
-        traceback.print_exc()
-        raise AppError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            message=UserResponseMessages.USER_CREATION_FAILED.value,
-            error=str(e),
-        )
+        raise e
 
 
 # This must use thr jwt token
@@ -107,8 +101,8 @@ def create_user_api(
     status_code=status.HTTP_200_OK,
     responses={
         200: {"model": GenericResponseModel[UserRead]},
-        400: {"model": AppErrorModel},
-        500: {"model": AppErrorModel},
+        400: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
     },
 )
 def get_user_api(
@@ -126,24 +120,20 @@ def get_user_api(
                 "data": response.model_dump(),
             },
         )
+    except AppError as e:
+        raise e
     except Exception as e:
-        traceback.print_exc()
-        raise AppError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            message=UserResponseMessages.INVALID_REQUEST_MESSAGE.value,
-            error=str(e),
-        )
+        raise e
 
 
 @router.patch(
     "/user",
     tags=[tag],
-    response_model=UserRead,
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_200_OK,
     responses={
         201: {"model": GenericResponseModel[UserRead]},
-        400: {"model": AppErrorModel},
-        500: {"model": AppErrorModel},
+        400: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
     },
 )
 def update_user_api(
@@ -166,10 +156,7 @@ def update_user_api(
                 "data": response.model_dump(),
             },
         )
+    except AppError as e:
+        raise e
     except Exception as e:
-        traceback.print_exc()
-        raise AppError(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            message=UserResponseMessages.USER_UPDATE_FAILED.value,
-            error=str(e),
-        )
+        raise e
