@@ -106,14 +106,15 @@ def main(
     """
     Main entry point for the FastAPI application.
     """
-    from app.utils.config_logging import setup_logging
-
-    setup_logging()
+    # from app.utils.config_logging import setup_logging
 
     # Export env for use inside create_app()
     os.environ["ENV"] = env
     if json_config_path:
         os.environ["JSON_CONFIG_PATH"] = json_config_path
+
+    # # Setup logging before Uvicorn starts
+    # setup_logging()
 
     # Validation note: reload mode doesn't support workers > 1
     if reload and workers > 1:
@@ -121,6 +122,42 @@ def main(
             "⚠️ Reload mode does not support multiple workers. Ignoring --workers."
         )
         workers = 1
+
+    # Load configs
+    loader = ConfigLoader()
+    configs = loader.get_config()
+    app_name = configs.get("app_name", "userverse")
+    version = configs.get("version", "1.0.0")
+    
+
+    # Configure Uvicorn log config
+    log_config = {
+    "version": 1,
+    "app_version": version,
+    "app_name": app_name,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
+            "()": "app.utils.config_logging.JsonFormatter",
+        },
+        "access": {
+            "()": "app.utils.config_logging.JsonFormatter",  # use same formatter
+        },
+    },
+    "handlers": {
+        "default": {
+            "formatter": "default",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+        },
+    },
+    "loggers": {
+        "uvicorn": {"handlers": ["default"], "level": "INFO"},
+        "uvicorn.error": {"handlers": ["default"], "level": "INFO"},
+        "uvicorn.access": {"handlers": ["default"], "level": "INFO"},
+    },
+}
+
 
     # Launch using factory to ensure consistent app creation
     click.echo(f"🚀 Starting Userverse API on http://{host}:{port} [env={env}]")
@@ -131,7 +168,8 @@ def main(
         port=port,
         reload=reload,
         workers=workers,
-        log_config=None
+        log_config=log_config,  # Add this parameter
+        use_colors=False,       # Disable colored logs for clean JSON
     )
 
 
