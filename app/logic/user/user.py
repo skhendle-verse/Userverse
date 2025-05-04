@@ -15,7 +15,7 @@ from app.models.user.user import (
     UserLogin,
     TokenResponseModel,
 )
-from app.models.user.messages import UserResponseMessages
+from app.models.user.response_messages import UserResponseMessages
 
 
 class UserService:

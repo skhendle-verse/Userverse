@@ -1,4 +1,4 @@
-from app.models.user.messages import UserResponseMessages
+from app.models.user.response_messages import UserResponseMessages
 from tests.http.conftest import client
 from tests.utils.basic_auth import get_basic_auth_header
 
@@ -32,7 +32,7 @@ def test_user_login_success(client, test_data):
 def test_user_login_invalid_credentials(client, test_data):
     """Test user login with invalid credentials"""
     user_one = test_data["user_one"]
-    
+
     response = client.patch(
         "/user/login",
         headers=get_basic_auth_header(

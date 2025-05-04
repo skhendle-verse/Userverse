@@ -1,6 +1,6 @@
 # tests/http/user/test_b_get_user_api.py
 from tests.http.client import client
-from app.models.user.messages import UserResponseMessages
+from app.models.user.response_messages import UserResponseMessages
 
 
 def test_get_user_success(client, login_token, test_data):

@@ -9,7 +9,7 @@ from app.database.user import User
 
 # models
 from app.models.user.user import UserRead
-from app.models.user.messages import UserResponseMessages
+from app.models.user.response_messages import UserResponseMessages
 
 
 class UserRepository:

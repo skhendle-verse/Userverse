@@ -1,5 +1,5 @@
 import pytest
-from app.models.user.messages import UserResponseMessages
+from app.models.user.response_messages import UserResponseMessages
 from tests.http.conftest import client
 from tests.utils.basic_auth import get_basic_auth_header
 
@@ -62,6 +62,7 @@ def test_b_create_user_two_success_and_unique_key_fail(client, test_data):
     assert user_data["email"] == use_two["email"]
     assert user_data["first_name"] == use_two["first_name"]
     assert user_data["last_name"] == use_two["last_name"]
+
 
 def test_c_create_user_two_fail(client, test_data):
     """Test user creation failure when the same user is created again"""

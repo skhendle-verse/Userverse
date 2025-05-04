@@ -1,7 +1,7 @@
 # tests/http/user/test_b_get_user_api.py
 from app.models.security_messages import SecurityResponseMessages
 from tests.http.client import client
-from app.models.user.messages import UserResponseMessages
+from app.models.user.response_messages import UserResponseMessages
 
 
 def test_a_update_user_success(client, login_token_user_two, test_data):

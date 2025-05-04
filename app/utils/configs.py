@@ -24,7 +24,9 @@ class ConfigLoader:
         if self.json_config_path:
             self.json_config_path = Path(self.json_config_path).resolve()
             if not self.json_config_path.exists():
-                raise ValueError(f"JSON config file does not exist: {self.json_config_path}")
+                raise ValueError(
+                    f"JSON config file does not exist: {self.json_config_path}"
+                )
         self.environment = environment
 
         self.config = self._load_config()
@@ -53,8 +55,9 @@ class ConfigLoader:
     def _load_from_toml(self):
         try:
             logging.info("Loading configuration from pyproject.toml")
-            pyproject_path = Path(__file__).resolve().parent.parent.parent / "pyproject.toml"
-
+            pyproject_path = (
+                Path(__file__).resolve().parent.parent.parent / "pyproject.toml"
+            )
 
             if not pyproject_path.exists():
                 return None

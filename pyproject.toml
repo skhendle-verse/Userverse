@@ -1,5 +1,6 @@
 [project]
 name = "userverse"
+dynamic = ["version"]
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -20,6 +21,10 @@ dependencies = [
     "sqlalchemy>=2.0.40",
     "sqlalchemy-utils>=0.41.2",
 ]
+
+[project.optional-dependencies]
+build = ["setuptools", "cython"]
+compile = ["cchardet"]
 
 [tool.uv.workspace]
 members = []

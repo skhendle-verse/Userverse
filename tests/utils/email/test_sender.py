@@ -5,13 +5,12 @@ from app.utils.email.sender import send_email  # Adjust if your file path is dif
 
 def test_send_email_in_test_environment(capfd):
     """Should print email body in plain text when environment is test"""
-    fake_config = {
-        "environment": "test_environment",
-        "email": {}
-    }
+    fake_config = {"environment": "test_environment", "email": {}}
 
     with patch("app.utils.configs.ConfigLoader.get_config", return_value=fake_config):
-        send_email("test@example.com", "Test Subject", "<h1>Hello</h1><p>This is a test</p>")
+        send_email(
+            "test@example.com", "Test Subject", "<h1>Hello</h1><p>This is a test</p>"
+        )
         out, _ = capfd.readouterr()
         assert "Hello" in out
         assert "This is a test" in out
@@ -21,11 +20,7 @@ def test_send_email_missing_username():
     """Should raise error if email username is missing"""
     fake_config = {
         "environment": "prod",
-        "email": {
-            "PASSWORD": "pass",
-            "HOST": "smtp.test.com",
-            "PORT": 587
-        }
+        "email": {"PASSWORD": "pass", "HOST": "smtp.test.com", "PORT": 587},
     }
 
     with patch("app.utils.configs.ConfigLoader.get_config", return_value=fake_config):
@@ -37,11 +32,7 @@ def test_send_email_missing_password():
     """Should raise error if password is missing"""
     fake_config = {
         "environment": "prod",
-        "email": {
-            "USERNAME": "user@test.com",
-            "HOST": "smtp.test.com",
-            "PORT": 587
-        }
+        "email": {"USERNAME": "user@test.com", "HOST": "smtp.test.com", "PORT": 587},
     }
 
     with patch("app.utils.configs.ConfigLoader.get_config", return_value=fake_config):
@@ -53,10 +44,7 @@ def test_send_email_missing_host_or_port():
     """Should raise error if host or port is missing"""
     fake_config = {
         "environment": "prod",
-        "email": {
-            "USERNAME": "user@test.com",
-            "PASSWORD": "secure"
-        }
+        "email": {"USERNAME": "user@test.com", "PASSWORD": "secure"},
     }
 
     with patch("app.utils.configs.ConfigLoader.get_config", return_value=fake_config):
@@ -72,8 +60,8 @@ def test_send_email_success():
             "USERNAME": "user@test.com",
             "PASSWORD": "secure",
             "HOST": "smtp.test.com",
-            "PORT": 587
-        }
+            "PORT": 587,
+        },
     }
 
     with patch("app.utils.configs.ConfigLoader.get_config", return_value=fake_config):

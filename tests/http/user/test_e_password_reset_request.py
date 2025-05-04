@@ -1,5 +1,4 @@
-# TODO: Test for valide and invalid email
-from app.models.user.messages import UserResponseMessages
+from app.models.user.response_messages import UserResponseMessages
 from tests.http.conftest import client
 
 

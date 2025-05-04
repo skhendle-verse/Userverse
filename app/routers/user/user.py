@@ -12,7 +12,7 @@ from app.models.user.user import (
     UserRead,
     UserUpdate,
 )
-from app.models.user.messages import UserResponseMessages
+from app.models.user.response_messages import UserResponseMessages
 
 # security
 from app.security.basic_auth import get_basic_auth_credentials
