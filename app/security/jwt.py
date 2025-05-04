@@ -149,14 +149,3 @@ async def get_current_user_from_jwt_token(
 
     return current_user
 
-
-if __name__ == "__main__":
-    # Example usage:
-    tokens = JWTManager().signJWT({"id": 123, "email": "agent@example.com"})
-    print("Generated Tokens:", tokens)
-
-    # Later, to refresh:
-    new_tokens = JWTManager().refresh_token(tokens["refresh_token"])
-    print("Refreshed Tokens:", new_tokens)
-
-    # uv run -m app.security.jwt

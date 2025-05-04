@@ -87,7 +87,9 @@ class UserPasswordService:
                 data=None,
             )
 
-        return GenericResponseModel(
+        raise AppError(
+            status_code=400,
             message="Invalid OTP",
-            data=None,
+            error="Invalid OTP, does not match or expired",
         )
+        

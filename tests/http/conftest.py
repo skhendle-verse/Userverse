@@ -5,6 +5,8 @@ import pytest
 from tests.utils.basic_auth import get_basic_auth_header
 from fastapi.testclient import TestClient
 from app.main import create_app
+from app.database import DatabaseSessionManager
+from app.database.user import User
 
 
 @pytest.fixture(scope="session")
@@ -20,6 +22,22 @@ def test_data():
     with open("tests/data/http/user.json") as f:
         data = json.load(f)
     return data
+
+# Get user row based on email, and extract OTP
+@pytest.fixture
+def get_user_one_otp(test_data):
+    """Get user row based on email, and extract OTP."""
+    user_one = test_data["user_one"]
+    email = user_one["email"]
+    db = DatabaseSessionManager()
+    session = db.session_object()
+    user = session.query(User).filter_by(email=email).first()
+    if user:
+        password_reset_data = user.primary_meta_data.get("password_reset", {})
+        return password_reset_data.get(
+                "password_reset_token"
+            )
+    return None
 
 
 @pytest.fixture
