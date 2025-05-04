@@ -40,10 +40,12 @@ def password_reset_validate_otp(
     credentials: UserLogin = Depends(get_basic_auth_credentials),
 ):
     try:
-        password_validate_otp_response = UserPasswordService().validate_otp_and_change_password(
-            user_email=credentials.email,
-            new_password=credentials.password,
-            otp=input.otp,
+        password_validate_otp_response = (
+            UserPasswordService().validate_otp_and_change_password(
+                user_email=credentials.email,
+                new_password=credentials.password,
+                otp=input.otp,
+            )
         )
         return JSONResponse(
             status_code=status.HTTP_202_ACCEPTED,
@@ -53,4 +55,3 @@ def password_reset_validate_otp(
         raise e
     except Exception as e:
         raise e
-

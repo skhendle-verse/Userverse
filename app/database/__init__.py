@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy.orm import sessionmaker, declarative_base
-from app.configs import ConfigLoader
+from app.utils.configs import ConfigLoader
 
 Base = declarative_base()
 

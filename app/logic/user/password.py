@@ -86,7 +86,7 @@ class UserPasswordService:
                 message="Password changed successfully",
                 data=None,
             )
-        
+
         return GenericResponseModel(
             message="Invalid OTP",
             data=None,

@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.configs import ConfigLoader
+from app.utils.configs import ConfigLoader
 from app.middleware.logging import LogRouteMiddleware
 from app.routers.user import user
 from app.routers.user import password
@@ -14,11 +14,8 @@ import uvicorn
 
 def create_app() -> FastAPI:
 
-    json_config_path = os.getenv("JSON_CONFIG_PATH", None)
     # load configs
-    loader = ConfigLoader(
-        json_config_path=json_config_path,
-    )
+    loader = ConfigLoader()
     configs = loader.get_config()
 
     cor_origins = configs.get("cor_origins", {})

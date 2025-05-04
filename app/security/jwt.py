@@ -5,7 +5,7 @@ from fastapi import status, Security
 from fastapi.security import APIKeyHeader
 
 # app imports
-from app.configs import ConfigLoader
+from app.utils.configs import ConfigLoader
 from app.models.security_messages import SecurityResponseMessages
 from app.models.user.user import TokenResponseModel, UserRead
 from app.utils.app_error import AppError

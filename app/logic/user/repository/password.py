@@ -72,7 +72,7 @@ class UserPasswordRepository:
                 return True
 
             return False
-        
+
     def update_password(self, user_email: str, new_password: str) -> None:
         """
         Update the password for a user.

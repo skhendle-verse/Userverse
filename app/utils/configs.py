@@ -1,3 +1,4 @@
+import os
 import logging
 import json
 import sys
@@ -18,8 +19,13 @@ cors_default = {
 
 
 class ConfigLoader:
-    def __init__(self, environment: str = None, json_config_path: str = None):
-        self.json_config_path = json_config_path
+    def __init__(self, environment: str = None):
+        json_config_path = os.getenv("JSON_CONFIG_PATH", None)
+        if json_config_path:
+            json_config_path = Path(json_config_path).resolve()
+            if not json_config_path.exists():
+                raise ValueError(f"JSON config file does not exist: {json_config_path}")
+            self.json_config_path = json_config_path
         self.environment = environment
         self.config = self._load_config()
 
@@ -106,9 +112,3 @@ class ConfigLoader:
 
     def get_config(self):
         return self.config
-
-
-# Load configuration
-configs = ConfigLoader(json_config_path="sample-config.json").get_config()
-logger = logging.getLogger(__name__)
-logger.warning("Configuration loaded successfully.")

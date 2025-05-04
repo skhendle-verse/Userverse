@@ -94,7 +94,6 @@ def create_user_api(
         raise e
 
 
-
 # This must use thr jwt token
 @router.get(
     "/user",
@@ -161,4 +160,3 @@ def update_user_api(
         raise e
     except Exception as e:
         raise e
-
