@@ -20,13 +20,13 @@ cors_default = {
 
 class ConfigLoader:
     def __init__(self, environment: str = None):
-        json_config_path = os.getenv("JSON_CONFIG_PATH", None)
-        if json_config_path:
-            json_config_path = Path(json_config_path).resolve()
-            if not json_config_path.exists():
-                raise ValueError(f"JSON config file does not exist: {json_config_path}")
-            self.json_config_path = json_config_path
+        self.json_config_path = os.getenv("JSON_CONFIG_PATH", None)
+        if self.json_config_path:
+            self.json_config_path = Path(self.json_config_path).resolve()
+            if not self.json_config_path.exists():
+                raise ValueError(f"JSON config file does not exist: {self.json_config_path}")
         self.environment = environment
+
         self.config = self._load_config()
 
     def _set_environment(self, config_data):
@@ -53,7 +53,8 @@ class ConfigLoader:
     def _load_from_toml(self):
         try:
             logging.info("Loading configuration from pyproject.toml")
-            pyproject_path = Path(__file__).resolve().parent.parent / "pyproject.toml"
+            pyproject_path = Path(__file__).resolve().parent.parent.parent / "pyproject.toml"
+
 
             if not pyproject_path.exists():
                 return None

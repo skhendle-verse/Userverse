@@ -12,9 +12,9 @@ export TEST_ENVIRONMENT=True
 echo "✅ TEST_ENVIRONMENT set to True"
 
 # Optional: Clean up old test DB if exists
-if [ -f "testing.db" ]; then
-    echo "🗑️ Removing old testing.db..."
-    rm testing.db
+if [ -f "test_environment.db" ]; then
+    echo "🗑️ Removing old test_environment.db..."
+    rm test_environment.db
 fi
 
 # Optional: Setup coverage report directory

@@ -6,7 +6,7 @@ Unit testing for db models
 
 ```bash
 # User Model testing
-(userverse) $: pytest -v tests/database/user.py -s
+(userverse) $: pytest -v tests/database/test_a_user.py -s
 
 ```
 

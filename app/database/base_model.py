@@ -2,6 +2,8 @@ from sqlalchemy import Column, DateTime, JSON
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import IntegrityError
+
 from typing import Any, Dict, List, Optional, Union
 import logging
 
@@ -83,11 +85,20 @@ class BaseModel(Base):
         """
         Create and save a new record.
         """
-        record = cls(**kwargs)
-        session.add(record)
-        session.commit()
-        logger.info(f"{cls.__name__} created: {record}")
-        return cls.to_dict(record)
+        try:
+            record = cls(**kwargs)
+            session.add(record)
+            session.commit()
+            logger.info(f"{cls.__name__} created: {record}")
+            return cls.to_dict(record)
+        except IntegrityError as e:
+            session.rollback()
+            logger.error(f"Integrity error: {e.orig}")
+            raise ValueError(f"Integrity error: {e.orig}")
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Error creating {cls.__name__}: {e}")
+            raise ValueError(f"Error creating {cls.__name__}: {e}")
 
     @classmethod
     def update(cls, session: Session, record_id: Any, **kwargs) -> Dict[str, Any]:
