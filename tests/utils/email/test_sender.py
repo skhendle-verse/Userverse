@@ -1,76 +1,88 @@
 import pytest
-from unittest.mock import patch
-from app.utils.email.sender import send_email
+from unittest.mock import patch, MagicMock
+from app.utils.email.sender import send_email  # Adjust if your file path is different
 
 
-@patch("app.utils.email.sender.configs", new_callable=lambda: {"email": {}})
-def test_send_email_empty_config(mock_configs, caplog):
-    with caplog.at_level("WARNING"):
-        send_email("test@example.com", "Subject", "<p>Body</p>")
-        assert "Email configuration not found." in caplog.text
+def test_send_email_in_test_environment(capfd):
+    """Should print email body in plain text when environment is test"""
+    fake_config = {
+        "environment": "test_environment",
+        "email": {}
+    }
+
+    with patch("app.utils.configs.ConfigLoader.get_config", return_value=fake_config):
+        send_email("test@example.com", "Test Subject", "<h1>Hello</h1><p>This is a test</p>")
+        out, _ = capfd.readouterr()
+        assert "Hello" in out
+        assert "This is a test" in out
 
 
-@patch(
-    "app.utils.email.sender.configs",
-    new_callable=lambda: {
+def test_send_email_missing_username():
+    """Should raise error if email username is missing"""
+    fake_config = {
+        "environment": "prod",
         "email": {
-            "PASSWORD": "password123",
-            "HOST": "smtp.example.com",
-            "PORT": 587,
+            "PASSWORD": "pass",
+            "HOST": "smtp.test.com",
+            "PORT": 587
         }
-    },
-)
-def test_send_email_missing_username(mock_configs):
-    with pytest.raises(ValueError) as exc_info:
-        send_email("test@example.com", "Subject", "<p>Body</p>")
-    assert "email address not found" in str(exc_info.value).lower()
+    }
+
+    with patch("app.utils.configs.ConfigLoader.get_config", return_value=fake_config):
+        with pytest.raises(ValueError, match="Email address not found"):
+            send_email("to@example.com", "Subject", "<p>body</p>")
 
 
-@patch(
-    "app.utils.email.sender.configs",
-    new_callable=lambda: {
+def test_send_email_missing_password():
+    """Should raise error if password is missing"""
+    fake_config = {
+        "environment": "prod",
         "email": {
-            "USERNAME": "test@example.com",
-            "HOST": "smtp.example.com",
-            "PORT": 587,
+            "USERNAME": "user@test.com",
+            "HOST": "smtp.test.com",
+            "PORT": 587
         }
-    },
-)
-def test_send_email_missing_password(mock_configs):
-    with pytest.raises(ValueError) as exc_info:
-        send_email("test@example.com", "Subject", "<p>Body</p>")
-    assert "username or password" in str(exc_info.value).lower()
+    }
+
+    with patch("app.utils.configs.ConfigLoader.get_config", return_value=fake_config):
+        with pytest.raises(ValueError, match="username or password"):
+            send_email("to@example.com", "Subject", "<p>body</p>")
 
 
-@patch(
-    "app.utils.email.sender.configs",
-    new_callable=lambda: {
+def test_send_email_missing_host_or_port():
+    """Should raise error if host or port is missing"""
+    fake_config = {
+        "environment": "prod",
         "email": {
-            "USERNAME": "test@example.com",
-            "PASSWORD": "password123",
-            # Missing HOST
-            "PORT": 587,
+            "USERNAME": "user@test.com",
+            "PASSWORD": "secure"
         }
-    },
-)
-def test_send_email_missing_host(mock_configs):
-    with pytest.raises(ValueError) as exc_info:
-        send_email("test@example.com", "Subject", "<p>Body</p>")
-    assert "host or port" in str(exc_info.value).lower()
+    }
+
+    with patch("app.utils.configs.ConfigLoader.get_config", return_value=fake_config):
+        with pytest.raises(ValueError, match="host or port"):
+            send_email("to@example.com", "Subject", "<p>body</p>")
 
 
-@patch(
-    "app.utils.email.sender.configs",
-    new_callable=lambda: {
+def test_send_email_success():
+    """Should send email successfully with full config"""
+    fake_config = {
+        "environment": "prod",
         "email": {
-            "USERNAME": "test@example.com",
-            "PASSWORD": "password123",
-            "HOST": "smtp.example.com",
-            # Missing PORT
+            "USERNAME": "user@test.com",
+            "PASSWORD": "secure",
+            "HOST": "smtp.test.com",
+            "PORT": 587
         }
-    },
-)
-def test_send_email_missing_port(mock_configs):
-    with pytest.raises(ValueError) as exc_info:
-        send_email("test@example.com", "Subject", "<p>Body</p>")
-    assert "host or port" in str(exc_info.value).lower()
+    }
+
+    with patch("app.utils.configs.ConfigLoader.get_config", return_value=fake_config):
+        with patch("smtplib.SMTP") as mock_smtp:
+            mock_server = MagicMock()
+            mock_smtp.return_value.__enter__.return_value = mock_server
+
+            send_email("to@example.com", "Subject", "<p>test</p>")
+
+            mock_server.starttls.assert_called_once()
+            mock_server.login.assert_called_once_with("user@test.com", "secure")
+            mock_server.send_message.assert_called_once()
