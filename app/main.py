@@ -90,8 +90,7 @@ def create_app() -> FastAPI:
     help="Number of Uvicorn worker processes (ignored in reload mode).",
 )
 @click.option(
-    "--config",
-    "json_config_path",
+    "--json_config_path",
     default=None,
     type=click.Path(exists=True, dir_okay=False, readable=True),
     help="Path to a custom JSON configuration file.",
@@ -132,6 +131,7 @@ def main(
         port=port,
         reload=reload,
         workers=workers,
+        log_config=None
     )
 
 

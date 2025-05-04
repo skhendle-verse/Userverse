@@ -91,9 +91,9 @@ Use the built-in CLI to run the app with full control over config, port, and wor
 
 uv run -m app.main --port 8500 \
   --env production \
-  --config sample-config.json \
+  --json_config_path sample-config.json \
   --host 0.0.0.0 \
-  --port 8500 \
+  --port 8504 \
   --workers 4
 ```
 
