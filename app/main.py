@@ -1,9 +1,11 @@
+import traceback
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.utils.configs import ConfigLoader
-from app.middleware.logging import LogRouteMiddleware
+from app.utils.config_logging import logger
+from app.middleware.logging import LogMiddleware
 from app.routers.user import user
 from app.routers.user import password
 
@@ -26,7 +28,7 @@ def create_app() -> FastAPI:
     ]
 
     app = FastAPI()
-    app.add_middleware(LogRouteMiddleware)
+    app.add_middleware(LogMiddleware)
 
     app.add_middleware(
         CORSMiddleware,
@@ -38,16 +40,31 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(Exception)
     async def app_error_handler(request: Request, exc: Exception):
+        # Get traceback info as a list of frames
+        tb_lines = traceback.format_exception(type(exc), exc, exc.__traceback__)
+        tb_str = ''.join(tb_lines)
+
+        # Extract the last call (where the exception occurred)
+        tb_frame = traceback.extract_tb(exc.__traceback__)[-1]  # Last frame
+        file_name = tb_frame.filename
+        line_number = tb_frame.lineno
+        func_name = tb_frame.name
+
+        logger.error(
+            f"Unhandled Exception in {file_name}, line {line_number}, in {func_name}(): {exc}"
+        )
+        logger.debug(f"Full traceback:\n{tb_str}")
+
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
                 "details": {
                     "message": "An error occurred, please try again.",
-                    "error": str(exc) + ", path:" + str(request.scope.get("path")),
+                    "error": str(exc),
+                    "location": f"{file_name}:{line_number} in {func_name}()",
                 },
             },
         )
-
     app.include_router(user.router)
     app.include_router(password.router)
 
@@ -128,35 +145,6 @@ def main(
     configs = loader.get_config()
     app_name = configs.get("app_name", "userverse")
     version = configs.get("version", "1.0.0")
-    
-
-    # Configure Uvicorn log config
-    log_config = {
-    "version": 1,
-    "app_version": version,
-    "app_name": app_name,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "default": {
-            "()": "app.utils.config_logging.JsonFormatter",
-        },
-        "access": {
-            "()": "app.utils.config_logging.JsonFormatter",  # use same formatter
-        },
-    },
-    "handlers": {
-        "default": {
-            "formatter": "default",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout",
-        },
-    },
-    "loggers": {
-        "uvicorn": {"handlers": ["default"], "level": "INFO"},
-        "uvicorn.error": {"handlers": ["default"], "level": "INFO"},
-        "uvicorn.access": {"handlers": ["default"], "level": "INFO"},
-    },
-}
 
 
     # Launch using factory to ensure consistent app creation
@@ -168,8 +156,8 @@ def main(
         port=port,
         reload=reload,
         workers=workers,
-        log_config=log_config,  # Add this parameter
-        use_colors=False,       # Disable colored logs for clean JSON
+        log_config=None,  # Add this parameter
+        use_colors=False,  # Disable colored logs for clean JSON
     )
 
 

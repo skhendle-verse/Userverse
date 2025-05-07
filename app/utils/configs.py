@@ -1,11 +1,10 @@
 import os
-import logging
 import json
 import sys
 from pathlib import Path
 from app.utils.config_db import DatabaseConfig
 from app.utils.config_env import EnvironmentManager
-
+from app.utils.config_logging import logger
 # Use built-in tomllib for Python 3.11+, otherwise use tomli
 if sys.version_info >= (3, 11):
     import tomllib
@@ -54,7 +53,7 @@ class ConfigLoader:
 
     def _load_from_toml(self):
         try:
-            logging.info("Loading configuration from pyproject.toml")
+            logger.info("Loading configuration from pyproject.toml")
             pyproject_path = (
                 Path(__file__).resolve().parent.parent.parent / "pyproject.toml"
             )
@@ -89,12 +88,12 @@ class ConfigLoader:
             }
 
         except Exception as e:
-            logging.error("Error loading configuration from pyproject.toml: %s", e)
+            logger.error("Error loading configuration from pyproject.toml: %s", e)
             raise ValueError("Error loading configuration from pyproject.toml: %s", e)
 
     def _load_from_json(self):
         try:
-            logging.info("Loading configuration from JSON")
+            logger.info("Loading configuration from JSON")
             with open(self.json_config_path) as f:
                 data = json.load(f)
 
@@ -111,7 +110,7 @@ class ConfigLoader:
             }
 
         except Exception as e:
-            logging.error("Error loading configuration from JSON: %s", e)
+            logger.error("Error loading configuration from JSON: %s", e)
             raise ValueError(f"Error loading configuration: {e}")
 
     def get_config(self):
