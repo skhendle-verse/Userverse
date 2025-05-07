@@ -1,7 +1,7 @@
 # href: https://www.sheshbabu.com/posts/fastapi-structured-json-logging/
 
 from starlette.middleware.base import BaseHTTPMiddleware
-from app.utils.config_logging import logger
+from app.utils.config.logging import logger
 
 class LogMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):

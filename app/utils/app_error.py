@@ -6,7 +6,7 @@ from typing import Optional
 
 
 
-from app.utils.config_logging import logger
+from app.utils.config.logging import logger
 
 class AppError(HTTPException):
     def __init__(

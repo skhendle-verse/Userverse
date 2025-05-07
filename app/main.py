@@ -3,8 +3,8 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.utils.configs import ConfigLoader
-from app.utils.config_logging import logger
+from app.utils.config.loader import ConfigLoader
+from app.utils.config.logging import logger
 from app.middleware.logging import LogMiddleware
 from app.routers.user import user
 from app.routers.user import password
@@ -123,7 +123,7 @@ def main(
     """
     Main entry point for the FastAPI application.
     """
-    # from app.utils.config_logging import setup_logging
+    # from app.utils.config.logging import setup_logging
 
     # Export env for use inside create_app()
     os.environ["ENV"] = env

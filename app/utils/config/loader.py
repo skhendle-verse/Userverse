@@ -2,9 +2,9 @@ import os
 import json
 import sys
 from pathlib import Path
-from app.utils.config_db import DatabaseConfig
-from app.utils.config_env import EnvironmentManager
-from app.utils.config_logging import logger
+from app.utils.config.database import DatabaseConfig
+from app.utils.config.environment import EnvironmentManager
+from app.utils.config.logging import logger
 # Use built-in tomllib for Python 3.11+, otherwise use tomli
 if sys.version_info >= (3, 11):
     import tomllib
