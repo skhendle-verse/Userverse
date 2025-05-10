@@ -29,6 +29,7 @@ from app.database.company import Company  # this ensures the model is registered
 from app.database.association_user_company import (
     AssociationUserCompany,
 )  # this ensures the model is registered
+from app.database.role import Role
 
 target_metadata = BaseModel.metadata
 

@@ -14,7 +14,9 @@ class Company(BaseModel):
     email = Column(String(256), nullable=False, unique=True)
     phone_number = Column(String(16), nullable=True)
     # relationship with users
-    users = relationship("AssociationUserCompany", back_populates="company")
+    users = relationship(
+        "AssociationUserCompany", back_populates="company", overlaps="role,user"
+    )
     # relationship with roles
     roles = relationship("Role", back_populates="company", cascade="all, delete-orphan")
 

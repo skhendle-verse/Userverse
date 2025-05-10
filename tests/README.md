@@ -37,17 +37,20 @@ TODO: Setup a testing config, to avoid comflicts with dev db
 # Security testing
 (userverse) $: pytest -v tests/http/test_security.py
 # Create user testing
-(userverse) $: pytest -v tests/http/user/test_a_create_user_api.py
+(userverse) $: pytest -v tests/http/a_user/test_a_create_user_api.py
 # User login testing
-(userverse) $: pytest -v tests/http/user/test_b_user_login_api.py
+(userverse) $: pytest -v tests/http/a_user/test_b_user_login_api.py
 # Get user testing
-(userverse) $: pytest -v tests/http/user/test_c_get_user.py
+(userverse) $: pytest -v tests/http/a_user/test_c_get_user.py
 # Update user testing
-(userverse) $: pytest -v tests/http/user/test_d_update_user_api.py
+(userverse) $: pytest -v tests/http/a_user/test_d_update_user_api.py
 # Reset Password: Get OTP
-(userverse) $: pytest -v tests/http/user/test_e_password_reset_request.py
+(userverse) $: pytest -v tests/http/a_user/test_e_password_reset_request.py
 # Validate OTP
-(userverse) $: pytest -v tests/http/user/test_f_password_otp_verify.py
+(userverse) $: pytest -v tests/http/a_user/test_f_password_otp_verify.py
+
+# testing company routes
+(userverse) $: pytest -v tests/http/b_company/test_a_create_company.py
 
 ```
 
