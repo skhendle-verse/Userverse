@@ -30,7 +30,9 @@ def test_a_password_reset_validate_otp_fail(client, test_user_data, get_user_one
     assert json_data["detail"]["error"] == PasswordResetResponseMessages.ERROR.value
 
 
-def test_b_password_reset_validate_otp_success(client, test_user_data, get_user_one_otp):
+def test_b_password_reset_validate_otp_success(
+    client, test_user_data, get_user_one_otp
+):
     """Test password reset with valid user email"""
     user_one = test_user_data["user_one"]
     new_password = "NewPassword123"

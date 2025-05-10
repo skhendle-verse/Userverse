@@ -13,6 +13,7 @@ def test_user_data():
         data = json.load(f)
     return data
 
+
 @pytest.fixture(scope="session")
 def test_company_data():
     """Fixture to load test data from JSON file."""
@@ -20,6 +21,7 @@ def test_company_data():
     with open("tests/data/database/company.json") as f:
         data = json.load(f)
     return data
+
 
 @pytest.fixture(scope="session")
 def test_role_data():

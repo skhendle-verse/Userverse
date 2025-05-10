@@ -17,7 +17,7 @@ class Company(BaseModel):
     users = relationship("AssociationUserCompany", back_populates="company")
     # relationship with roles
     roles = relationship("Role", back_populates="company", cascade="all, delete-orphan")
-    
+
     @classmethod
     def get_company_by_email(cls, session: Session, email: str) -> dict:
         try:

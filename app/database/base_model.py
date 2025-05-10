@@ -111,9 +111,11 @@ class BaseModel(Base):
             return cls.to_dict(record)
         except NoResultFound:
             raise RecordNotFoundError(cls.__name__, record_id)
-        
+
     @classmethod
-    def update_by_filters(cls, session: Session, filters: Dict[str, Any], **kwargs) -> Dict[str, Any]:
+    def update_by_filters(
+        cls, session: Session, filters: Dict[str, Any], **kwargs
+    ) -> Dict[str, Any]:
         """
         Update a record using composite key filters (e.g., company_id + name).
         """
@@ -126,7 +128,6 @@ class BaseModel(Base):
             return cls.to_dict(record)
         except NoResultFound:
             raise ValueError(f"{cls.__name__} with filters {filters} not found.")
-
 
     @classmethod
     def delete(cls, session: Session, record_id: Any) -> Dict[str, str]:
@@ -144,7 +145,9 @@ class BaseModel(Base):
             raise RecordNotFoundError(cls.__name__, record_id)
 
     @classmethod
-    def delete_by_filters(cls, session: Session, filters: Dict[str, Any]) -> Dict[str, str]:
+    def delete_by_filters(
+        cls, session: Session, filters: Dict[str, Any]
+    ) -> Dict[str, str]:
         """
         Soft delete a record using composite key filters.
         """
@@ -156,7 +159,6 @@ class BaseModel(Base):
             return {"message": f"{cls.__name__} with filters {filters} deleted"}
         except NoResultFound:
             raise ValueError(f"{cls.__name__} with filters {filters} not found.")
-
 
     @classmethod
     def bulk_create(

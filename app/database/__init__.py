@@ -23,7 +23,6 @@ class DatabaseSessionManager:
         from .role import Role
         from .association_user_company import AssociationUserCompany
         from .user import User
-        
 
         self.engine = self._configure_engine()
         self._base.metadata.create_all(bind=self.engine)
