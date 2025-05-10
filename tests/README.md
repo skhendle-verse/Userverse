@@ -51,6 +51,6 @@ Unit testing for app Utils
 (userverse) $: pytest -v tests/utils/email/test_renderer.py -s
 
 # Send email testing
-(userverse) $: pytest -v tests/utils/email/test_senderer.py -s
+(userverse) $: pytest -v tests/utils/email/test_sender.py -s
 
 ```
