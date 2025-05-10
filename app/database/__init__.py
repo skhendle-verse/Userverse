@@ -19,7 +19,8 @@ class DatabaseSessionManager:
         loader = ConfigLoader()
         configs = loader.get_config()
         self.configs = configs
-
+        from .company import Company
+        from .association_user_company import AssociationUserCompany
         from .user import User
 
         self.engine = self._configure_engine()
@@ -36,3 +37,11 @@ class DatabaseSessionManager:
 
     def session_object(self):
         return self._session()
+    
+if __name__ == "__main__":
+    # Example usage
+    db_manager = DatabaseSessionManager()
+    session = db_manager.session_object()
+    logger.info("Database session created successfully.")
+    # Don't forget to close the session when done
+    session.close()
