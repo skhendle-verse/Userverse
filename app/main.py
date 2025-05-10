@@ -1,23 +1,24 @@
+import os
 import traceback
+import logging
+
+import click
+import uvicorn
 from fastapi import FastAPI, Request, status
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from uvicorn.config import Config
+from uvicorn.server import Server
 
 from app.middleware.otel import setup_otel
-from app.utils.config.loader import ConfigLoader
-from app.utils.config.logging import logger
 from app.middleware.logging import LogMiddleware
 from app.routers.user import user
 from app.routers.user import password
-
-import os
-import click
-import uvicorn
+from app.utils.config.loader import ConfigLoader
+from app.utils.config.logging import logger
 
 
 def create_app() -> FastAPI:
-
-    # load configs
     loader = ConfigLoader()
     configs = loader.get_config()
 
@@ -29,10 +30,9 @@ def create_app() -> FastAPI:
     ]
 
     app = FastAPI()
-    # Attach OpenTelemetry middleware
+
     setup_otel(app)
     app.add_middleware(LogMiddleware)
-
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -43,18 +43,13 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(Exception)
     async def app_error_handler(request: Request, exc: Exception):
-        # Get traceback info as a list of frames
         tb_lines = traceback.format_exception(type(exc), exc, exc.__traceback__)
-        tb_str = ''.join(tb_lines)
-
-        # Extract the last call (where the exception occurred)
-        tb_frame = traceback.extract_tb(exc.__traceback__)[-1]  # Last frame
-        file_name = tb_frame.filename
-        line_number = tb_frame.lineno
-        func_name = tb_frame.name
+        tb_str = "".join(tb_lines)
+        tb_frame = traceback.extract_tb(exc.__traceback__)[-1]
 
         logger.error(
-            f"Unhandled Exception in {file_name}, line {line_number}, in {func_name}(): {exc}"
+            f"Unhandled Exception in {tb_frame.filename}, "
+            f"line {tb_frame.lineno}, in {tb_frame.name}(): {exc}"
         )
         logger.debug(f"Full traceback:\n{tb_str}")
 
@@ -64,10 +59,11 @@ def create_app() -> FastAPI:
                 "details": {
                     "message": "An error occurred, please try again.",
                     "error": str(exc),
-                    "location": f"{file_name}:{line_number} in {func_name}()",
+                    "location": f"{tb_frame.filename}:{tb_frame.lineno} in {tb_frame.name}()",
                 },
             },
         )
+
     app.include_router(user.router)
     app.include_router(password.router)
 
@@ -101,11 +97,7 @@ def create_app() -> FastAPI:
     type=click.Choice(["development", "production", "testing"]),
     help="Environment to run the server in.",
 )
-@click.option(
-    "--reload",
-    is_flag=True,
-    help="Reload the server on code change (for development only).",
-)
+@click.option("--reload", is_flag=True, help="Reload the server on code change.")
 @click.option(
     "--workers",
     default=1,
@@ -126,35 +118,39 @@ def main(
     workers: int,
     json_config_path: str | None,
 ):
-    """
-    Main entry point for the FastAPI application.
-    """
-
-    # Export env for use inside create_app()
     os.environ["ENV"] = env
     if json_config_path:
         os.environ["JSON_CONFIG_PATH"] = json_config_path
 
-    # Validation note: reload mode doesn't support workers > 1
     if reload and workers > 1:
-        click.echo(
-            "⚠️ Reload mode does not support multiple workers. Ignoring --workers."
-        )
+        logger.warning("Reload mode does not support multiple workers. Using a single worker.")
         workers = 1
 
+    logger.info(f"🚀 Starting Userverse API on http://{host}:{port} [env={env}]")
 
-    # Launch using factory to ensure consistent app creation
-    click.echo(f"🚀 Starting Userverse API on http://{host}:{port} [env={env}]")
-    uvicorn.run(
-        "app.main:create_app",
+    # Silence all Uvicorn-related logs
+    logging.getLogger("uvicorn").setLevel(logging.CRITICAL)
+    logging.getLogger("uvicorn.error").setLevel(logging.CRITICAL)
+    logging.getLogger("uvicorn.access").setLevel(logging.CRITICAL)
+    logging.getLogger("watchfiles.main").setLevel(logging.WARNING)
+
+    # Tell watchfiles to ignore .venv directory
+    if reload:
+        os.environ["WATCHFILES_IGNORE"] = ".venv"
+
+    config = Config(
+        app="app.main:create_app",
         factory=True,
         host=host,
         port=port,
         reload=reload,
         workers=workers,
-        log_config=None,  # Add this parameter
-        use_colors=False,  # Disable colored logs for clean JSON
+        use_colors=False,
+        log_level="critical",  # Uvicorn log level
     )
+
+    server = Server(config)
+    server.run()
 
 
 if __name__ == "__main__":

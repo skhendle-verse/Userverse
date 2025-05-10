@@ -6,7 +6,12 @@ from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExport
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
-def setup_otel(app, service_name: str = "fastapi-app", collector_endpoint="http://otel-collector:4318/v1/traces"):
+
+def setup_otel(
+    app,
+    service_name: str = "fastapi-app",
+    collector_endpoint="http://otel-collector:4318/v1/traces",
+):
     """
     Initializes OpenTelemetry tracing and instrumentation for a FastAPI app.
     - service_name: name to appear in OpenSearch traces

@@ -2,9 +2,12 @@
 import os
 import json
 import pytest
+from unittest.mock import patch
 from tests.utils.basic_auth import get_basic_auth_header
 from fastapi.testclient import TestClient
+
 from app.main import create_app
+from app.utils.config.loader import ConfigLoader
 from app.database import DatabaseSessionManager
 from app.database.user import User
 
@@ -12,8 +15,12 @@ from app.database.user import User
 @pytest.fixture(scope="session")
 def client():
     os.environ["ENV"] = "testing"
-    app = create_app()
-    return TestClient(app)
+
+    default_config = ConfigLoader(environment="testing").get_config()  # pulls the default from your updated loader
+    print(f"Default config: {default_config}")
+    with patch.object(ConfigLoader, "get_config", return_value=default_config):
+        app = create_app()
+        return TestClient(app)
 
 
 @pytest.fixture(scope="session")

@@ -1,5 +1,8 @@
-from app.models.user.response_messages import UserResponseMessages, PasswordResetResponseMessages
-from tests.http.conftest import client
+from app.models.user.response_messages import (
+    UserResponseMessages,
+    PasswordResetResponseMessages,
+)
+from tests.http.conftest import client, test_data, login_token
 
 
 def test_password_reset_success(client, test_data):
@@ -15,7 +18,7 @@ def test_password_reset_success(client, test_data):
     json_data = response.json()
 
     assert "message" in json_data
-    assert json_data["message"] == PasswordResetResponseMessages.OTP_SENT.value 
+    assert json_data["message"] == PasswordResetResponseMessages.OTP_SENT.value
 
     assert "data" in json_data
     assert json_data["data"] is None

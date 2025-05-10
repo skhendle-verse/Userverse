@@ -5,8 +5,8 @@ import traceback
 from typing import Optional
 
 
-
 from app.utils.config.logging import logger
+
 
 class AppError(HTTPException):
     def __init__(

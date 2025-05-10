@@ -9,7 +9,10 @@ from app.logic.user.repository.user import UserRepository
 from app.logic.user.repository.password import UserPasswordRepository
 
 # UTILS
-from app.models.user.response_messages import PasswordResetResponseMessages, UserResponseMessages
+from app.models.user.response_messages import (
+    PasswordResetResponseMessages,
+    UserResponseMessages,
+)
 from app.utils.app_error import AppError
 
 

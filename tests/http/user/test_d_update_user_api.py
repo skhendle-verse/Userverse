@@ -1,6 +1,5 @@
-# tests/http/user/test_b_get_user_api.py
+from tests.http.conftest import client, test_data, login_token
 from app.models.security_messages import SecurityResponseMessages
-from tests.http.client import client
 from app.models.user.response_messages import UserResponseMessages
 
 
