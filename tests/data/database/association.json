@@ -1,0 +1,9 @@
+{
+    "user_one": {
+        "email": "testuser@example.com",
+        "password": "secure123",
+        "first_name": "Test",
+        "last_name": "User",
+        "phone_number": "+27110000001"
+    }
+}

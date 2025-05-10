@@ -2,31 +2,31 @@ import pytest
 from app.database.user import User
 from app.database.base_model import RecordNotFoundError
 
-from tests.database.conftest import test_data, test_session
+from tests.database.conftest import test_user_data, test_session
 
 
-def test_create_user(test_session, test_data):
-    user_data = test_data["create_user"]
+def test_create_user(test_session, test_user_data):
+    user_data = test_user_data["create_user"]
     user = User.create(test_session, **user_data)
     assert user["email"] == user_data["email"]
 
 
-def test_get_user_by_id(test_session, test_data):
-    user_data = test_data["get_user_by_id"]
+def test_get_user_by_id(test_session, test_user_data):
+    user_data = test_user_data["get_user_by_id"]
     created_user = User.create(test_session, **user_data)
     result = User.get_by_id(test_session, created_user["id"])
     assert result["email"] == user_data["email"]
 
 
-def test_get_user_by_email(test_session, test_data):
-    user_data = test_data["get_user_by_email"]
+def test_get_user_by_email(test_session, test_user_data):
+    user_data = test_user_data["get_user_by_email"]
     created_user = User.create(test_session, **user_data)
     result = User.get_user_by_email(test_session, user_data["email"])
     assert result.email == created_user["email"]
 
 
-def test_update_user(test_session, test_data):
-    user_data = test_data["update_user"]
+def test_update_user(test_session, test_user_data):
+    user_data = test_user_data["update_user"]
     created_user = User.create(
         test_session, email=user_data["email"], password=user_data["password"]
     )
@@ -36,27 +36,27 @@ def test_update_user(test_session, test_data):
     assert updated_user["first_name"] == user_data["update_fields"]["first_name"]
 
 
-def test_delete_user(test_session, test_data):
-    user_data = test_data["delete_user"]
+def test_delete_user(test_session, test_user_data):
+    user_data = test_user_data["delete_user"]
     created_user = User.create(test_session, **user_data)
     response = User.delete(test_session, created_user["id"])
     assert "deleted" in response["message"]
 
 
-def test_get_by_id_not_found(test_session, test_data):
-    missing_id = test_data["not_found_tests"]["nonexistent_id"]
+def test_get_by_id_not_found(test_session, test_user_data):
+    missing_id = test_user_data["not_found_tests"]["nonexistent_id"]
     with pytest.raises(RecordNotFoundError):
         User.get_by_id(test_session, missing_id)
 
 
-def test_get_user_by_email_not_found(test_session, test_data):
-    missing_email = test_data["not_found_tests"]["nonexistent_email"]
+def test_get_user_by_email_not_found(test_session, test_user_data):
+    missing_email = test_user_data["not_found_tests"]["nonexistent_email"]
     with pytest.raises(ValueError):
         User.get_user_by_email(test_session, missing_email)
 
 
-def test_update_json_field_primary_metadata(test_session, test_data):
-    user_data = test_data["json_field_update"]
+def test_update_json_field_primary_metadata(test_session, test_user_data):
+    user_data = test_user_data["json_field_update"]
     created_user = User.create(
         test_session, email=user_data["email"], password=user_data["password"]
     )
@@ -73,8 +73,8 @@ def test_update_json_field_primary_metadata(test_session, test_data):
     )
 
 
-def test_update_json_field_invalid_column(test_session, test_data):
-    user_data = test_data["invalid_json_field"]
+def test_update_json_field_invalid_column(test_session, test_user_data):
+    user_data = test_user_data["invalid_json_field"]
     created_user = User.create(
         test_session, email=user_data["email"], password=user_data["password"]
     )
@@ -92,9 +92,9 @@ def test_update_json_field_invalid_column(test_session, test_data):
         )
 
 
-def test_update_json_field_record_not_found(test_session, test_data):
-    missing_id = test_data["not_found_tests"]["nonexistent_id"]
-    json_update = test_data["json_field_update"]["json_update"]
+def test_update_json_field_record_not_found(test_session, test_user_data):
+    missing_id = test_user_data["not_found_tests"]["nonexistent_id"]
+    json_update = test_user_data["json_field_update"]["json_update"]
     with pytest.raises(RecordNotFoundError):
         User.update_json_field(
             test_session,

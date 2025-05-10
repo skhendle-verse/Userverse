@@ -111,6 +111,22 @@ class BaseModel(Base):
             return cls.to_dict(record)
         except NoResultFound:
             raise RecordNotFoundError(cls.__name__, record_id)
+        
+    @classmethod
+    def update_by_filters(cls, session: Session, filters: Dict[str, Any], **kwargs) -> Dict[str, Any]:
+        """
+        Update a record using composite key filters (e.g., company_id + name).
+        """
+        try:
+            record = session.query(cls).filter_by(**filters).one()
+            for field, value in kwargs.items():
+                setattr(record, field, value)
+            session.commit()
+            logger.info(f"{cls.__name__} updated with filters {filters}")
+            return cls.to_dict(record)
+        except NoResultFound:
+            raise ValueError(f"{cls.__name__} with filters {filters} not found.")
+
 
     @classmethod
     def delete(cls, session: Session, record_id: Any) -> Dict[str, str]:
@@ -126,6 +142,21 @@ class BaseModel(Base):
             return {"message": f"{cls.__name__} with id={record_id} deleted"}
         except NoResultFound:
             raise RecordNotFoundError(cls.__name__, record_id)
+
+    @classmethod
+    def delete_by_filters(cls, session: Session, filters: Dict[str, Any]) -> Dict[str, str]:
+        """
+        Soft delete a record using composite key filters.
+        """
+        try:
+            record = session.query(cls).filter_by(**filters).one()
+            record._closed_at = func.now()
+            session.commit()
+            logger.info(f"{cls.__name__} deleted with filters {filters}")
+            return {"message": f"{cls.__name__} with filters {filters} deleted"}
+        except NoResultFound:
+            raise ValueError(f"{cls.__name__} with filters {filters} not found.")
+
 
     @classmethod
     def bulk_create(
