@@ -1,20 +1,24 @@
-from fastapi import FastAPI, Request, status
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-
-from app.utils.configs import ConfigLoader
-from app.middleware.logging import LogRouteMiddleware
-from app.routers.user import user
-from app.routers.user import password
-
 import os
+import traceback
+import logging
+
 import click
 import uvicorn
+from fastapi import FastAPI, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from uvicorn.config import Config
+from uvicorn.server import Server
+
+from app.middleware.otel import setup_otel
+from app.middleware.logging import LogMiddleware
+from app.routers.user import user
+from app.routers.user import password
+from app.utils.config.loader import ConfigLoader
+from app.utils.config.logging import logger
 
 
 def create_app() -> FastAPI:
-
-    # load configs
     loader = ConfigLoader()
     configs = loader.get_config()
 
@@ -26,8 +30,9 @@ def create_app() -> FastAPI:
     ]
 
     app = FastAPI()
-    app.add_middleware(LogRouteMiddleware)
 
+    setup_otel(app)
+    app.add_middleware(LogMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -38,12 +43,23 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(Exception)
     async def app_error_handler(request: Request, exc: Exception):
+        tb_lines = traceback.format_exception(type(exc), exc, exc.__traceback__)
+        tb_str = "".join(tb_lines)
+        tb_frame = traceback.extract_tb(exc.__traceback__)[-1]
+
+        logger.error(
+            f"Unhandled Exception in {tb_frame.filename}, "
+            f"line {tb_frame.lineno}, in {tb_frame.name}(): {exc}"
+        )
+        logger.debug(f"Full traceback:\n{tb_str}")
+
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
                 "details": {
                     "message": "An error occurred, please try again.",
-                    "error": str(exc) + ", path:" + str(request.scope.get("path")),
+                    "error": str(exc),
+                    "location": f"{tb_frame.filename}:{tb_frame.lineno} in {tb_frame.name}()",
                 },
             },
         )
@@ -53,18 +69,21 @@ def create_app() -> FastAPI:
 
     @app.get("/")
     async def root():
-        return JSONResponse(
-            status_code=200,
-            content={
-                "status": "ok",
-                "version": configs.get("version"),
-                "name": configs.get("name"),
-                "description": configs.get("description"),
-                "repository": configs.get("repository"),
-                "documentation": configs.get("documentation"),
-                "message": "Welcome to the Userverse backend API",
-            },
-        )
+        from opentelemetry import trace
+
+        with trace.get_tracer(__name__).start_as_current_span("manual-span"):
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "status": "ok",
+                    "version": configs.get("version"),
+                    "name": configs.get("name"),
+                    "description": configs.get("description"),
+                    "repository": configs.get("repository"),
+                    "documentation": configs.get("documentation"),
+                    "message": "Welcome to the Userverse backend API",
+                },
+            )
 
     return app
 
@@ -78,11 +97,7 @@ def create_app() -> FastAPI:
     type=click.Choice(["development", "production", "testing"]),
     help="Environment to run the server in.",
 )
-@click.option(
-    "--reload",
-    is_flag=True,
-    help="Reload the server on code change (for development only).",
-)
+@click.option("--reload", is_flag=True, help="Reload the server on code change.")
 @click.option(
     "--workers",
     default=1,
@@ -90,8 +105,7 @@ def create_app() -> FastAPI:
     help="Number of Uvicorn worker processes (ignored in reload mode).",
 )
 @click.option(
-    "--config",
-    "json_config_path",
+    "--json_config_path",
     default=None,
     type=click.Path(exists=True, dir_okay=False, readable=True),
     help="Path to a custom JSON configuration file.",
@@ -104,35 +118,39 @@ def main(
     workers: int,
     json_config_path: str | None,
 ):
-    """
-    Main entry point for the FastAPI application.
-    """
-    from app.utils.config_logging import setup_logging
-
-    setup_logging()
-
-    # Export env for use inside create_app()
     os.environ["ENV"] = env
     if json_config_path:
         os.environ["JSON_CONFIG_PATH"] = json_config_path
 
-    # Validation note: reload mode doesn't support workers > 1
     if reload and workers > 1:
-        click.echo(
-            "⚠️ Reload mode does not support multiple workers. Ignoring --workers."
-        )
+        logger.warning("Reload mode does not support multiple workers. Using a single worker.")
         workers = 1
 
-    # Launch using factory to ensure consistent app creation
-    click.echo(f"🚀 Starting Userverse API on http://{host}:{port} [env={env}]")
-    uvicorn.run(
-        "app.main:create_app",
+    logger.info(f"🚀 Starting Userverse API on http://{host}:{port} [env={env}]")
+
+    # Silence all Uvicorn-related logs
+    logging.getLogger("uvicorn").setLevel(logging.CRITICAL)
+    logging.getLogger("uvicorn.error").setLevel(logging.CRITICAL)
+    logging.getLogger("uvicorn.access").setLevel(logging.CRITICAL)
+    logging.getLogger("watchfiles.main").setLevel(logging.WARNING)
+
+    # Tell watchfiles to ignore .venv directory
+    if reload:
+        os.environ["WATCHFILES_IGNORE"] = ".venv"
+
+    config = Config(
+        app="app.main:create_app",
         factory=True,
         host=host,
         port=port,
         reload=reload,
         workers=workers,
+        use_colors=False,
+        log_level="critical",  # Uvicorn log level
     )
+
+    server = Server(config)
+    server.run()
 
 
 if __name__ == "__main__":

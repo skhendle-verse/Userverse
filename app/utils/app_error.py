@@ -2,13 +2,10 @@ from fastapi import status
 from fastapi.exceptions import HTTPException
 import inspect
 import traceback
-import logging
 from typing import Optional
 
-# Configure your logger to output to console
-logging.basicConfig(
-    level=logging.ERROR, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+
+from app.utils.config.logging import logger
 
 
 class AppError(HTTPException):
@@ -30,7 +27,7 @@ class AppError(HTTPException):
 
         # Log the error if needed
         if log_error:
-            logging.error(
+            logger.error(
                 f"AppError: {message} | Details: {error} | Location: {caller_details}"
             )
             # self.log_exception()
@@ -53,4 +50,4 @@ class AppError(HTTPException):
     def log_exception(self):
         # This method could be extended to integrate with external monitoring tools
         tb = traceback.format_exc()
-        logging.error(f"StackTrace: {tb}")
+        logger.error(f"StackTrace: {tb}")

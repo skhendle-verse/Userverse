@@ -1,12 +1,5 @@
 {
-    "database": {
-        "HOST": "localhost",
-        "PORT": 5432,
-        "USERNAME": "sandile",
-        "PASSWORD": "Password123",
-        "NAME": "userverse",
-        "TYPE": "postgresql"
-    },
+
     "cor_origins": {
         "allowed": [
             "*"

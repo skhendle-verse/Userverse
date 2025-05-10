@@ -9,9 +9,11 @@ from app.logic.user.repository.user import UserRepository
 from app.logic.user.repository.password import UserPasswordRepository
 
 # UTILS
+from app.models.user.response_messages import (
+    PasswordResetResponseMessages,
+    UserResponseMessages,
+)
 from app.utils.app_error import AppError
-from app.utils.email.renderer import render_email_template
-from app.utils.email.sender import send_email
 
 
 class UserPasswordService:
@@ -32,7 +34,7 @@ class UserPasswordService:
         user_repository = UserRepository()
         user = user_repository.get_user_by_email(user_email)
         if not user:
-            raise ValueError("User not found")
+            raise ValueError(UserResponseMessages.USER_NOT_FOUND.value)
         # reset token
         token = cls.generate_random_string(length=6)
         # populate the token in the database for the user
@@ -53,7 +55,7 @@ class UserPasswordService:
         )
 
         return GenericResponseModel(
-            message="OTP sent to email",
+            message=PasswordResetResponseMessages.OTP_SENT.value,
             data=None,
         )
 
@@ -69,7 +71,7 @@ class UserPasswordService:
         user_repository = UserRepository()
         user = user_repository.get_user_by_email(user_email)
         if not user:
-            raise ValueError("User not found")
+            raise ValueError(UserResponseMessages.USER_NOT_FOUND.value)
 
         # populate the token in the database for the user
         user_password_repository = UserPasswordRepository()
@@ -83,12 +85,12 @@ class UserPasswordService:
                 new_password=new_password,
             )
             return GenericResponseModel(
-                message="Password changed successfully",
+                message=PasswordResetResponseMessages.PASSWORD_CHANGED.value,
                 data=None,
             )
 
         raise AppError(
             status_code=400,
-            message="Invalid OTP",
-            error="Invalid OTP, does not match or expired",
+            message=PasswordResetResponseMessages.OTP_VERIFICATION_FAILED.value,
+            error=PasswordResetResponseMessages.ERROR.value,
         )

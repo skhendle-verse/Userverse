@@ -23,7 +23,10 @@ mkdir -p "$COVERAGE_DIR"
 
 echo "-----------------------------------------"
 echo "📄 Generating Coverage Report Summary:"
-pytest --cov=app --cov-report=term-missing --cov-report=xml
+pytest -v -s --cov=app \
+    --cov-report=term-missing \
+    --cov-report=xml:"$COVERAGE_DIR/coverage.xml"
+
 
 echo "========================================="
 echo "✅ HTTP integration tests completed!"

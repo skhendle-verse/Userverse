@@ -2,7 +2,7 @@ import logging
 from bs4 import BeautifulSoup
 from email.message import EmailMessage
 import smtplib
-from app.utils.configs import ConfigLoader
+from app.utils.config.loader import ConfigLoader
 
 
 def send_email(to: str, subject: str, html_body: str):

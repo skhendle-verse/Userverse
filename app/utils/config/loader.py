@@ -1,10 +1,11 @@
 import os
-import logging
 import json
 import sys
 from pathlib import Path
-from app.utils.config_db import DatabaseConfig
-from app.utils.config_env import EnvironmentManager
+from app.utils.config.cors import CorsConfig
+from app.utils.config.database import DatabaseConfig
+from app.utils.config.environment import EnvironmentManager
+from app.utils.config.logging import logger
 
 # Use built-in tomllib for Python 3.11+, otherwise use tomli
 if sys.version_info >= (3, 11):
@@ -54,13 +55,14 @@ class ConfigLoader:
 
     def _load_from_toml(self):
         try:
-            logging.info("Loading configuration from pyproject.toml")
+            logger.info("Loading configuration from pyproject.toml")
             pyproject_path = (
                 Path(__file__).resolve().parent.parent.parent / "pyproject.toml"
             )
 
             if not pyproject_path.exists():
-                return None
+                logger.warning("pyproject.toml not found — using default test config.")
+                return self._default_test_config()
 
             with open(pyproject_path, "rb") as f:
                 pyproject_data = tomllib.load(f)
@@ -70,17 +72,14 @@ class ConfigLoader:
             )
 
             if not app_config:
-                raise ValueError(
-                    "No configuration found in pyproject.toml under [tool.uservese.config]"
-                )
+                logger.warning("Missing config section in pyproject.toml — using default test config.")
+                return self._default_test_config()
 
             environment = self._set_environment(app_config)
             return {
                 "environment": environment,
-                "database_url": DatabaseConfig.get_connection_string(
-                    app_config, environment
-                ),
-                "cor_origins": app_config.get("cor_origins", cors_default),
+                "database_url": DatabaseConfig.get_connection_string(app_config, environment),
+                "cor_origins": CorsConfig.get_cors(configs=app_config, environment=environment),
                 "jwt": app_config.get("jwt", {}),
                 "email": app_config.get("email", {}),
                 "version": app_config.get("version", "0.1.0"),
@@ -89,12 +88,26 @@ class ConfigLoader:
             }
 
         except Exception as e:
-            logging.error("Error loading configuration from pyproject.toml: %s", e)
-            raise ValueError("Error loading configuration from pyproject.toml: %s", e)
+            logger.error("Error loading configuration from pyproject.toml: %s", e)
+            logger.warning("Falling back to default test config.")
+            return self._default_test_config()
+
+    def _default_test_config(self):
+        environment = "test_environment"
+        return {
+            "database_url": DatabaseConfig.get_connection_string({}, environment),
+            "environment": environment,
+            "cor_origins": CorsConfig.get_cors(configs={}, environment=environment),
+            "jwt": {},
+            "email": {},
+            "version": "0.1.0",
+            "name": "Userverse",
+            "description": "Mocked config for test",
+        }
 
     def _load_from_json(self):
         try:
-            logging.info("Loading configuration from JSON")
+            logger.info("Loading configuration from JSON")
             with open(self.json_config_path) as f:
                 data = json.load(f)
 
@@ -102,7 +115,7 @@ class ConfigLoader:
             return {
                 "environment": environment,
                 "database_url": DatabaseConfig.get_connection_string(data, environment),
-                "cor_origins": data.get("cors_origins", cors_default),
+                "cor_origins": CorsConfig.get_cors(configs=data, environment=environment),
                 "jwt": data.get("jwt", {}),
                 "email": data.get("email", {}),
                 "version": data.get("version", "0.1.0"),
@@ -111,7 +124,7 @@ class ConfigLoader:
             }
 
         except Exception as e:
-            logging.error("Error loading configuration from JSON: %s", e)
+            logger.error("Error loading configuration from JSON: %s", e)
             raise ValueError(f"Error loading configuration: {e}")
 
     def get_config(self):

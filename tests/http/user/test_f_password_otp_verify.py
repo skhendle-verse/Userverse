@@ -1,3 +1,4 @@
+from app.models.user.response_messages import PasswordResetResponseMessages
 from tests.http.conftest import client, get_user_one_otp
 from tests.utils.basic_auth import get_basic_auth_header
 
@@ -22,8 +23,8 @@ def test_a_password_reset_validate_otp_fail(client, test_data, get_user_one_otp)
     json_data = response.json()
 
     assert "detail" in json_data
-    assert json_data["detail"]["message"] == "Invalid OTP"
-    assert json_data["detail"]["error"] == "Invalid OTP, does not match or expired"
+    assert json_data["detail"]["message"] == PasswordResetResponseMessages.OTP_VERIFICATION_FAILED.value
+    assert json_data["detail"]["error"] == PasswordResetResponseMessages.ERROR.value
 
 
 def test_b_password_reset_validate_otp_success(client, test_data, get_user_one_otp):
@@ -46,7 +47,7 @@ def test_b_password_reset_validate_otp_success(client, test_data, get_user_one_o
     json_data = response.json()
 
     assert "message" in json_data
-    assert json_data["message"] == "Password changed successfully"
+    assert json_data["message"] == PasswordResetResponseMessages.PASSWORD_CHANGED.value
 
     assert "data" in json_data
     assert json_data["data"] is None

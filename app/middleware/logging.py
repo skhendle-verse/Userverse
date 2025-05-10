@@ -1,12 +1,19 @@
+# href: https://www.sheshbabu.com/posts/fastapi-structured-json-logging/
+
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
-import logging
-
-logger = logging.getLogger("__name__")
+from app.utils.config.logging import logger
 
 
-class LogRouteMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        logger.info(f"{request.method} {request.url.path}")
+class LogMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
         response = await call_next(request)
+        logger.info(
+            "Incoming request",
+            extra={
+                "req": {"method": request.method, "url": str(request.url)},
+                "res": {
+                    "status_code": response.status_code,
+                },
+            },
+        )
         return response

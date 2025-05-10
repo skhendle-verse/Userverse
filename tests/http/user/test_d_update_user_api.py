@@ -1,6 +1,6 @@
-# tests/http/user/test_b_get_user_api.py
+
+from tests.http.conftest import client, test_data, login_token
 from app.models.security_messages import SecurityResponseMessages
-from tests.http.client import client
 from app.models.user.response_messages import UserResponseMessages
 
 
@@ -37,7 +37,7 @@ def test_a_update_user_success(client, login_token_user_two, test_data):
     assert json_response["data"]["phone_number"] == user_two["phone_number"]
 
 
-def test_b_update_user_fail_with_invalid_token(test_data):
+def test_b_update_user_fail_with_invalid_token(client, test_data):
     """Test updating user information with an invalid token."""
     user_two = test_data["user_two"]
     update_data = test_data["update_user"]

@@ -26,3 +26,12 @@ class UserResponseMessages(str, Enum):
     EMAIL_VERIFICATION_FAILED = "Email verification failed"
     ACCOUNT_LOCKED = "Account is locked"
     INVALID_REQUEST_MESSAGE = "Invalid request"
+
+
+class PasswordResetResponseMessages(str, Enum):
+    OTP_SENT = "OTP sent to email"
+    OTP_VERIFIED = "OTP verified successfully"
+    OTP_VERIFICATION_FAILED = "OTP verification failed"
+    PASSWORD_CHANGED = "Password changed successfully"
+    PASSWORD_CHANGE_FAILED = "Password change failed"
+    ERROR = "Invalid OTP, does not match or expired"

@@ -1,7 +1,7 @@
 import pytest
 import json
 from unittest.mock import patch
-from app.utils.configs import ConfigLoader
+from app.utils.config.loader import ConfigLoader
 from app.database import DatabaseSessionManager
 
 

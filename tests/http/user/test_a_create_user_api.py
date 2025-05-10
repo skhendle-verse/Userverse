@@ -1,6 +1,6 @@
 import pytest
 from app.models.user.response_messages import UserResponseMessages
-from tests.http.conftest import client
+from tests.http.conftest import client, test_data
 from tests.utils.basic_auth import get_basic_auth_header
 
 
