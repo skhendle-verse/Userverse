@@ -123,7 +123,9 @@ def main(
         os.environ["JSON_CONFIG_PATH"] = json_config_path
 
     if reload and workers > 1:
-        logger.warning("Reload mode does not support multiple workers. Using a single worker.")
+        logger.warning(
+            "Reload mode does not support multiple workers. Using a single worker."
+        )
         workers = 1
 
     logger.info(f"🚀 Starting Userverse API on http://{host}:{port} [env={env}]")

@@ -23,7 +23,10 @@ def test_a_password_reset_validate_otp_fail(client, test_data, get_user_one_otp)
     json_data = response.json()
 
     assert "detail" in json_data
-    assert json_data["detail"]["message"] == PasswordResetResponseMessages.OTP_VERIFICATION_FAILED.value
+    assert (
+        json_data["detail"]["message"]
+        == PasswordResetResponseMessages.OTP_VERIFICATION_FAILED.value
+    )
     assert json_data["detail"]["error"] == PasswordResetResponseMessages.ERROR.value
 
 

@@ -72,14 +72,20 @@ class ConfigLoader:
             )
 
             if not app_config:
-                logger.warning("Missing config section in pyproject.toml — using default test config.")
+                logger.warning(
+                    "Missing config section in pyproject.toml — using default test config."
+                )
                 return self._default_test_config()
 
             environment = self._set_environment(app_config)
             return {
                 "environment": environment,
-                "database_url": DatabaseConfig.get_connection_string(app_config, environment),
-                "cor_origins": CorsConfig.get_cors(configs=app_config, environment=environment),
+                "database_url": DatabaseConfig.get_connection_string(
+                    app_config, environment
+                ),
+                "cor_origins": CorsConfig.get_cors(
+                    configs=app_config, environment=environment
+                ),
                 "jwt": app_config.get("jwt", {}),
                 "email": app_config.get("email", {}),
                 "version": app_config.get("version", "0.1.0"),
@@ -115,7 +121,9 @@ class ConfigLoader:
             return {
                 "environment": environment,
                 "database_url": DatabaseConfig.get_connection_string(data, environment),
-                "cor_origins": CorsConfig.get_cors(configs=data, environment=environment),
+                "cor_origins": CorsConfig.get_cors(
+                    configs=data, environment=environment
+                ),
                 "jwt": data.get("jwt", {}),
                 "email": data.get("email", {}),
                 "version": data.get("version", "0.1.0"),
