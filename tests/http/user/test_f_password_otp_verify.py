@@ -1,11 +1,11 @@
 from app.models.user.response_messages import PasswordResetResponseMessages
-from tests.http.conftest import client, get_user_one_otp
+from tests.http.conftest import client, get_user_one_otp, test_user_data
 from tests.utils.basic_auth import get_basic_auth_header
 
 
-def test_a_password_reset_validate_otp_fail(client, test_data, get_user_one_otp):
+def test_a_password_reset_validate_otp_fail(client, test_user_data, get_user_one_otp):
     """Test password reset with valid user email"""
-    user_one = test_data["user_one"]
+    user_one = test_user_data["user_one"]
     new_password = "NewPassword123"
 
     headers = get_basic_auth_header(
@@ -30,9 +30,9 @@ def test_a_password_reset_validate_otp_fail(client, test_data, get_user_one_otp)
     assert json_data["detail"]["error"] == PasswordResetResponseMessages.ERROR.value
 
 
-def test_b_password_reset_validate_otp_success(client, test_data, get_user_one_otp):
+def test_b_password_reset_validate_otp_success(client, test_user_data, get_user_one_otp):
     """Test password reset with valid user email"""
-    user_one = test_data["user_one"]
+    user_one = test_user_data["user_one"]
     new_password = "NewPassword123"
 
     headers = get_basic_auth_header(
