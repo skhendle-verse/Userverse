@@ -1,24 +1,22 @@
-from sqlalchemy import Column, String, Integer, ForeignKey
-from sqlalchemy.orm import relationship, backref, Session
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy import Column, Integer, String, ForeignKey, ForeignKeyConstraint
+from sqlalchemy.orm import relationship
 from .base_model import BaseModel
-
 
 class AssociationUserCompany(BaseModel):
     __tablename__ = "association_user_company"
 
-    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
-    company_id = Column(Integer, ForeignKey("company.id"), primary_key=True)
-    user_level = Column(String(255))
-    # A user can be associated with multiple companies
-    user = relationship("User", back_populates="companies")
-    # A company can have multiple users
-    company = relationship("Company", back_populates="users")
+    user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+    company_id = Column(Integer, ForeignKey('company.id'), primary_key=True)
+    role_name = Column(String(256), nullable=False)
 
-    @classmethod
-    def get_user_by_email(cls, session: Session, email: str) -> dict:
-        try:
-            agent = session.query(cls).filter_by(email=email).one()
-            return agent
-        except NoResultFound:
-            raise ValueError(f"User with email:{email}, not found.")
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['company_id', 'role_name'],
+            ['role.company_id', 'role.name'],
+            ondelete="CASCADE"
+        ),
+    )
+
+    user = relationship("User", back_populates="companies")
+    company = relationship("Company", back_populates="users")
+    role = relationship("Role", back_populates="users")

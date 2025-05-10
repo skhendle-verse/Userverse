@@ -26,7 +26,7 @@ def client():
 
 
 @pytest.fixture(scope="session")
-def test_data():
+def test_user_data():
     """Fixture to load test data from JSON file."""
     with open("tests/data/http/user.json") as f:
         data = json.load(f)
@@ -35,9 +35,9 @@ def test_data():
 
 # Get user row based on email, and extract OTP
 @pytest.fixture
-def get_user_one_otp(test_data):
+def get_user_one_otp(test_user_data):
     """Get user row based on email, and extract OTP."""
-    user_one = test_data["user_one"]
+    user_one = test_user_data["user_one"]
     email = user_one["email"]
     db = DatabaseSessionManager()
     session = db.session_object()
@@ -49,9 +49,9 @@ def get_user_one_otp(test_data):
 
 
 @pytest.fixture
-def login_token(client, test_data):
+def login_token(client, test_user_data):
     """Fixture to log in the user and provide the Bearer token for tests."""
-    user_one = test_data["user_one"]
+    user_one = test_user_data["user_one"]
     response = client.patch(
         "/user/login",
         headers=get_basic_auth_header(
@@ -66,9 +66,9 @@ def login_token(client, test_data):
 
 
 @pytest.fixture
-def login_token_user_two(client, test_data):
+def login_token_user_two(client, test_user_data):
     """Fixture to log in the second user and provide the Bearer token."""
-    user_two = test_data["user_two"]
+    user_two = test_user_data["user_two"]
     response = client.patch(
         "/user/login",
         headers=get_basic_auth_header(

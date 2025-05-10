@@ -10,8 +10,17 @@
 Unit testing for db models
 
 ```bash
-# User Model testing
+# User Model testing, tests/database/test_b_company.py
 (userverse) $: pytest -v tests/database/test_a_user.py -s
+
+# company tests
+(userverse) $: pytest -v tests/database/test_b_company.py -s
+
+# role tests
+(userverse) $: pytest -v tests/database/test_c_role.py -s
+
+# association
+(userverse) $: pytest -v tests/database/test_e_association.py -s
 
 ```
 

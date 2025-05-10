@@ -2,12 +2,12 @@ from app.models.user.response_messages import (
     UserResponseMessages,
     PasswordResetResponseMessages,
 )
-from tests.http.conftest import client, test_data, login_token
+from tests.http.conftest import client, test_user_data, login_token
 
 
-def test_password_reset_success(client, test_data):
+def test_password_reset_success(client, test_user_data):
     """Test password reset with valid user email"""
-    user_one = test_data["user_one"]
+    user_one = test_user_data["user_one"]
 
     response = client.patch(
         "/user/password-reset/request",

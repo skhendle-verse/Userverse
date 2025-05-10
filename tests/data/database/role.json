@@ -1,0 +1,13 @@
+{
+    "admin_role": {
+        "name": "Admin",
+        "description": "Administrator with full access."
+    },
+    "viewer_role": {
+        "name": "Viewer",
+        "description": "Can view resources but cannot make changes."
+    },
+    "update_admin_role": {
+        "description": "Updated Admin Role Description"
+    }
+}

@@ -1,12 +1,12 @@
-from tests.http.conftest import client, test_data, login_token
+from tests.http.conftest import client, test_user_data, login_token
 from app.models.security_messages import SecurityResponseMessages
 from app.models.user.response_messages import UserResponseMessages
 
 
-def test_a_update_user_success(client, login_token_user_two, test_data):
+def test_a_update_user_success(client, login_token_user_two, test_user_data):
     """Test updating user information successfully."""
-    user_two = test_data["user_two"]
-    update_data = test_data["update_user"]
+    user_two = test_user_data["user_two"]
+    update_data = test_user_data["update_user"]
     # Assuming the login_token is valid and corresponds to user_one
     headers = {"Authorization": f"Bearer {login_token_user_two}"}
     updated_first_name = user_two["first_name"] + " " + update_data["first_name"]
@@ -36,10 +36,10 @@ def test_a_update_user_success(client, login_token_user_two, test_data):
     assert json_response["data"]["phone_number"] == user_two["phone_number"]
 
 
-def test_b_update_user_fail_with_invalid_token(client, test_data):
+def test_b_update_user_fail_with_invalid_token(client, test_user_data):
     """Test updating user information with an invalid token."""
-    user_two = test_data["user_two"]
-    update_data = test_data["update_user"]
+    user_two = test_user_data["user_two"]
+    update_data = test_user_data["update_user"]
     # Assuming the login_token is valid and corresponds to user_one
     headers = {"Authorization": "Bearer invalid_token"}
     updated_first_name = user_two["first_name"] + " " + update_data["first_name"]

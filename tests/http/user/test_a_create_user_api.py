@@ -1,12 +1,12 @@
 import pytest
 from app.models.user.response_messages import UserResponseMessages
-from tests.http.conftest import client, test_data
+from tests.http.conftest import client, test_user_data
 from tests.utils.basic_auth import get_basic_auth_header
 
 
-def test_a_create_user_one_success(client, test_data):
+def test_a_create_user_one_success(client, test_user_data):
     """Test user creation with valid payload (user one)"""
-    use_one = test_data["user_one"]
+    use_one = test_user_data["user_one"]
     payload = {
         "first_name": use_one["first_name"],
         "last_name": use_one["last_name"],
@@ -34,9 +34,9 @@ def test_a_create_user_one_success(client, test_data):
     assert user_data["last_name"] == use_one["last_name"]
 
 
-def test_b_create_user_two_success_and_unique_key_fail(client, test_data):
+def test_b_create_user_two_success_and_unique_key_fail(client, test_user_data):
     """Test user creation with valid payload (user two), and then attempt to create the same user again"""
-    use_two = test_data["user_two"]
+    use_two = test_user_data["user_two"]
     payload = {
         "first_name": use_two["first_name"],
         "last_name": use_two["last_name"],
@@ -64,9 +64,9 @@ def test_b_create_user_two_success_and_unique_key_fail(client, test_data):
     assert user_data["last_name"] == use_two["last_name"]
 
 
-def test_c_create_user_two_fail(client, test_data):
+def test_c_create_user_two_fail(client, test_user_data):
     """Test user creation failure when the same user is created again"""
-    use_two = test_data["user_two"]
+    use_two = test_user_data["user_two"]
     payload = {
         "first_name": use_two["first_name"],
         "last_name": use_two["last_name"],
@@ -85,10 +85,10 @@ def test_c_create_user_two_fail(client, test_data):
         )
 
 
-def test_d_create_user_invalid_phone_should_fail(client, test_data):
+def test_d_create_user_invalid_phone_should_fail(client, test_user_data):
     """Test user creation failure when phone number is invalid"""
-    data = test_data["invalid_phone"]
-    user = test_data["user_two"]
+    data = test_user_data["invalid_phone"]
+    user = test_user_data["user_two"]
     headers = get_basic_auth_header(username=user["email"], password=user["password"])
     response = client.post("/user", json=data, headers=headers)
     assert response.status_code in [400, 422]

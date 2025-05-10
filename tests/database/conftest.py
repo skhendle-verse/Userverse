@@ -6,10 +6,26 @@ from app.database import DatabaseSessionManager
 
 
 @pytest.fixture(scope="session")
-def test_data():
+def test_user_data():
     """Fixture to load test data from JSON file."""
     # Load the test data from JSON file
-    with open("tests/data/database/user_db_test_data.json") as f:
+    with open("tests/data/database/user.json") as f:
+        data = json.load(f)
+    return data
+
+@pytest.fixture(scope="session")
+def test_company_data():
+    """Fixture to load test data from JSON file."""
+    # Load the test data from JSON file
+    with open("tests/data/database/company.json") as f:
+        data = json.load(f)
+    return data
+
+@pytest.fixture(scope="session")
+def test_role_data():
+    """Fixture to load test data from JSON file."""
+    # Load the test data from JSON file
+    with open("tests/data/database/role.json") as f:
         data = json.load(f)
     return data
 

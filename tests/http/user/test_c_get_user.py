@@ -1,10 +1,10 @@
-from tests.http.conftest import client, test_data, login_token
+from tests.http.conftest import client, test_user_data, login_token
 from app.models.user.response_messages import UserResponseMessages
 
 
-def test_get_user_success(client, login_token, test_data):
+def test_get_user_success(client, login_token, test_user_data):
     """Test fetching user details with valid token"""
-    user = test_data["user_one"]
+    user = test_user_data["user_one"]
     # Assuming the login_token is valid and corresponds to user_one
     headers = {"Authorization": f"Bearer {login_token}"}
     response = client.get("/user", headers=headers)
