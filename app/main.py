@@ -3,6 +3,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.middleware.otel import setup_otel
 from app.utils.config.loader import ConfigLoader
 from app.utils.config.logging import logger
 from app.middleware.logging import LogMiddleware
@@ -28,6 +29,8 @@ def create_app() -> FastAPI:
     ]
 
     app = FastAPI()
+    # Attach OpenTelemetry middleware
+    setup_otel(app)
     app.add_middleware(LogMiddleware)
 
     app.add_middleware(
@@ -70,18 +73,21 @@ def create_app() -> FastAPI:
 
     @app.get("/")
     async def root():
-        return JSONResponse(
-            status_code=200,
-            content={
-                "status": "ok",
-                "version": configs.get("version"),
-                "name": configs.get("name"),
-                "description": configs.get("description"),
-                "repository": configs.get("repository"),
-                "documentation": configs.get("documentation"),
-                "message": "Welcome to the Userverse backend API",
-            },
-        )
+        from opentelemetry import trace
+
+        with trace.get_tracer(__name__).start_as_current_span("manual-span"):
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "status": "ok",
+                    "version": configs.get("version"),
+                    "name": configs.get("name"),
+                    "description": configs.get("description"),
+                    "repository": configs.get("repository"),
+                    "documentation": configs.get("documentation"),
+                    "message": "Welcome to the Userverse backend API",
+                },
+            )
 
     return app
 
@@ -123,15 +129,11 @@ def main(
     """
     Main entry point for the FastAPI application.
     """
-    # from app.utils.config.logging import setup_logging
 
     # Export env for use inside create_app()
     os.environ["ENV"] = env
     if json_config_path:
         os.environ["JSON_CONFIG_PATH"] = json_config_path
-
-    # # Setup logging before Uvicorn starts
-    # setup_logging()
 
     # Validation note: reload mode doesn't support workers > 1
     if reload and workers > 1:
@@ -139,12 +141,6 @@ def main(
             "⚠️ Reload mode does not support multiple workers. Ignoring --workers."
         )
         workers = 1
-
-    # Load configs
-    loader = ConfigLoader()
-    configs = loader.get_config()
-    app_name = configs.get("app_name", "userverse")
-    version = configs.get("version", "1.0.0")
 
 
     # Launch using factory to ensure consistent app creation
