@@ -12,8 +12,11 @@ from uvicorn.server import Server
 
 from app.middleware.otel import setup_otel
 from app.middleware.logging import LogMiddleware
+# user
 from app.routers.user import user
 from app.routers.user import password
+# company
+from app.routers.company import company
 from app.utils.config.loader import ConfigLoader
 from app.utils.config.logging import logger
 
@@ -66,6 +69,7 @@ def create_app() -> FastAPI:
 
     app.include_router(user.router)
     app.include_router(password.router)
+    app.include_router(company.router)
 
     @app.get("/")
     async def root():
@@ -123,6 +127,7 @@ def main(
         os.environ["JSON_CONFIG_PATH"] = json_config_path
 
     if reload and workers > 1:
+        os.environ["WATCHFILES_IGNORE"] = "*.pyc;.venv"
         logger.warning(
             "Reload mode does not support multiple workers. Using a single worker."
         )
@@ -136,23 +141,28 @@ def main(
     logging.getLogger("uvicorn.access").setLevel(logging.CRITICAL)
     logging.getLogger("watchfiles.main").setLevel(logging.WARNING)
 
-    # Tell watchfiles to ignore .venv directory
+
     if reload:
-        os.environ["WATCHFILES_IGNORE"] = ".venv"
-
-    config = Config(
-        app="app.main:create_app",
-        factory=True,
-        host=host,
-        port=port,
-        reload=reload,
-        workers=workers,
-        use_colors=False,
-        log_level="critical",  # Uvicorn log level
-    )
-
-    server = Server(config)
-    server.run()
+        uvicorn.run(
+            "app.main:create_app",
+            factory=True,
+            host=host,
+            port=port,
+            reload=True,
+            log_level="critical"
+        )
+    else:
+        config = Config(
+            app="app.main:create_app",
+            factory=True,
+            host=host,
+            port=port,
+            workers=workers,
+            use_colors=False,
+            log_level="critical",
+        )
+        server = Server(config)
+        server.run()
 
 
 if __name__ == "__main__":
