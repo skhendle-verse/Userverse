@@ -39,7 +39,8 @@ class DatabaseSessionManager:
 
     def session_object(self):
         return self._session()
-    
+
+
 if __name__ == "__main__":
     # Example usage
     db_manager = DatabaseSessionManager()

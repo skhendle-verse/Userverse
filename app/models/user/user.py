@@ -4,6 +4,7 @@ from pydantic import BaseModel, EmailStr, field_validator, Field
 from app.utils.hash_password import hash_password
 from app.models.phone_number import validate_phone_number_format
 
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
@@ -38,7 +39,6 @@ class UserCreate(BaseModel):
         return validate_phone_number_format(v)
 
 
-
 class UserRead(BaseModel):
     id: int
     first_name: Optional[str] = None
@@ -48,7 +48,10 @@ class UserRead(BaseModel):
 
 
 class TokenResponseModel(BaseModel):
-    token_type: Literal["bearer"] = Field("bearer", description="Type of the token",)
+    token_type: Literal["bearer"] = Field(
+        "bearer",
+        description="Type of the token",
+    )
     access_token: str = Field(..., description="JWT access token")
     access_token_expiration: str = Field(
         ..., description="Access token expiration time in 'YYYY-MM-DD HH:MM:SS' format"
