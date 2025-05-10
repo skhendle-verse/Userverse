@@ -33,11 +33,19 @@ def test_user_data():
     return data
 
 
+@pytest.fixture(scope="session")
+def test_company_data():
+    """Fixture to load test data from JSON file."""
+    with open("tests/data/database/company.json") as f:
+        data = json.load(f)
+    return data
+
+
 # Get user row based on email, and extract OTP
 @pytest.fixture
-def get_user_one_otp(test_user_data):
+def get_user_two_otp(test_user_data):
     """Get user row based on email, and extract OTP."""
-    user_one = test_user_data["user_one"]
+    user_one = test_user_data["user_two"]
     email = user_one["email"]
     db = DatabaseSessionManager()
     session = db.session_object()

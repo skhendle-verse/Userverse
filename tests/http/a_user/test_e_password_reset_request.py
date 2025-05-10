@@ -7,11 +7,11 @@ from tests.http.conftest import client, test_user_data, login_token
 
 def test_password_reset_success(client, test_user_data):
     """Test password reset with valid user email"""
-    user_one = test_user_data["user_one"]
+    user = test_user_data["user_two"]
 
     response = client.patch(
         "/user/password-reset/request",
-        json={"email": user_one["email"]},
+        json={"email": user["email"]},
     )
 
     assert response.status_code in [200, 201, 202]

@@ -17,7 +17,9 @@ def send_email(to: str, subject: str, html_body: str):
         logging.warning("Email configuration not found.")
         soup = BeautifulSoup(html_body, "html.parser")
         # Correct usage of click.echo with styled text
-        click.echo(click.style("Email configuration not found. HTML body:", fg="yellow"))
+        click.echo(
+            click.style("Email configuration not found. HTML body:", fg="yellow")
+        )
         click.echo(f"\n{soup.get_text(separator='\n', strip=True)}\n")
         return
 
@@ -44,6 +46,7 @@ def send_email(to: str, subject: str, html_body: str):
         server.starttls()
         server.login(username, password)
         server.send_message(msg)
+
 
 if __name__ == "__main__":
     # Example usage

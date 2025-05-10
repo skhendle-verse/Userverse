@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class CompanyResponseMessages(str, Enum):
     # company creation
     COMPANY_CREATED = "Company created successfully"

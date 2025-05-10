@@ -18,6 +18,7 @@ class AssociationUserCompany(BaseModel):
         ),
     )
 
-    user = relationship("User", back_populates="companies")
-    company = relationship("Company", back_populates="users")
-    role = relationship("Role", back_populates="users")
+    # relationships
+    role = relationship("Role", back_populates="users", overlaps="company,users")
+    company = relationship("Company", back_populates="users", overlaps="role")
+    user = relationship("User", back_populates="companies", overlaps="company,role")

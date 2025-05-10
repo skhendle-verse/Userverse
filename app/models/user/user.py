@@ -34,7 +34,6 @@ class UserCreate(BaseModel):
     last_name: Optional[str] = None
     phone_number: Optional[str] = Field(None, example="1236547899")
 
-
     @field_validator("phone_number")
     def validate_phone_number(cls, v: Optional[str]) -> Optional[str]:
         return validate_phone_number_format(v)
@@ -46,7 +45,6 @@ class UserRead(BaseModel):
     last_name: Optional[str] = None
     email: EmailStr
     phone_number: Optional[str] = Field(None, example="1236547899")
-
 
 
 class TokenResponseModel(BaseModel):

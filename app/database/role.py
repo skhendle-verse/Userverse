@@ -13,8 +13,10 @@ class Role(BaseModel):
     name = Column(String(256), primary_key=True)
     description = Column(String(256), nullable=True)
 
-    company = relationship("Company", back_populates="roles")
-    users = relationship("AssociationUserCompany", back_populates="role")
+    company = relationship("Company", back_populates="roles", overlaps="users")
+    users = relationship(
+        "AssociationUserCompany", back_populates="role", overlaps="company,users"
+    )
 
     @classmethod
     def update_role(

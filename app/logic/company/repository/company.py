@@ -22,11 +22,15 @@ class CompanyRepository:
     def __init__(self):
         self.db_manager = DatabaseSessionManager()
 
-    def create_company(self, payload: CompanyCreate, created_by: UserRead) -> CompanyRead:
+    def create_company(
+        self, payload: CompanyCreate, created_by: UserRead
+    ) -> CompanyRead:
         with self.db_manager.session_object() as session:
             try:
                 # 1. Create company
-                company = Company.create(session, **payload.model_dump(exclude={"address"}))
+                company = Company.create(
+                    session, **payload.model_dump(exclude={"address"})
+                )
 
                 if not company:
                     raise AppError(
@@ -41,7 +45,7 @@ class CompanyRepository:
                         record_id=company["id"],
                         column_name="primary_meta_data",
                         key="address",
-                        value=payload.address.model_dump()
+                        value=payload.address.model_dump(),
                     )
 
                 # 3. Create default roles (Administrator, Viewer)
@@ -62,17 +66,14 @@ class CompanyRepository:
                 )
 
                 registered_company = Company.get_by_id(session, company["id"])
-                if 'primary_meta_data' in registered_company:
-                    primary_meta_data = registered_company.get(
-                        'primary_meta_data'
-                    )
-                    if 'address' in primary_meta_data:
-                        address = primary_meta_data.get('address')
-                        registered_company['address'] = address
-
+                if "primary_meta_data" in registered_company:
+                    primary_meta_data = registered_company.get("primary_meta_data")
+                    if "address" in primary_meta_data:
+                        address = primary_meta_data.get("address")
+                        registered_company["address"] = address
 
                 return CompanyRead(**registered_company)
 
             except Exception as e:
                 session.rollback()
-                raise AppError.internal(str(e))
+                raise e

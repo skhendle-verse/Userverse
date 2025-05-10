@@ -14,4 +14,3 @@ class CompanyDefaultRoles(str, Enum):
     def description(self) -> str:
         """Returns just the role description."""
         return self.value.split(":", 1)[1].strip()
-

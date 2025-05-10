@@ -12,9 +12,11 @@ from uvicorn.server import Server
 
 from app.middleware.otel import setup_otel
 from app.middleware.logging import LogMiddleware
+
 # user
 from app.routers.user import user
 from app.routers.user import password
+
 # company
 from app.routers.company import company
 from app.utils.config.loader import ConfigLoader
@@ -34,7 +36,7 @@ def create_app() -> FastAPI:
 
     app = FastAPI()
 
-    setup_otel(app)
+    # setup_otel(app)
     app.add_middleware(LogMiddleware)
     app.add_middleware(
         CORSMiddleware,
@@ -141,7 +143,6 @@ def main(
     logging.getLogger("uvicorn.access").setLevel(logging.CRITICAL)
     logging.getLogger("watchfiles.main").setLevel(logging.WARNING)
 
-
     if reload:
         uvicorn.run(
             "app.main:create_app",
@@ -149,7 +150,7 @@ def main(
             host=host,
             port=port,
             reload=True,
-            log_level="critical"
+            log_level="critical",
         )
     else:
         config = Config(

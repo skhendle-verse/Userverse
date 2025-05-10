@@ -51,4 +51,4 @@ def create_company_api(
     except AppError as e:
         raise e
     except Exception as e:
-        raise AppError.internal(str(e))
+        raise e
