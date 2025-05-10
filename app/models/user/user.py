@@ -17,7 +17,7 @@ class UserLogin(BaseModel):
 class UserUpdate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    phone_number: Optional[str] = None
+    phone_number: Optional[str] = Field(None, example="1236547899")
     password: Optional[str] = None
 
     @field_validator("password")
@@ -32,7 +32,8 @@ class UserUpdate(BaseModel):
 class UserCreate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    phone_number: Optional[str] = None
+    phone_number: Optional[str] = Field(None, example="1236547899")
+
 
     @field_validator("phone_number")
     def validate_phone_number(cls, v: Optional[str]) -> Optional[str]:
@@ -44,7 +45,8 @@ class UserRead(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     email: EmailStr
-    phone_number: Optional[str] = None
+    phone_number: Optional[str] = Field(None, example="1236547899")
+
 
 
 class TokenResponseModel(BaseModel):
