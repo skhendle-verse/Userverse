@@ -2,12 +2,7 @@ import re
 from typing import Optional, Literal
 from pydantic import BaseModel, EmailStr, field_validator, Field
 from app.utils.hash_password import hash_password
-
-
-PHONE_NUMBER_REGEX = re.compile(
-    r"^\+?\d{10,15}$"
-)  # Allows optional "+" and 10-15 digits
-
+from app.models.phone_number import validate_phone_number_format
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -30,11 +25,7 @@ class UserUpdate(BaseModel):
 
     @field_validator("phone_number")
     def validate_phone_number(cls, v: Optional[str]) -> Optional[str]:
-        if v and not PHONE_NUMBER_REGEX.match(v):
-            raise ValueError(
-                "Invalid phone number format. Must be 10-15 digits, optional leading '+'."
-            )
-        return v
+        return validate_phone_number_format(v)
 
 
 class UserCreate(BaseModel):
@@ -44,11 +35,8 @@ class UserCreate(BaseModel):
 
     @field_validator("phone_number")
     def validate_phone_number(cls, v: Optional[str]) -> Optional[str]:
-        if v and not PHONE_NUMBER_REGEX.match(v):
-            raise ValueError(
-                "Invalid phone number format. Must be 10-15 digits, optional leading '+'."
-            )
-        return v
+        return validate_phone_number_format(v)
+
 
 
 class UserRead(BaseModel):
@@ -60,7 +48,7 @@ class UserRead(BaseModel):
 
 
 class TokenResponseModel(BaseModel):
-    token_type: Literal["bearer"] = Field("bearer", description="Type of the token")
+    token_type: Literal["bearer"] = Field("bearer", description="Type of the token",)
     access_token: str = Field(..., description="JWT access token")
     access_token_expiration: str = Field(
         ..., description="Access token expiration time in 'YYYY-MM-DD HH:MM:SS' format"

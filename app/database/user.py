@@ -14,8 +14,8 @@ class User(BaseModel):
     phone_number = Column(String(255), nullable=True)
     password = Column(String(255), nullable=False)
 
-    # # All the companies agent is linked with
-    # company = relationship("CompanyUserAssociation", back_populates="user")
+    # All the companies agent is linked with
+    companies = relationship("AssociationUserCompany", back_populates="user")
 
     @classmethod
     def get_user_by_email(cls, session: Session, email: str) -> dict:

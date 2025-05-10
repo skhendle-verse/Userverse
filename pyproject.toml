@@ -37,7 +37,7 @@ PASSWORD = "Password123"
 NAME = "userverse"
 # Database type
 # Supported types: postgresql, mysql, sqlite
-# Example: postgresql://username:password@localhost:5432/dbname
+# Example: postgresql://sandile:Password123@localhost:5432/userverse
 # Example: mysql://username:password@localhost:3306/dbname
 # Example: sqlite:///path/to/database.db
 # Example: sqlite:///:memory:

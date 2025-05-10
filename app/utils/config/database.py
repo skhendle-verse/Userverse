@@ -21,11 +21,11 @@ class DatabaseConfig:
             db_type = db_config.get("TYPE")
             host = db_config.get("HOST")
             port = db_config.get("PORT")
-            user = db_config.get("USERNAME")
+            user = db_config.get("USER")
             password = db_config.get("PASSWORD")
             db_name = db_config.get("NAME")
 
-            if db_type == "postgresql":
+            if db_type in ("postgresql", "postgres"):
                 return (
                     f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db_name}"
                 )
