@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 
+
 class CompanyAddress(BaseModel):
     street: Optional[str] = Field(None, example="123 Main St")
     city: Optional[str] = Field(None, example="Cape Town")
