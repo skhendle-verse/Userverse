@@ -1,5 +1,10 @@
 # Userverse Testing
 
+    -   To run the first suite 
+    ```bash
+    
+    ```
+
 ## Database
 
 Unit testing for db models
