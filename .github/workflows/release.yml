@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write  # Required for pushing tags
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -12,6 +15,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Get Latest Tag
         id: get_tag
@@ -24,10 +29,7 @@ jobs:
       - name: Determine Version Bump
         id: version
         run: |
-          # Set default to patch if no marker found
           bump="patch"
-
-          # Check last commit message or PR title
           message=$(git log -1 --pretty=%B)
 
           if echo "$message" | grep -iqE '\[major\]'; then
@@ -61,10 +63,14 @@ jobs:
 
           echo "new_version=$new_version" >> "$GITHUB_OUTPUT"
 
+      - name: Set up Git credentials
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
       - name: Create and Push Tag
         run: |
           new_tag="v${{ steps.semver.outputs.new_version }}"
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
           git tag "$new_tag"
           git push origin "$new_tag"
