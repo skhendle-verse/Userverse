@@ -1,3 +1,4 @@
+import click
 import logging
 from bs4 import BeautifulSoup
 from email.message import EmailMessage
@@ -15,7 +16,9 @@ def send_email(to: str, subject: str, html_body: str):
     if not email_config or environment == "test_environment":
         logging.warning("Email configuration not found.")
         soup = BeautifulSoup(html_body, "html.parser")
-        print("\n", soup.get_text(separator="\n", strip=True), "\n")
+        # Correct usage of click.echo with styled text
+        click.echo(click.style("Email configuration not found. HTML body:", fg="yellow"))
+        click.echo(f"\n{soup.get_text(separator='\n', strip=True)}\n")
         return
 
     username = email_config.get("USERNAME")
@@ -41,3 +44,10 @@ def send_email(to: str, subject: str, html_body: str):
         server.starttls()
         server.login(username, password)
         server.send_message(msg)
+
+if __name__ == "__main__":
+    # Example usage
+    to = "as@fg.dsfgd"
+    subject = "Test Email"
+    html_body = "<h1>Hello</h1><p>This is a test email.</p>"
+    send_email(to, subject, html_body)

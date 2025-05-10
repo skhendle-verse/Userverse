@@ -68,7 +68,6 @@ class CompanyRepository:
                     )
                     if 'address' in primary_meta_data:
                         address = primary_meta_data.get('address')
-                        print(address)
                         registered_company['address'] = address
 
 

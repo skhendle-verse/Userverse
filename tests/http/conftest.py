@@ -19,7 +19,7 @@ def client():
     default_config = ConfigLoader(
         environment="testing"
     ).get_config()  # pulls the default from your updated loader
-    print(f"Default config: {default_config}")
+
     with patch.object(ConfigLoader, "get_config", return_value=default_config):
         app = create_app()
         return TestClient(app)
