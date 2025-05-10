@@ -1,5 +1,6 @@
+[![Release Status](https://github.com/skhendle-verse/Userverse/actions/workflows/release.yml/badge.svg)](https://github.com/skhendle-verse/Userverse/actions/workflows/release.yml)
 
-[![Build Status](https://github.com/skhendle-verse/Userverse/actions/workflows/testing-build.yml/badge.svg)](https://github.com/skhendle-verse/Userverse/actions/workflows/testing-build.yml)
+[![Build Status](https://github.com/skhendle-verse/Userverse/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/skhendle-verse/Userverse/actions/workflows/build-and-test.yml)
 
 [![codecov](https://codecov.io/gh/SoftwareVerse/Userverse/graph/badge.svg?token=8SIX9ONX0A)](https://codecov.io/gh/SoftwareVerse/Userverse)
 

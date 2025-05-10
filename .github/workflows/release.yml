@@ -1,4 +1,4 @@
-name: CI - Build and Release Tag
+name: CI - Release Tag
 
 on:
   push:
