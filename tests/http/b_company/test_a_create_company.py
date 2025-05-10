@@ -12,15 +12,11 @@ def test_a_create_company_one_success(client, test_company_data, login_token):
     """Test creating Company One using User One's token"""
     payload = {
         **test_company_data["company_one"],
-        "address": test_company_data["json_field"]["value"]
+        "address": test_company_data["json_field"]["value"],
     }
     headers = {"Authorization": f"Bearer {login_token}"}
 
-    response = client.post(
-        "/company",
-        json=payload,
-        headers=headers
-    )
+    response = client.post("/company", json=payload, headers=headers)
 
     assert response.status_code in [200, 201]
     json_data = response.json()
@@ -39,15 +35,11 @@ def test_b_create_company_two_success(client, test_company_data, login_token_use
     """Test creating Company Two using User Two's token"""
     payload = {
         **test_company_data["company_two"],
-        "address": test_company_data["json_field"]["value"]
+        "address": test_company_data["json_field"]["value"],
     }
     headers = {"Authorization": f"Bearer {login_token_user_two}"}
 
-    response = client.post(
-        "/company",
-        json=payload,
-        headers=headers
-    )
+    response = client.post("/company", json=payload, headers=headers)
 
     assert response.status_code in [200, 201]
     json_data = response.json()
