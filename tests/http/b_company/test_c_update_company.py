@@ -65,5 +65,8 @@ def test_b_update_company_two_failure(client, login_token, test_company_data):
     json_data = response.json()
     #
     assert "detail" in json_data
-    assert json_data["detail"]["message"] == CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value
+    assert (
+        json_data["detail"]["message"]
+        == CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value
+    )
     print(json_data)
