@@ -17,6 +17,7 @@ class DatabaseConfig:
             return f"sqlite:///{environment}.db"
 
         db_config = configs.get("database", {})
+        print(f"Database config: {db_config}")
         if db_config:
             db_type = db_config.get("TYPE")
             host = db_config.get("HOST")
@@ -36,4 +37,5 @@ class DatabaseConfig:
         else:
             url = f"sqlite:///{environment}.db"
 
+        print(f"Database URL: {url}")
         return url

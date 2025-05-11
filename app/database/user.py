@@ -21,6 +21,6 @@ class User(BaseModel):
     def get_user_by_email(cls, session: Session, email: str) -> dict:
         try:
             agent = session.query(cls).filter_by(email=email).one()
-            return agent
+            return cls.to_dict(agent)
         except NoResultFound:
             raise ValueError(f"User with email:{email}, not found.")

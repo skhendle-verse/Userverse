@@ -10,6 +10,7 @@
 Unit testing for db models
 
 ```bash
+
 # User Model testing, tests/database/test_b_company.py
 (userverse) $: pytest -v tests/database/test_a_user.py -s
 
@@ -51,6 +52,9 @@ TODO: Setup a testing config, to avoid comflicts with dev db
 
 # testing company routes
 (userverse) $: pytest -v tests/http/b_company/test_a_create_company.py
+
+# testing company routes
+(userverse) $: pytest -v tests/http/b_company/test_b_get_company.py
 
 ```
 

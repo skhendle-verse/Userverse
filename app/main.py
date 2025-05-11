@@ -48,23 +48,14 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(Exception)
     async def app_error_handler(request: Request, exc: Exception):
-        tb_lines = traceback.format_exception(type(exc), exc, exc.__traceback__)
-        tb_str = "".join(tb_lines)
-        tb_frame = traceback.extract_tb(exc.__traceback__)[-1]
-
-        logger.error(
-            f"Unhandled Exception in {tb_frame.filename}, "
-            f"line {tb_frame.lineno}, in {tb_frame.name}(): {exc}"
-        )
-        logger.debug(f"Full traceback:\n{tb_str}")
-
+        logger.error(f"Unhandled exception: {exc}")
         return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content={
-                "details": {
+                "detail": {
                     "message": "An error occurred, please try again.",
                     "error": str(exc),
-                    "location": f"{tb_frame.filename}:{tb_frame.lineno} in {tb_frame.name}()",
+                    # "location": f"{tb_frame.filename}:{tb_frame.lineno} in {tb_frame.name}()",
                 },
             },
         )

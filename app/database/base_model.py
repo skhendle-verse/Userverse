@@ -28,7 +28,7 @@ class BaseModel(Base):
     _created_at = Column(DateTime(), nullable=False, server_default=func.now())
     _updated_at = Column(DateTime(), nullable=True, onupdate=func.now())
     _closed_at = Column(DateTime(), nullable=True)
-    # ✅ Use MutableDict here:
+    # Use MutableDict here:
     primary_meta_data = Column(MutableDict.as_mutable(JSON), default=dict)
     secondary_meta_data = Column(MutableDict.as_mutable(JSON), default=dict)
 
