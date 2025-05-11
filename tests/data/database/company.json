@@ -26,7 +26,14 @@
             "street": "123 Main St",
             "city": "Johannesburg",
             "state": "Gauteng",
-            "zip_code": "2000",
+            "postal_code": "2000",
+            "country": "South Africa"
+        },
+        "updated_value": {
+            "street": "456 Elm St",
+            "city": "Cape Town",
+            "state": "Western Cape",
+            "postal_code": "8000",
             "country": "South Africa"
         }
     }

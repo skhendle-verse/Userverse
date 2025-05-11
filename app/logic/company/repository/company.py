@@ -1,3 +1,4 @@
+from app.models.company.address import CompanyAddress
 from fastapi import status
 
 # utils
@@ -26,30 +27,23 @@ class CompanyRepository:
         self, payload: CompanyCreate, created_by: UserRead
     ) -> CompanyRead:
         with self.db_manager.session_object() as session:
-            try:
-                # 1. Create company
-                company = self._create_company_record(session, payload)
+            # 1. Create company
+            company = self._create_company_record(session, payload)
 
-                # 2. Add address to primary_meta_data
-                if payload.address:
-                    self._add_company_address(session, company["id"], payload.address)
+            # 2. Add address to primary_meta_data
+            if payload.address:
+                self._add_company_address(session, company["id"], payload.address)
 
-                # 3. Create default roles
-                self._create_default_roles(session, company["id"])
+            # 3. Create default roles
+            self._create_default_roles(session, company["id"])
 
-                # 4. Associate creator as Administrator
-                self._associate_creator(session, created_by.id, company["id"])
+            # 4. Associate creator as Administrator
+            self._associate_creator(session, created_by.id, company["id"])
 
-                # 5. Get the registered company with complete data
-                registered_company = self._get_registered_company(
-                    session, company["id"]
-                )
+            # 5. Get the registered company with complete data
+            registered_company = self._get_registered_company(session, company["id"])
 
-                return CompanyRead(**registered_company)
-
-            except Exception as e:
-                session.rollback()
-                raise e
+            return CompanyRead(**registered_company)
 
     def get_company_by_id(self, company_id: str) -> CompanyRead:
         """
@@ -100,6 +94,37 @@ class CompanyRepository:
             # Reuse the method to get complete company data
             return CompanyRead(**self._get_registered_company(session, company["id"]))
 
+    def update_company(
+        self, payload: CompanyUpdate, company_id: str, user: UserRead
+    ) -> CompanyRead:
+        """
+        Update a company by its ID.
+
+        Args:
+            payload: The updated company data
+            company_id: The unique identifier of the company
+            user: The user making the update
+
+        Returns:
+            CompanyRead: The updated company data
+
+        Raises:
+            AppError: If update fails
+        """
+        with self.db_manager.session_object() as session:
+            # Update the company record
+            company = Company.update(session, company_id, **payload.model_dump())
+            if payload.address:
+                self._add_company_address(session, company_id, payload.address)
+
+            if not company:
+                raise AppError(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    message=CompanyResponseMessages.COMPANY_UPDATE_FAILED.value,
+                )
+
+            return CompanyRead(**self._get_registered_company(session, company["id"]))
+
     def _create_company_record(self, session, payload: CompanyCreate) -> dict:
         """Create the company record in the database"""
         company = Company.create(session, **payload.model_dump(exclude={"address"}))
@@ -112,7 +137,9 @@ class CompanyRepository:
 
         return company
 
-    def _add_company_address(self, session, company_id: str, address) -> None:
+    def _add_company_address(
+        self, session, company_id: str, address: CompanyAddress
+    ) -> None:
         """Add address to the company's primary_meta_data"""
         Company.update_json_field(
             session,

@@ -18,6 +18,8 @@ from app.models.company.company import (
     CompanyUpdate,
     CompanyRead,
 )
+from app.models.company.roles import CompanyDefaultRoles
+
 
 from app.models.user.user import UserRead
 
@@ -62,19 +64,60 @@ class CompanyService:
         if email:
             company = company_repository.get_company_by_email(email)
 
-        # check if user is authorized to view the company
+        linked_company = CompanyService.check_if_user_is_in_company(
+            user_id=user.id,
+            company_id=company.id,
+        )
+
+        if not linked_company:
+            raise AppError(
+                status_code=status.HTTP_403_FORBIDDEN,
+                message=CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value,
+            )
+
+        return company
+
+    @staticmethod
+    def update_company(
+        payload: CompanyUpdate, company_id: str, user: UserRead
+    ) -> CompanyRead:
+        """
+        Update a company by its ID.
+        """
+        linked_company = CompanyService.check_if_user_is_in_company(
+            user_id=user.id,
+            company_id=company_id,
+            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
+        )
+        if not linked_company:
+            raise AppError(
+                status_code=status.HTTP_403_FORBIDDEN,
+                message=CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value,
+            )
+        company_repository = CompanyRepository()
+        company = company_repository.update_company(payload, company_id, user)
+        if not company:
+            raise AppError(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                message=CompanyResponseMessages.COMPANY_UPDATE_FAILED.value,
+            )
+        return company
+
+    @staticmethod
+    def check_if_user_is_in_company(
+        user_id: str, company_id: str, role: str = None
+    ) -> bool:
+        """
+        Check if the user is linked to the company.
+        If a role is provided, check if the user has that role.
+        """
         with DatabaseSessionManager().session_object() as session:
             # Check if the user is linked to the company
             linked_company = AssociationUserCompany.is_user_linked_to_company(
                 session=session,
-                user_id=user.id,
-                company_id=company.id,
+                user_id=int(user_id),
+                company_id=int(company_id),
+                role_name=role,
             )
 
-            if not linked_company:
-                raise AppError(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    message=CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value,
-                )
-
-        return company
+            return linked_company
