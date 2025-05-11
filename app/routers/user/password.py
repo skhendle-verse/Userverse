@@ -16,7 +16,7 @@ tag = "User Password Management"
 
 
 # This should trigger the sending of an email
-@router.patch("/user/password-reset/request", tags=[tag], response_model=str)
+@router.patch("/password-reset/request", tags=[tag], response_model=str)
 def password_reset_request_api(
     input: PasswordResetRequest,
 ):
@@ -34,7 +34,7 @@ def password_reset_request_api(
         raise e
 
 
-@router.patch("/user/password-reset/validate-otp", tags=[tag], response_model=str)
+@router.patch("/password-reset/validate-otp", tags=[tag], response_model=str)
 def password_reset_validate_otp(
     input: OTPValidationRequest,
     credentials: UserLogin = Depends(get_basic_auth_credentials),

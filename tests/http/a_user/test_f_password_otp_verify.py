@@ -14,7 +14,7 @@ def test_a_password_reset_validate_otp_fail(client, test_user_data, get_user_two
     )
 
     response = client.patch(
-        "/user/password-reset/validate-otp",
+        "password-reset/validate-otp",
         headers=headers,
         json={"otp": get_user_two_otp + "FGWSE"},
     )
@@ -43,7 +43,7 @@ def test_b_password_reset_validate_otp_success(
     )
 
     response = client.patch(
-        "/user/password-reset/validate-otp",
+        "password-reset/validate-otp",
         headers=headers,
         json={"otp": get_user_two_otp},
     )

@@ -47,7 +47,7 @@ def test_add_company_address(test_session, test_company_data):
         company_address_data["value"],
     )
 
-    # Updated company: {'id': 1, 'name': 'Company One', 'description': None, 'industry': None, 'email': 'company.one@email.com', 'phone_number': None, '_created_at': datetime.datetime(2025, 5, 10, 18, 46, 55), '_updated_at': datetime.datetime(2025, 5, 10, 18, 46, 55), '_closed_at': None, 'primary_meta_data': {'address': {'street': '123 Main St', 'city': 'Johannesburg', 'state': 'Gauteng', 'zip_code': '2000', 'country': 'South Africa'}}, 'secondary_meta_data': {}}
+    # Updated company: {'id': 1, 'name': 'Company One', 'description': None, 'industry': None, 'email': 'company.one@email.com', 'phone_number': None, '_created_at': datetime.datetime(2025, 5, 10, 18, 46, 55), '_updated_at': datetime.datetime(2025, 5, 10, 18, 46, 55), '_closed_at': None, 'primary_meta_data': {'address': {'street': '123 Main St', 'city': 'Johannesburg', 'state': 'Gauteng', 'postal_code': '2000', 'country': 'South Africa'}}, 'secondary_meta_data': {}}
     assert (
         updated_company["primary_meta_data"]["address"]["street"]
         == company_address_data["value"]["street"]
@@ -61,8 +61,8 @@ def test_add_company_address(test_session, test_company_data):
         == company_address_data["value"]["state"]
     )
     assert (
-        updated_company["primary_meta_data"]["address"]["zip_code"]
-        == company_address_data["value"]["zip_code"]
+        updated_company["primary_meta_data"]["address"]["postal_code"]
+        == company_address_data["value"]["postal_code"]
     )
     assert (
         updated_company["primary_meta_data"]["address"]["country"]

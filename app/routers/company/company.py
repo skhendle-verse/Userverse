@@ -96,3 +96,42 @@ def get_company_api(
         raise e
     except Exception as e:
         raise e
+
+
+@router.patch(
+    "/company/{company_id}",
+    tags=[tag],
+    status_code=status.HTTP_200_OK,
+    responses={
+        201: {"model": GenericResponseModel[CompanyRead]},
+        400: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
+    },
+)
+def update_user_api(
+    company_updates: CompanyUpdate,
+    company_id: int = Path(..., description="Company ID to update"),
+    user: UserRead = Depends(get_current_user_from_jwt_token),
+):
+    """
+    Update a company by its ID.
+    Requires the user to be an administrator of the company.
+    """
+    try:
+        response = CompanyService().update_company(
+            payload=company_updates,
+            company_id=company_id,
+            user=user,
+        )
+
+        return JSONResponse(
+            status_code=status.HTTP_201_CREATED,
+            content=GenericResponseModel(
+                message=CompanyResponseMessages.COMPANY_UPDATED.value,
+                data=response.model_dump(),
+            ).model_dump(),
+        )
+    except AppError as e:
+        raise e
+    except Exception as e:
+        raise e
