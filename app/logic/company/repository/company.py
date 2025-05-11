@@ -41,7 +41,9 @@ class CompanyRepository:
                 self._associate_creator(session, created_by.id, company["id"])
 
                 # 5. Get the registered company with complete data
-                registered_company = self._get_registered_company(session, company["id"])
+                registered_company = self._get_registered_company(
+                    session, company["id"]
+                )
 
                 return CompanyRead(**registered_company)
 
@@ -98,12 +100,9 @@ class CompanyRepository:
             # Reuse the method to get complete company data
             return CompanyRead(**self._get_registered_company(session, company["id"]))
 
-    
     def _create_company_record(self, session, payload: CompanyCreate) -> dict:
         """Create the company record in the database"""
-        company = Company.create(
-            session, **payload.model_dump(exclude={"address"})
-        )
+        company = Company.create(session, **payload.model_dump(exclude={"address"}))
 
         if not company:
             raise AppError(

@@ -6,6 +6,7 @@ from app.utils.app_error import AppError
 
 # repository
 from app.logic.company.repository.company import CompanyRepository
+
 # database
 from app.database import DatabaseSessionManager
 from app.database.association_user_company import AssociationUserCompany
@@ -57,7 +58,7 @@ class CompanyService:
         company = None
         if company_id:
             company = company_repository.get_company_by_id(company_id)
-            
+
         if email:
             company = company_repository.get_company_by_email(email)
 
@@ -69,7 +70,7 @@ class CompanyService:
                 user_id=user.id,
                 company_id=company.id,
             )
-        
+
             if not linked_company:
                 raise AppError(
                     status_code=status.HTTP_403_FORBIDDEN,
@@ -77,5 +78,3 @@ class CompanyService:
                 )
 
         return company
-
-

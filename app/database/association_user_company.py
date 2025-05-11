@@ -24,7 +24,9 @@ class AssociationUserCompany(BaseModel):
     user = relationship("User", back_populates="companies", overlaps="company,role")
 
     @classmethod
-    def is_user_linked_to_company(cls, session: Session, user_id: int, company_id: int, role_name: str = None) -> bool:
+    def is_user_linked_to_company(
+        cls, session: Session, user_id: int, company_id: int, role_name: str = None
+    ) -> bool:
         """
         Check if a user is associated with a company, optionally filtered by role.
         """

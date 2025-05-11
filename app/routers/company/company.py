@@ -53,6 +53,7 @@ def create_company_api(
     except Exception as e:
         raise e
 
+
 @router.get(
     "/company",
     tags=[tag],
@@ -75,13 +76,9 @@ def get_company_api(
     """
     try:
         if email:
-            company = CompanyService().get_company(
-                user=user, email=email
-            )
+            company = CompanyService().get_company(user=user, email=email)
         elif company_id:
-            company = CompanyService().get_company(
-                user=user, company_id=company_id
-            )
+            company = CompanyService().get_company(user=user, company_id=company_id)
         else:
             raise AppError(
                 status_code=status.HTTP_400_BAD_REQUEST,
