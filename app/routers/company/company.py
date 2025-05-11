@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query, Path
 from fastapi.responses import JSONResponse
 
 # Models
@@ -47,6 +47,53 @@ def create_company_api(
                 "message": CompanyResponseMessages.COMPANY_CREATED.value,
                 "data": response.model_dump(),
             },
+        )
+    except AppError as e:
+        raise e
+    except Exception as e:
+        raise e
+
+@router.get(
+    "/company",
+    tags=[tag],
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"model": GenericResponseModel[CompanyRead]},
+        400: {"model": AppErrorResponseModel},
+        404: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
+    },
+)
+def get_company_api(
+    email: str = Query(None, description="(Optional) Lookup company by email"),
+    company_id: int = Query(None, description="(Optional) Lookup company by ID"),
+    user: UserRead = Depends(get_current_user_from_jwt_token),
+):
+    """
+    Retrieve a company by email or company_id.
+    Priority: email > company_id.
+    """
+    try:
+        if email:
+            company = CompanyService().get_company(
+                user=user, email=email
+            )
+        elif company_id:
+            company = CompanyService().get_company(
+                user=user, company_id=company_id
+            )
+        else:
+            raise AppError(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                message=CompanyResponseMessages.COMPANY_ID_OR_EMAIL_REQUIRED.value,
+            )
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=GenericResponseModel(
+                message=CompanyResponseMessages.COMPANY_FOUND.value,
+                data=company.model_dump(),
+            ).model_dump(),
         )
     except AppError as e:
         raise e

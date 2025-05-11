@@ -24,6 +24,6 @@ class Company(BaseModel):
     def get_company_by_email(cls, session: Session, email: str) -> dict:
         try:
             company = session.query(cls).filter_by(email=email).one()
-            return company
+            return cls.to_dict(company)
         except NoResultFound:
             raise ValueError(f"Company with email:{email}, not found.")
