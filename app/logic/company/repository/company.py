@@ -159,7 +159,9 @@ class CompanyRepository:
                 description=role.description,
             )
 
-    def _associate_creator(self, session, created_by: UserRead, company_id: str) -> None:
+    def _associate_creator(
+        self, session, created_by: UserRead, company_id: str
+    ) -> None:
         """Associate the creator as Administrator of the company"""
         AssociationUserCompany.create(
             session,
