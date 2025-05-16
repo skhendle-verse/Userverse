@@ -1,0 +1,78 @@
+from fastapi import APIRouter, Depends, status, Query, Path
+from fastapi.responses import JSONResponse
+
+# Models
+from app.models.generic_response import GenericResponseModel
+from app.models.company.roles import (
+    RoleCreate,
+    RoleRead,
+    RoleUpdate,
+    CompanyDefaultRoles,
+)
+from app.models.app_error import AppErrorResponseModel
+from app.models.company.response_messages import CompanyResponseMessages
+
+# Auth
+from app.security.jwt import get_current_user_from_jwt_token
+from app.models.user.user import UserRead
+
+# Logic
+from app.logic.company.company import CompanyService
+from app.logic.company.role import RoleService
+
+# Utils
+from app.utils.app_error import AppError
+
+router = APIRouter()
+tag = "Role Management"
+
+
+@router.post(
+    "/role/{company_id}",
+    tags=[tag],
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        201: {"model": GenericResponseModel[RoleRead]},
+        400: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
+    },
+)
+def create_role_api(
+    company_id: int,
+    payload: RoleCreate,
+    user: UserRead = Depends(get_current_user_from_jwt_token),
+):
+    """
+    Register a new role.
+    """
+    try:
+        company_service = CompanyService()
+        admin_user = company_service.check_if_user_is_in_company(
+            user_id=user.id,
+            company_id=company_id,
+            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
+        )
+
+        if not admin_user:
+            raise AppError(
+                status_code=status.HTTP_403_FORBIDDEN,
+                message=CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value,
+            )
+        role_service = RoleService()
+        response = role_service.create_role(
+            payload=payload,
+            created_by=user,
+            company_id=company_id,
+        )
+
+        return JSONResponse(
+            status_code=status.HTTP_201_CREATED,
+            content={
+                "message": CompanyResponseMessages.ROLE_CREATION_SUCCESS.value,
+                "data": response.model_dump(),
+            },
+        )
+    except AppError as e:
+        raise e
+    except Exception as e:
+        raise e
