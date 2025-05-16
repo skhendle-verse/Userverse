@@ -45,3 +45,37 @@ class Role(BaseModel):
             raise ValueError(
                 f"Role with company_id={company_id} and name='{name}' not found."
             )
+
+    @classmethod
+    def update_json_field(
+        cls,
+        session,
+        company_id: int,
+        name: str,
+        column_name: str,
+        key: str,
+        value: any,
+    ):
+        """
+        Update a key in a JSON field using (company_id, name) as composite key.
+        """
+        role = (
+            session.query(cls).filter_by(company_id=company_id, name=name).one_or_none()
+        )
+        if not role:
+            raise ValueError(
+                f"Role with company_id={company_id} and name='{name}' not found."
+            )
+
+        if not hasattr(role, column_name):
+            raise ValueError(f"Column '{column_name}' does not exist on Role.")
+
+        json_column = getattr(role, column_name)
+        if not isinstance(json_column, dict):
+            raise ValueError(f"Column '{column_name}' is not a JSON field.")
+
+        json_column[key] = value
+        setattr(role, column_name, json_column)
+
+        session.commit()
+        return role

@@ -17,3 +17,13 @@ class CompanyResponseMessages(str, Enum):
     # company delete
     COMPANY_DELETED = "Company deleted successfully"
     COMPANY_DELETION_FAILED = "Company deletion failed"
+    # Role creation
+    ROLE_CREATION_SUCCESS = "Role created successfully"
+    ROLE_CREATION_FORBIDDEN = "Role creation is forbidden"
+    ROLE_CREATION_FAILED = "Role creation failed"
+    ROLE_NOT_FOUND = "Role not found"
+    ROLE_DELETION_FAILED = "Role deletion failed"
+    ROLE_DELETED = "Role deleted successfully"
+    ROLE_UPDATED = "Role updated successfully"
+    ROLE_UPDATE_FAILED = "Role update failed"
+    ROLE_ALREADY_EXISTS = "Role already exists"

@@ -13,6 +13,16 @@
         "industry": "Technology",
         "phone_number": "+27123456789"
     },
+    "roles":{
+        "user": {
+            "name": "User",
+            "description": "Standard user role with limited access."
+        },
+        "client": {
+            "name": "Client",
+            "description": "Client role with access to client-specific features."
+        }
+    },
     "update_company_one": {
         "name": "Updated Company One",
         "description": "An updated description for Company One.",

@@ -19,6 +19,7 @@ from app.routers.user import password
 
 # company
 from app.routers.company import company
+from app.routers.company import roles
 from app.utils.config.loader import ConfigLoader
 from app.utils.config.logging import logger
 
@@ -63,6 +64,7 @@ def create_app() -> FastAPI:
     app.include_router(user.router)
     app.include_router(password.router)
     app.include_router(company.router)
+    app.include_router(roles.router)
 
     @app.get("/")
     async def root():
