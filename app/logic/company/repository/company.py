@@ -38,7 +38,7 @@ class CompanyRepository:
             self._create_default_roles(session, company["id"])
 
             # 4. Associate creator as Administrator
-            self._associate_creator(session, created_by.id, company["id"])
+            self._associate_creator(session, created_by, company["id"])
 
             # 5. Get the registered company with complete data
             registered_company = self._get_registered_company(session, company["id"])
@@ -159,11 +159,11 @@ class CompanyRepository:
                 description=role.description,
             )
 
-    def _associate_creator(self, session, user_id: str, company_id: str) -> None:
+    def _associate_creator(self, session, created_by: UserRead, company_id: str) -> None:
         """Associate the creator as Administrator of the company"""
         AssociationUserCompany.create(
             session,
-            user_id=user_id,
+            user_id=created_by.id,
             company_id=company_id,
             role_name=CompanyDefaultRoles.ADMINISTRATOR.name_value,
         )

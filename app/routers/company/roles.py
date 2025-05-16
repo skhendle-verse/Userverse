@@ -24,11 +24,11 @@ from app.logic.company.role import RoleService
 from app.utils.app_error import AppError
 
 router = APIRouter()
-tag = "Role Management"
+tag = "Company Role Management"
 
 
 @router.post(
-    "/role/{company_id}",
+    "/{company_id}/role",
     tags=[tag],
     status_code=status.HTTP_201_CREATED,
     responses={

@@ -28,6 +28,5 @@ class RoleUpdate(BaseModel):
 
 
 class RoleRead(BaseModel):
-    company_id: int
     name: str
     description: Optional[str]
