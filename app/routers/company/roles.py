@@ -152,7 +152,6 @@ def delete_role_api(
     Delete a role and reassign all users to a replacement role (same company).
     """
     try:
-        # call service,
         response = RoleService.delete_role(
             payload=payload,
             deleted_by=user,
