@@ -2,6 +2,7 @@ import pytest
 from app.models.company.response_messages import CompanyResponseMessages
 from tests.http.conftest import client, test_company_data, login_token
 
+
 def test_update_role_description_success(client, login_token, test_company_data):
     """
     Test updating a role's description successfully.
@@ -17,7 +18,10 @@ def test_update_role_description_success(client, login_token, test_company_data)
     assert "data" in json_data
     assert json_data["data"]["description"] == payload["description"]
 
-def test_update_role_description_forbidden(client, login_token_user_two, test_company_data):
+
+def test_update_role_description_forbidden(
+    client, login_token_user_two, test_company_data
+):
     """
     Test updating a role's description fails if not admin.
     """
@@ -27,7 +31,11 @@ def test_update_role_description_forbidden(client, login_token_user_two, test_co
     assert response.status_code in [400, 403]
     json_data = response.json()
     assert "detail" in json_data
-    assert json_data["detail"]["message"] == CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value
+    assert (
+        json_data["detail"]["message"]
+        == CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value
+    )
+
 
 def test_update_role_description_not_found(client, login_token, test_company_data):
     """

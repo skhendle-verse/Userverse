@@ -19,6 +19,8 @@ from app.models.user.user import UserRead
 # Logic
 from app.logic.company.company import CompanyService
 from app.logic.company.role import RoleService
+
+
 @router.patch(
     "/{company_id}/role/{name}",
     tags=[tag],
@@ -69,6 +71,7 @@ def update_role_description_api(
         raise e
     except Exception as e:
         raise e
+
 
 # Utils
 from app.utils.app_error import AppError

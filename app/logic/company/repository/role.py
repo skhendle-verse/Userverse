@@ -44,6 +44,7 @@ class RoleRepository:
                     message=CompanyResponseMessages.ROLE_UPDATE_FAILED.value,
                     error=str(e),
                 )
+
     def __init__(self, company_id: int):
         self.company_id = company_id
         self.db_manager = DatabaseSessionManager()
