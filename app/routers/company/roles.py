@@ -217,8 +217,7 @@ def get_company_roles_api(
             )
 
         response = RoleService.get_company_roles(
-            payload=query_params,
-            company_id=company_id
+            payload=query_params, company_id=company_id
         )
 
         return JSONResponse(

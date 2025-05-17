@@ -11,7 +11,9 @@ from tests.http.conftest import client, login_token, test_company_data
         ("limit=10&offset=0&name=er&description=access", {"User Updated", "Viewer"}),
     ],
 )
-def test_get_company_roles(client, login_token, test_company_data, query_params, expected_names):
+def test_get_company_roles(
+    client, login_token, test_company_data, query_params, expected_names
+):
     """
     Test getting company roles with optional filters.
     """
