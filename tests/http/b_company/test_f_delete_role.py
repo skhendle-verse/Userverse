@@ -10,7 +10,7 @@ def test_a_delete_role_success(client, login_token, test_company_data):
     """
     headers = {
         "Authorization": f"Bearer {login_token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
     payload = {
         "role_name_to_delete": "Client Updated",
@@ -21,7 +21,7 @@ def test_a_delete_role_success(client, login_token, test_company_data):
         method="DELETE",
         url="/company/1/role",
         data=json.dumps(payload),
-        headers=headers
+        headers=headers,
     )
 
     assert response.status_code == 201  # Ensure this matches actual API response
@@ -41,7 +41,7 @@ def test_b_delete_default_role_forbidden(client, login_token):
     """
     headers = {
         "Authorization": f"Bearer {login_token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
     payload = {
         "role_name_to_delete": "Administrator",
@@ -58,7 +58,9 @@ def test_b_delete_default_role_forbidden(client, login_token):
     assert response.status_code == 422  # triggered by Pydantic field validator
     json_data = response.json()
     assert "detail" in json_data
-    assert any("Cannot delete default system role" in err["msg"] for err in json_data["detail"])
+    assert any(
+        "Cannot delete default system role" in err["msg"] for err in json_data["detail"]
+    )
 
 
 def test_c_delete_role_not_found(client, login_token):
@@ -67,7 +69,7 @@ def test_c_delete_role_not_found(client, login_token):
     """
     headers = {
         "Authorization": f"Bearer {login_token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
     payload = {
         "role_name_to_delete": "NonExistentRole",
@@ -86,8 +88,11 @@ def test_c_delete_role_not_found(client, login_token):
     assert "detail" in json_data
     assert "error" in json_data["detail"]
     assert "message" in json_data["detail"]
-    assert  "Role 'NonExistentRole' not found." == json_data["detail"]["error"]
-    assert json_data["detail"]["message"] == CompanyResponseMessages.ROLE_UPDATE_FAILED.value
+    assert "Role 'NonExistentRole' not found." == json_data["detail"]["error"]
+    assert (
+        json_data["detail"]["message"]
+        == CompanyResponseMessages.ROLE_UPDATE_FAILED.value
+    )
 
 
 def test_d_delete_role_self_replacement_forbidden(client, login_token):
@@ -96,7 +101,7 @@ def test_d_delete_role_self_replacement_forbidden(client, login_token):
     """
     headers = {
         "Authorization": f"Bearer {login_token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
     payload = {
         "role_name_to_delete": "Client Updated",
@@ -115,5 +120,8 @@ def test_d_delete_role_self_replacement_forbidden(client, login_token):
     assert "detail" in json_data
     assert "error" in json_data["detail"]
     assert "message" in json_data["detail"]
-    assert  "Cannot replace a role with itself." == json_data["detail"]["error"]
-    assert json_data["detail"]["message"] == CompanyResponseMessages.ROLE_UPDATE_FAILED.value
+    assert "Cannot replace a role with itself." == json_data["detail"]["error"]
+    assert (
+        json_data["detail"]["message"]
+        == CompanyResponseMessages.ROLE_UPDATE_FAILED.value
+    )
