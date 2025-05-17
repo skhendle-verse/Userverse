@@ -50,18 +50,6 @@ def create_role_api(
     Register a new role.
     """
     try:
-        company_service = CompanyService()
-        admin_user = company_service.check_if_user_is_in_company(
-            user_id=user.id,
-            company_id=company_id,
-            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
-        )
-
-        if not admin_user:
-            raise AppError(
-                status_code=status.HTTP_403_FORBIDDEN,
-                message=CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value,
-            )
         role_service = RoleService()
         response = role_service.create_role(
             payload=payload,
@@ -104,17 +92,6 @@ def update_role_api(
     Requires the user to be an administrator of the company.
     """
     try:
-        company_service = CompanyService()
-        admin_user = company_service.check_if_user_is_in_company(
-            user_id=user.id,
-            company_id=company_id,
-            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
-        )
-        if not admin_user:
-            raise AppError(
-                status_code=status.HTTP_403_FORBIDDEN,
-                message=CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value,
-            )
         role_service = RoleService()
         response = role_service.update_role(
             company_id=company_id,
@@ -154,17 +131,6 @@ def delete_role_api(
     Delete a role and reassign all users to a replacement role (same company).
     """
     try:
-        company_service = CompanyService()
-        admin_user = company_service.check_if_user_is_in_company(
-            user_id=user.id,
-            company_id=company_id,
-            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
-        )
-        if not admin_user:
-            raise AppError(
-                status_code=status.HTTP_403_FORBIDDEN,
-                message=CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value,
-            )
         response = RoleService.delete_role(
             payload=payload,
             deleted_by=user,
@@ -203,21 +169,8 @@ def get_company_roles_api(
     Get paginated roles for a company.
     """
     try:
-        company_service = CompanyService()
-        admin_user = company_service.check_if_user_is_in_company(
-            user_id=user.id,
-            company_id=company_id,
-            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
-        )
-
-        if not admin_user:
-            raise AppError(
-                status_code=status.HTTP_403_FORBIDDEN,
-                message=CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value,
-            )
-
         response = RoleService.get_company_roles(
-            payload=query_params, company_id=company_id
+            payload=query_params, company_id=company_id, user=user
         )
 
         return JSONResponse(

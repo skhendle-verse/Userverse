@@ -64,16 +64,11 @@ class CompanyService:
         if email:
             company = company_repository.get_company_by_email(email)
 
-        linked_company = CompanyService.check_if_user_is_in_company(
+        CompanyService.check_if_user_is_in_company(
             user_id=user.id,
             company_id=company.id,
         )
 
-        if not linked_company:
-            raise AppError(
-                status_code=status.HTTP_403_FORBIDDEN,
-                message=CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value,
-            )
 
         return company
 
@@ -119,5 +114,11 @@ class CompanyService:
                 company_id=int(company_id),
                 role_name=role,
             )
+            if not linked_company:
+                raise AppError(
+                status_code=status.HTTP_403_FORBIDDEN,
+                message=CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value,
+            )
+
 
             return linked_company
