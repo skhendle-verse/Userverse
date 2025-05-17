@@ -2,6 +2,7 @@ from app.models.company.address import CompanyAddress
 from fastapi import status
 
 # utils
+from app.models.generic_pagination import PaginatedResponse, PaginationMeta
 from app.utils.app_error import AppError
 
 # database
@@ -10,10 +11,12 @@ from app.database.company import Company
 from app.database.user import User
 from app.database.role import Role
 from app.database.association_user_company import AssociationUserCompany
+from sqlalchemy.orm import joinedload
+
 
 # models
 from app.models.company.company import CompanyRead, CompanyCreate, CompanyUpdate
-from app.models.user.user import UserRead
+from app.models.user.user import UserQueryParams, UserRead
 from app.models.company.roles import CompanyDefaultRoles
 
 from app.models.company.response_messages import CompanyResponseMessages
@@ -93,6 +96,57 @@ class CompanyRepository:
 
             # Reuse the method to get complete company data
             return CompanyRead(**self._get_registered_company(session, company["id"]))
+
+    def get_company_users(
+        self, company_id: int, params: UserQueryParams
+    ) -> PaginatedResponse[UserRead]:
+        """
+        Get all users in a company with optional filters and pagination.
+        """
+        with self.db_manager.session_object() as session:
+            query = (
+                session.query(AssociationUserCompany)
+                .join(AssociationUserCompany.user)
+                .filter(
+                    AssociationUserCompany.company_id == company_id,
+                    AssociationUserCompany._closed_at.is_(None),
+                    User._closed_at.is_(None),
+                )
+            )
+
+            # Apply filters
+            if params.role_name:
+                query = query.filter(
+                    AssociationUserCompany.role_name.ilike(f"%{params.role_name}%")
+                )
+            if params.first_name:
+                query = query.filter(User.first_name.ilike(f"%{params.first_name}%"))
+            if params.last_name:
+                query = query.filter(User.last_name.ilike(f"%{params.last_name}%"))
+            if params.email:
+                query = query.filter(User.email.ilike(f"%{params.email}%"))
+
+            total = query.count()
+
+            results = (
+                query.options(joinedload(AssociationUserCompany.user))
+                .offset(params.offset)
+                .limit(params.limit)
+                .all()
+            )
+
+            users = [UserRead(**User.to_dict(assoc.user)) for assoc in results]
+
+            return PaginatedResponse[UserRead](
+                records=users,
+                pagination=PaginationMeta(
+                    total_records=total,
+                    limit=params.limit,
+                    offset=params.offset,
+                    current_page=params.offset // params.limit + 1,
+                    total_pages=(total + params.limit - 1) // params.limit,
+                ),
+            )
 
     def update_company(
         self, payload: CompanyUpdate, company_id: str, user: UserRead

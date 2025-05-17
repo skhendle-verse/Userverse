@@ -1,6 +1,7 @@
 from fastapi import status
 
 # utils
+from app.models.generic_pagination import PaginatedResponse
 from app.security.jwt import JWTManager
 from app.utils.app_error import AppError
 
@@ -21,7 +22,7 @@ from app.models.company.company import (
 from app.models.company.roles import CompanyDefaultRoles
 
 
-from app.models.user.user import UserRead
+from app.models.user.user import UserQueryParams, UserRead
 
 
 from app.models.company.response_messages import CompanyResponseMessages
@@ -43,6 +44,23 @@ class CompanyService:
                 message=CompanyResponseMessages.COMPANY_CREATION_FAILED.value,
             )
         return company
+
+    @staticmethod
+    def get_company_user(
+        company_id: int,
+        params: UserQueryParams,
+        user: UserRead,
+    ) -> PaginatedResponse[UserRead]:
+        CompanyService.check_if_user_is_in_company(
+            user_id=user.id,
+            company_id=company_id,
+            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
+        )
+        repository = CompanyRepository()
+        return repository.get_company_users(
+            company_id=company_id,
+            params=params,
+        )
 
     @staticmethod
     def get_company(
@@ -69,7 +87,6 @@ class CompanyService:
             company_id=company.id,
         )
 
-
         return company
 
     @staticmethod
@@ -79,16 +96,12 @@ class CompanyService:
         """
         Update a company by its ID.
         """
-        linked_company = CompanyService.check_if_user_is_in_company(
+        CompanyService.check_if_user_is_in_company(
             user_id=user.id,
             company_id=company_id,
             role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
         )
-        if not linked_company:
-            raise AppError(
-                status_code=status.HTTP_403_FORBIDDEN,
-                message=CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value,
-            )
+
         company_repository = CompanyRepository()
         company = company_repository.update_company(payload, company_id, user)
         if not company:
@@ -116,9 +129,8 @@ class CompanyService:
             )
             if not linked_company:
                 raise AppError(
-                status_code=status.HTTP_403_FORBIDDEN,
-                message=CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value,
-            )
-
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    message=CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value,
+                )
 
             return linked_company

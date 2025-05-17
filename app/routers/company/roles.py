@@ -94,6 +94,7 @@ def update_role_api(
     try:
         role_service = RoleService()
         response = role_service.update_role(
+            updated_by=user,
             company_id=company_id,
             name=name,
             payload=payload,

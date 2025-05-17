@@ -25,7 +25,9 @@ from app.models.company.response_messages import CompanyResponseMessages
 class RoleService:
 
     @staticmethod
-    def update_role(company_id: int, updated_by: UserRead, name: str, payload: RoleUpdate) -> RoleRead:
+    def update_role(
+        company_id: int, updated_by: UserRead, name: str, payload: RoleUpdate
+    ) -> RoleRead:
         """
         Update the description of a role for a company.
         """
