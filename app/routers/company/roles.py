@@ -2,10 +2,12 @@ from fastapi import APIRouter, Depends, status, Query, Path
 from fastapi.responses import JSONResponse
 
 # Models
+from app.models.generic_pagination import PaginatedResponse
 from app.models.generic_response import GenericResponseModel
 from app.models.company.roles import (
     RoleCreate,
     RoleDelete,
+    RoleQueryParams,
     RoleRead,
     RoleUpdate,
     CompanyDefaultRoles,
@@ -152,6 +154,17 @@ def delete_role_api(
     Delete a role and reassign all users to a replacement role (same company).
     """
     try:
+        company_service = CompanyService()
+        admin_user = company_service.check_if_user_is_in_company(
+            user_id=user.id,
+            company_id=company_id,
+            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
+        )
+        if not admin_user:
+            raise AppError(
+                status_code=status.HTTP_403_FORBIDDEN,
+                message=CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value,
+            )
         response = RoleService.delete_role(
             payload=payload,
             deleted_by=user,
@@ -164,6 +177,56 @@ def delete_role_api(
                 "message": CompanyResponseMessages.ROLE_DELETED.value,
                 "data": response,
             },
+        )
+    except AppError as e:
+        raise e
+    except Exception as e:
+        raise e
+
+
+@router.get(
+    "/company/{company_id}/roles",
+    tags=[tag],
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"model": GenericResponseModel[PaginatedResponse[RoleRead]]},
+        400: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
+    },
+)
+def get_company_roles_api(
+    company_id: int,
+    query_params: RoleQueryParams = Depends(),
+    user: UserRead = Depends(get_current_user_from_jwt_token),
+):
+    """
+    Get paginated roles for a company.
+    """
+    try:
+        company_service = CompanyService()
+        admin_user = company_service.check_if_user_is_in_company(
+            user_id=user.id,
+            company_id=company_id,
+            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
+        )
+
+        if not admin_user:
+            raise AppError(
+                status_code=status.HTTP_403_FORBIDDEN,
+                message=CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value,
+            )
+
+        response = RoleService.get_company_roles(
+            payload=query_params,
+            company_id=company_id
+        )
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=GenericResponseModel(
+                message=CompanyResponseMessages.ROLE_GET_SUCCESS.value,
+                data=response,
+            ).model_dump(),
         )
     except AppError as e:
         raise e

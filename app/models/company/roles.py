@@ -3,6 +3,8 @@ from typing import Optional
 from pydantic import BaseModel
 from pydantic import BaseModel, EmailStr, field_validator, Field
 
+from app.models.generic_pagination import PaginationParams
+
 
 class CompanyDefaultRoles(str, Enum):
     ADMINISTRATOR = "Administrator: Full access to manage users and data"
@@ -44,3 +46,8 @@ class RoleDelete(BaseModel):
 class RoleRead(BaseModel):
     name: Optional[str]
     description: Optional[str]
+
+
+class RoleQueryParams(PaginationParams):
+    name: Optional[str] = Field(None, description="Filter by role name")
+    description: Optional[str] = Field(None, description="Filter by role description")

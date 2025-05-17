@@ -1,6 +1,7 @@
 from fastapi import status
 
 # utils
+from app.models.generic_pagination import PaginatedResponse, PaginationMeta
 from app.utils.app_error import AppError
 
 # repository
@@ -9,7 +10,7 @@ from app.logic.company.repository.role import RoleRepository
 
 # models
 from app.models.company.company import CompanyRead
-from app.models.company.roles import CompanyDefaultRoles, RoleDelete
+from app.models.company.roles import CompanyDefaultRoles, RoleDelete, RoleQueryParams
 from app.models.company.roles import (
     RoleCreate,
     RoleRead,
@@ -59,3 +60,18 @@ class RoleService:
     def delete_role(payload: RoleDelete, deleted_by: UserRead, company_id: int) -> dict:
         role_repository = RoleRepository(company_id=company_id)
         return role_repository.delete_role(payload=payload, deleted_by=deleted_by)
+
+    @staticmethod
+    def get_company_roles(
+        payload: RoleQueryParams, company_id: int
+    ) -> PaginatedResponse[RoleRead]:
+        """
+        Get company roles with pagination and optional filtering.
+        """
+        role_repository = RoleRepository(company_id=company_id)
+        result = role_repository.get_roles(payload=payload)
+
+        return PaginatedResponse[RoleRead](
+            records=[RoleRead(**role) for role in result["records"]],
+            pagination=PaginationMeta(**result["pagination"]),
+        )
