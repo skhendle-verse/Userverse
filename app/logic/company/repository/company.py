@@ -15,7 +15,12 @@ from sqlalchemy.orm import joinedload
 
 
 # models
-from app.models.company.company import CompanyQueryParams, CompanyRead, CompanyCreate, CompanyUpdate
+from app.models.company.company import (
+    CompanyQueryParams,
+    CompanyRead,
+    CompanyCreate,
+    CompanyUpdate,
+)
 from app.models.user.user import UserQueryParams, UserRead
 from app.models.company.roles import CompanyDefaultRoles
 
