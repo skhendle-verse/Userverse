@@ -38,3 +38,12 @@ class CompanyCreate(BaseModel):
     @field_validator("phone_number")
     def validate_phone_number(cls, v: Optional[str]) -> Optional[str]:
         return validate_phone_number_format(v)
+
+class CompanyQueryParams(BaseModel):
+    limit: int = Field(10, ge=1, le=100)
+    offset: int = Field(0, ge=0)
+    role_name: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    industry: Optional[str] = None
+    email: Optional[str] = None
