@@ -55,6 +55,9 @@ TODO: Setup a testing config, to avoid comflicts with dev db
 
 # testing company routes
 (userverse) $: pytest -v tests/http/b_company/test_b_get_company.py
+(userverse) $: pytest -v tests/http/b_company/test_c_update_company.py
+(userverse) $: pytest -v tests/http/b_company/test_d_create_role.py
+(userverse) $: pytest -v tests/http/b_company/test_e_update_role.py
 
 ```
 

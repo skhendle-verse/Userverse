@@ -25,7 +25,11 @@ from app.models.company.response_messages import CompanyResponseMessages
 
 class RoleRepository:
 
-    def update_role_description(self, name: str, description: str) -> RoleRead:
+    def __init__(self, company_id: int):
+        self.company_id = company_id
+        self.db_manager = DatabaseSessionManager()
+
+    def update_role(self, name: str, payload: RoleUpdate) -> RoleRead:
         """
         Update the description of a role for this company.
         """
@@ -35,7 +39,8 @@ class RoleRepository:
                     session,
                     company_id=self.company_id,
                     name=name,
-                    new_description=description,
+                    new_description=payload.description,
+                    new_name=payload.name,
                 )
                 return RoleRead(**updated)
             except Exception as e:
@@ -44,10 +49,6 @@ class RoleRepository:
                     message=CompanyResponseMessages.ROLE_UPDATE_FAILED.value,
                     error=str(e),
                 )
-
-    def __init__(self, company_id: int):
-        self.company_id = company_id
-        self.db_manager = DatabaseSessionManager()
 
     def create_role(
         self,
