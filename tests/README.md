@@ -32,7 +32,7 @@ TODO: Setup a testing config, to avoid comflicts with dev db
 ```bash
 # assign a value to TEST_ENVIRONMENT, which help trigger creation of testing.db
 (userverse) $: export TEST_ENVIRONMENT=True
-
+#
 # Main route testing
 (userverse) $: pytest -v tests/http/test_main.py
 # Security testing
@@ -49,15 +49,18 @@ TODO: Setup a testing config, to avoid comflicts with dev db
 (userverse) $: pytest -v tests/http/a_user/test_e_password_reset_request.py
 # Validate OTP
 (userverse) $: pytest -v tests/http/a_user/test_f_password_otp_verify.py
-
 # testing company routes
 (userverse) $: pytest -v tests/http/b_company/test_a_create_company.py
-
 # testing company routes
 (userverse) $: pytest -v tests/http/b_company/test_b_get_company.py
+# Update company
 (userverse) $: pytest -v tests/http/b_company/test_c_update_company.py
+# Create role
 (userverse) $: pytest -v tests/http/b_company/test_d_create_role.py
+# Update role
 (userverse) $: pytest -v tests/http/b_company/test_e_update_role.py
+# Delete role
+(userverse) $: pytest -v tests/http/b_company/test_f_delete_role.py
 
 ```
 
