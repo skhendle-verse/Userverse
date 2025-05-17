@@ -9,7 +9,7 @@ from app.logic.company.repository.role import RoleRepository
 
 # models
 from app.models.company.company import CompanyRead
-from app.models.company.roles import CompanyDefaultRoles
+from app.models.company.roles import CompanyDefaultRoles, RoleDelete
 from app.models.company.roles import (
     RoleCreate,
     RoleRead,
@@ -54,3 +54,8 @@ class RoleService:
                 message=CompanyResponseMessages.ROLE_CREATION_FAILED.value,
             )
         return role
+
+    @staticmethod
+    def delete_role(payload: RoleDelete, deleted_by: UserRead, company_id: int) -> dict:
+        role_repository = RoleRepository(company_id=company_id)
+        return role_repository.delete_role(payload=payload, deleted_by=deleted_by)
