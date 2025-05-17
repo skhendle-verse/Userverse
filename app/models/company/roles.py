@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Optional
 from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, field_validator, Field
 
 
 class CompanyDefaultRoles(str, Enum):
@@ -26,6 +27,18 @@ class RoleCreate(BaseModel):
 class RoleUpdate(BaseModel):
     name: Optional[str]
     description: Optional[str]
+
+
+class RoleDelete(BaseModel):
+    replacement_role_name: str
+    role_name_to_delete: str
+
+    @field_validator("role_name_to_delete")
+    def validate_not_default_role(cls, v: str) -> str:
+        default_roles = {r.name_value for r in CompanyDefaultRoles}
+        if v in default_roles:
+            raise ValueError(f"Cannot delete default system role: '{v}'")
+        return v
 
 
 class RoleRead(BaseModel):

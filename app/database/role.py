@@ -1,6 +1,9 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from sqlalchemy.orm.exc import NoResultFound
+
+from app.models.user.user import UserRead
 from .base_model import BaseModel
 
 
@@ -79,3 +82,73 @@ class Role(BaseModel):
 
         session.commit()
         return role
+
+    @classmethod
+    def delete_role_and_reassign_users(
+        cls,
+        session,
+        company_id: int,
+        name_to_delete: str,
+        replacement_name: str,
+        deleted_by: UserRead,
+    ):
+        """
+        Delete a role and reassign its users to a replacement role.
+
+        Args:
+            session: SQLAlchemy session.
+            company_id: ID of the company.
+            name_to_delete: Role name to delete.
+            replacement_name: Role name to assign to affected users.
+
+        Returns:
+            dict: A success message and counts of affected users.
+        Raises:
+            ValueError: If roles are not found or reassignment is invalid.
+        """
+        if name_to_delete == replacement_name:
+            raise ValueError("Cannot replace a role with itself.")
+
+        role_to_delete = (
+            session.query(cls)
+            .filter_by(company_id=company_id, name=name_to_delete)
+            .one_or_none()
+        )
+
+        if not role_to_delete:
+            raise ValueError(f"Role '{name_to_delete}' not found.")
+
+        replacement_role = (
+            session.query(cls)
+            .filter_by(company_id=company_id, name=replacement_name)
+            .one_or_none()
+        )
+
+        if not replacement_role:
+            raise ValueError(f"Replacement role '{replacement_name}' not found.")
+
+        # Reassign users to the replacement role
+        reassigned_count = 0
+        for user_link in role_to_delete.users:
+            user_link.role = replacement_role
+            reassigned_count += 1
+
+        # Delete the original role
+        # Soft delete the role
+        role_to_delete._closed_at = func.now()
+        session.add(role_to_delete)
+        session.commit()
+        role_to_delete.update_json_field(
+            session=session,
+            company_id=company_id,
+            name=name_to_delete,
+            column_name="primary_meta_data",
+            key="deleted_by",
+            value=deleted_by.model_dump(),
+        )
+        session.refresh(role_to_delete)
+
+        return {
+            "message": f"Role '{name_to_delete}' soft deleted and users reassigned to '{replacement_name}'.",
+            "users_reassigned": reassigned_count,
+        }

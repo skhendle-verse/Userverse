@@ -15,7 +15,7 @@ from app.models.company.roles import (
     RoleCreate,
     RoleRead,
     RoleUpdate,
-    CompanyDefaultRoles,
+    RoleDelete,
 )
 from app.models.user.user import UserRead
 from app.models.company.roles import CompanyDefaultRoles
@@ -28,6 +28,27 @@ class RoleRepository:
     def __init__(self, company_id: int):
         self.company_id = company_id
         self.db_manager = DatabaseSessionManager()
+
+    def delete_role(self, payload: RoleDelete, deleted_by: UserRead) -> dict:
+        """
+        Delete role from a company
+        """
+        with self.db_manager.session_object() as session:
+            try:
+                updated = Role.delete_role_and_reassign_users(
+                    session=session,
+                    company_id=self.company_id,
+                    name_to_delete=payload.role_name_to_delete,
+                    replacement_name=payload.replacement_role_name,
+                    deleted_by=deleted_by,
+                )
+                return updated
+            except Exception as e:
+                raise AppError(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    message=CompanyResponseMessages.ROLE_UPDATE_FAILED.value,
+                    error=str(e),
+                )
 
     def update_role(self, name: str, payload: RoleUpdate) -> RoleRead:
         """

@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from app.models.generic_response import GenericResponseModel
 from app.models.company.roles import (
     RoleCreate,
+    RoleDelete,
     RoleRead,
     RoleUpdate,
     CompanyDefaultRoles,
@@ -84,7 +85,7 @@ def create_role_api(
     tags=[tag],
     status_code=status.HTTP_200_OK,
     responses={
-        200: {"model": GenericResponseModel[RoleRead]},
+        201: {"model": GenericResponseModel[RoleRead]},
         400: {"model": AppErrorResponseModel},
         404: {"model": AppErrorResponseModel},
         500: {"model": AppErrorResponseModel},
@@ -123,6 +124,45 @@ def update_role_api(
             content={
                 "message": CompanyResponseMessages.ROLE_UPDATED.value,
                 "data": response.model_dump(),
+            },
+        )
+    except AppError as e:
+        raise e
+    except Exception as e:
+        raise e
+
+
+@router.delete(
+    "/company/{company_id}/role",
+    tags=[tag],
+    status_code=status.HTTP_200_OK,
+    responses={
+        201: {"model": GenericResponseModel[dict]},
+        400: {"model": AppErrorResponseModel},
+        404: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
+    },
+)
+def delete_role_api(
+    payload: RoleDelete,
+    company_id: int = Path(..., description="Company ID to update"),
+    user: UserRead = Depends(get_current_user_from_jwt_token),
+):
+    """
+    Delete a role and reassign all users to a replacement role (same company).
+    """
+    try:
+        response = RoleService.delete_role(
+            payload=payload,
+            deleted_by=user,
+            company_id=company_id,
+        )
+
+        return JSONResponse(
+            status_code=status.HTTP_201_CREATED,
+            content={
+                "message": CompanyResponseMessages.ROLE_DELETED.value,
+                "data": response,
             },
         )
     except AppError as e:
