@@ -225,9 +225,16 @@ class CompanyRepository:
                 .all()
             )
 
-            companies = [
-                CompanyRead(**Company.to_dict(assoc.company)) for assoc in results
-            ]
+            companies = []
+            for assoc in results:
+                registered_company = Company.to_dict(assoc.company)
+                if "primary_meta_data" in registered_company:
+                    primary_meta_data = registered_company.get("primary_meta_data")
+                    if "address" in primary_meta_data:
+                        address = primary_meta_data.get("address")
+                        registered_company["address"] = address
+
+                companies.append(CompanyRead(**registered_company))
 
             return PaginatedResponse[CompanyRead](
                 records=companies,

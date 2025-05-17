@@ -74,7 +74,7 @@ def test_get_users_for_company(
 
     if expected_status == 200:
         json_data = response.json()
-        assert json_data["message"] == CompanyResponseMessages.COMPANY_USERS_GET.value
+        assert json_data["message"] == CompanyResponseMessages.GET_COMPANY_USERS.value
         records = json_data["data"]["records"]
         actual_emails = {user["email"] for user in records}
         assert actual_emails == expected_emails

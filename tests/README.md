@@ -63,6 +63,11 @@ TODO: Setup a testing config, to avoid comflicts with dev db
 (userverse) $: pytest -v tests/http/b_company/test_f_delete_role.py
 # Get roles
 (userverse) $: pytest -v tests/http/b_company/test_g_get_roles.py
+# Get roles
+(userverse) $: pytest -v tests/http/b_company/test_h_get_company_users.py
+# Get roles
+(userverse) $: pytest -v tests/http/b_company/test_i_get_user_companies.py
+
 
 ```
 

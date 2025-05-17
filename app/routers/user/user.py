@@ -4,6 +4,9 @@ from fastapi.responses import JSONResponse
 
 # Models
 from app.models.app_error import AppErrorResponseModel
+from app.models.company.company import CompanyQueryParams, CompanyRead
+from app.models.company.response_messages import CompanyResponseMessages
+from app.models.generic_pagination import PaginatedResponse
 from app.models.generic_response import GenericResponseModel
 from app.models.user.user import (
     TokenResponseModel,
@@ -155,6 +158,45 @@ def update_user_api(
                 "message": UserResponseMessages.USER_UPDATED.value,
                 "data": response.model_dump(),
             },
+        )
+    except AppError as e:
+        raise e
+    except Exception as e:
+        raise e
+
+
+@router.get(
+    "/user/companies",
+    tags=[tag],
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"model": GenericResponseModel[PaginatedResponse[CompanyRead]]},
+        400: {"model": AppErrorResponseModel},
+        404: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
+    },
+)
+def get_user_companies_api(
+    params: CompanyQueryParams = Depends(),
+    user: UserRead = Depends(get_current_user_from_jwt_token),
+):
+    """
+    `    Get all companies the authenticated user is linked to.
+        Supports filtering by role and company details.`
+    """
+    try:
+        user_service = UserService()
+        response = user_service.get_user_companies(
+            params=params,
+            user=user,
+        )
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=GenericResponseModel(
+                message=CompanyResponseMessages.GET_COMPANY_USERS.value,
+                data=response.model_dump(),
+            ).model_dump(),
         )
     except AppError as e:
         raise e

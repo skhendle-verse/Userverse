@@ -170,7 +170,7 @@ def get_company_users_api(
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=GenericResponseModel(
-                message=CompanyResponseMessages.COMPANY_USERS_GET.value,
+                message=CompanyResponseMessages.GET_COMPANY_USERS.value,
                 data=response.model_dump(),
             ).model_dump(),
         )
