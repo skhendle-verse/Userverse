@@ -1,6 +1,8 @@
 from fastapi import status
 
 # utils
+from app.logic.company.repository.company import CompanyRepository
+from app.models.company.company import CompanyQueryParams
 from app.security.jwt import JWTManager
 from app.utils.app_error import AppError
 
@@ -32,6 +34,14 @@ class UserService:
                 message=UserResponseMessages.INVALID_CREDENTIALS.value,
             )
         return JWTManager().sign_jwt(user)
+
+    @staticmethod
+    def get_user_companies(
+        params: CompanyQueryParams,
+        user: UserRead,
+    ):
+        company_repository = CompanyRepository()
+        return company_repository.get_user_companies(user_id=user.id, params=params)
 
     @staticmethod
     def get_user(user_id: int = None, user_email: str = None) -> UserRead:
