@@ -24,6 +24,26 @@ from app.models.company.response_messages import CompanyResponseMessages
 
 
 class RoleRepository:
+
+    def update_role_description(self, name: str, description: str) -> RoleRead:
+        """
+        Update the description of a role for this company.
+        """
+        with self.db_manager.session_object() as session:
+            try:
+                updated = Role.update_role(
+                    session,
+                    company_id=self.company_id,
+                    name=name,
+                    new_description=description,
+                )
+                return RoleRead(**updated)
+            except Exception as e:
+                raise AppError(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    message=CompanyResponseMessages.ROLE_UPDATE_FAILED.value,
+                    error=str(e),
+                )
     def __init__(self, company_id: int):
         self.company_id = company_id
         self.db_manager = DatabaseSessionManager()
