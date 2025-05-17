@@ -11,8 +11,13 @@ from app.models.company.response_messages import CompanyResponseMessages
         ("login_token", "limit=10&offset=0&email=notfound@example.com", set(), 200),
         ("login_token_user_two", "limit=10&offset=0", {2}, 200),
         ("login_token_user_two", "limit=10&offset=0&role_name=Admin", {2}, 200),
-        ("login_token_user_two", "limit=10&offset=0&industry=Healthcare", set(), 200),  # updated
-    ]
+        (
+            "login_token_user_two",
+            "limit=10&offset=0&industry=Healthcare",
+            set(),
+            200,
+        ),  # updated
+    ],
 )
 def test_get_user_companies(
     client,
