@@ -45,7 +45,7 @@ def test_b_update_role_description_forbidden(client, login_token_user_two):
     assert "detail" in json_data
     assert (
         json_data["detail"]["message"]
-        == CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value
+        == CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value
     )
 
 

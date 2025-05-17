@@ -60,3 +60,12 @@ class TokenResponseModel(BaseModel):
     refresh_token_expiration: str = Field(
         ..., description="Refresh token expiration time in 'YYYY-MM-DD HH:MM:SS' format"
     )
+
+
+class UserQueryParams(BaseModel):
+    limit: int = Field(10, ge=1, le=100)
+    offset: int = Field(0, ge=0)
+    role_name: Optional[str] = Field(None, description="Filter by role name")
+    first_name: Optional[str] = Field(None, description="Filter by user first name")
+    last_name: Optional[str] = Field(None, description="Filter by user last name")
+    email: Optional[str] = Field(None, description="Filter by user email")

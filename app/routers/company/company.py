@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, status, Query, Path
 from fastapi.responses import JSONResponse
 
 # Models
+from app.models.company.roles import CompanyDefaultRoles
+from app.models.generic_pagination import PaginatedResponse
 from app.models.generic_response import GenericResponseModel
 from app.models.company.company import CompanyCreate, CompanyRead, CompanyUpdate
 from app.models.app_error import AppErrorResponseModel
@@ -9,7 +11,7 @@ from app.models.company.response_messages import CompanyResponseMessages
 
 # Auth
 from app.security.jwt import get_current_user_from_jwt_token
-from app.models.user.user import UserRead
+from app.models.user.user import UserQueryParams, UserRead
 
 # Logic
 from app.logic.company.company import CompanyService
@@ -128,6 +130,47 @@ def update_user_api(
             status_code=status.HTTP_201_CREATED,
             content=GenericResponseModel(
                 message=CompanyResponseMessages.COMPANY_UPDATED.value,
+                data=response.model_dump(),
+            ).model_dump(),
+        )
+    except AppError as e:
+        raise e
+    except Exception as e:
+        raise e
+
+
+@router.get(
+    "/company/{company_id}/users",
+    tags=[tag],
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"model": GenericResponseModel[PaginatedResponse[UserRead]]},
+        400: {"model": AppErrorResponseModel},
+        404: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
+    },
+)
+def get_company_users_api(
+    company_id: int,
+    params: UserQueryParams = Depends(),
+    user: UserRead = Depends(get_current_user_from_jwt_token),
+):
+    """
+    Retrieve a company by email or company_id.
+    Priority: email > company_id.
+    """
+    try:
+        company_service = CompanyService()
+        response = company_service.get_company_user(
+            company_id=company_id,
+            params=params,
+            user=user,
+        )
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=GenericResponseModel(
+                message=CompanyResponseMessages.COMPANY_USERS_GET.value,
                 data=response.model_dump(),
             ).model_dump(),
         )

@@ -79,7 +79,7 @@ def test_b_create_company_roles_failure(
         assert "detail" in json_data
         assert (
             json_data["detail"]["message"]
-            == CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value
+            == CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value
         )
 
 
