@@ -21,58 +21,6 @@ from app.logic.company.company import CompanyService
 from app.logic.company.role import RoleService
 
 
-@router.patch(
-    "/{company_id}/role/{name}",
-    tags=[tag],
-    status_code=status.HTTP_200_OK,
-    responses={
-        200: {"model": GenericResponseModel[RoleRead]},
-        400: {"model": AppErrorResponseModel},
-        404: {"model": AppErrorResponseModel},
-        500: {"model": AppErrorResponseModel},
-    },
-)
-def update_role_description_api(
-    company_id: int,
-    name: str = Path(..., description="Role name to update"),
-    payload: RoleUpdate = None,
-    user: UserRead = Depends(get_current_user_from_jwt_token),
-):
-    """
-    Update the description of a role by name for a company.
-    Requires the user to be an administrator of the company.
-    """
-    try:
-        company_service = CompanyService()
-        admin_user = company_service.check_if_user_is_in_company(
-            user_id=user.id,
-            company_id=company_id,
-            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
-        )
-        if not admin_user:
-            raise AppError(
-                status_code=status.HTTP_403_FORBIDDEN,
-                message=CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value,
-            )
-        role_service = RoleService()
-        response = role_service.update_role_description(
-            company_id=company_id,
-            name=name,
-            description=payload.description,
-        )
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={
-                "message": CompanyResponseMessages.ROLE_UPDATED.value,
-                "data": response.model_dump(),
-            },
-        )
-    except AppError as e:
-        raise e
-    except Exception as e:
-        raise e
-
-
 # Utils
 from app.utils.app_error import AppError
 
@@ -81,7 +29,7 @@ tag = "Company Role Management"
 
 
 @router.post(
-    "/{company_id}/role",
+    "/company/{company_id}/role",
     tags=[tag],
     status_code=status.HTTP_201_CREATED,
     responses={
@@ -91,8 +39,8 @@ tag = "Company Role Management"
     },
 )
 def create_role_api(
-    company_id: int,
     payload: RoleCreate,
+    company_id: int = Path(..., description="Company ID to update"),
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
     """
@@ -122,6 +70,58 @@ def create_role_api(
             status_code=status.HTTP_201_CREATED,
             content={
                 "message": CompanyResponseMessages.ROLE_CREATION_SUCCESS.value,
+                "data": response.model_dump(),
+            },
+        )
+    except AppError as e:
+        raise e
+    except Exception as e:
+        raise e
+
+
+@router.patch(
+    "/company/{company_id}/role/{name}",
+    tags=[tag],
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"model": GenericResponseModel[RoleRead]},
+        400: {"model": AppErrorResponseModel},
+        404: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
+    },
+)
+def update_role_api(
+    payload: RoleUpdate,
+    company_id: int = Path(..., description="Company ID to update"),
+    name: str = Path(..., description="Role name to update"),
+    user: UserRead = Depends(get_current_user_from_jwt_token),
+):
+    """
+    Update the description of a role by name for a company.
+    Requires the user to be an administrator of the company.
+    """
+    try:
+        company_service = CompanyService()
+        admin_user = company_service.check_if_user_is_in_company(
+            user_id=user.id,
+            company_id=company_id,
+            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
+        )
+        if not admin_user:
+            raise AppError(
+                status_code=status.HTTP_403_FORBIDDEN,
+                message=CompanyResponseMessages.ROLE_CREATION_FORBIDDEN.value,
+            )
+        role_service = RoleService()
+        response = role_service.update_role(
+            company_id=company_id,
+            name=name,
+            payload=payload,
+        )
+        return JSONResponse(
+            status_code=status.HTTP_201_CREATED,
+            content={
+                "message": CompanyResponseMessages.ROLE_UPDATED.value,
                 "data": response.model_dump(),
             },
         )

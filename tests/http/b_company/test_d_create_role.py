@@ -23,7 +23,7 @@ def test_a_create_company_one_roles_success(client, login_token, test_company_da
     headers = {"Authorization": f"Bearer {login_token}"}
 
     for role_key, role_value in roles.items():
-        response = client.post("/1/role", json=role_value, headers=headers)
+        response = client.post("/company/1/role", json=role_value, headers=headers)
         #
         assert response.status_code in [200, 201]
         json_data = response.json()
@@ -47,7 +47,7 @@ def test_a_create_company_two_roles_success(
     headers = {"Authorization": f"Bearer {login_token_user_two}"}
 
     for role_key, role_value in roles.items():
-        response = client.post("/2/role", json=role_value, headers=headers)
+        response = client.post("/company/2/role", json=role_value, headers=headers)
         #
         assert response.status_code in [200, 201]
         json_data = response.json()
@@ -71,7 +71,7 @@ def test_b_create_company_roles_failure(
     headers = {"Authorization": f"Bearer {login_token_user_two}"}
 
     for role_key, role_value in roles.items():
-        response = client.post("/1/role", json=role_value, headers=headers)
+        response = client.post("/company/1/role", json=role_value, headers=headers)
         #
         assert response.status_code in [400, 403]
         json_data = response.json()
@@ -93,7 +93,7 @@ def test_c_create_company_roles_failure(
     headers = {"Authorization": f"Bearer {login_token_user_two}"}
 
     for role_key, role_value in roles.items():
-        response = client.post("/2/role", json=role_value, headers=headers)
+        response = client.post("/company/2/role", json=role_value, headers=headers)
         #
         assert response.status_code in [400, 403]
         json_data = response.json()

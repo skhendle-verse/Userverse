@@ -24,9 +24,10 @@ class RoleCreate(BaseModel):
 
 
 class RoleUpdate(BaseModel):
+    name: Optional[str]
     description: Optional[str]
 
 
 class RoleRead(BaseModel):
-    name: str
+    name: Optional[str]
     description: Optional[str]

@@ -23,15 +23,14 @@ from app.models.company.response_messages import CompanyResponseMessages
 class RoleService:
 
     @staticmethod
-    def update_role_description(
-        company_id: int, name: str, description: str
-    ) -> RoleRead:
+    def update_role(company_id: int, name: str, payload: RoleUpdate) -> RoleRead:
         """
         Update the description of a role for a company.
         """
         role_repository = RoleRepository(company_id=company_id)
-        role = role_repository.update_role_description(
-            name=name, description=description
+        role = role_repository.update_role(
+            name=name,
+            payload=payload,
         )
         if not role:
             raise AppError(
