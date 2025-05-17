@@ -21,6 +21,7 @@ class CompanyResponseMessages(str, Enum):
     ROLE_CREATION_SUCCESS = "Role created successfully"
     ROLE_CREATION_FORBIDDEN = "Role creation is forbidden"
     ROLE_CREATION_FAILED = "Role creation failed"
+    ROLE_GET_SUCCESS = "Roles retrieved successfully"
     ROLE_NOT_FOUND = "Role not found"
     ROLE_DELETION_FAILED = "Role deletion failed"
     ROLE_DELETED = "Role deleted successfully"

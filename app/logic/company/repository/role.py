@@ -13,6 +13,7 @@ from app.database.association_user_company import AssociationUserCompany
 # models
 from app.models.company.roles import (
     RoleCreate,
+    RoleQueryParams,
     RoleRead,
     RoleUpdate,
     RoleDelete,
@@ -28,6 +29,40 @@ class RoleRepository:
     def __init__(self, company_id: int):
         self.company_id = company_id
         self.db_manager = DatabaseSessionManager()
+
+    def get_roles(
+        self,
+        payload: RoleQueryParams,
+    ) -> dict:
+        """
+        Get paginated roles for the company with optional filtering.
+        Excludes soft-deleted roles (_closed_at is not null).
+        """
+        with self.db_manager.session_object() as session:
+            try:
+                filters = {
+                    "company_id": Role.company_id == self.company_id,
+                    "_closed_at": Role._closed_at.is_(None),
+                }
+                if payload.name:
+                    filters["name"] = Role.name.ilike(f"%{payload.name}%")
+                if payload.description:
+                    filters["description"] = Role.description.ilike(
+                        f"%{payload.description}%"
+                    )
+
+                return Role.get_all(
+                    session=session,
+                    filters=filters,
+                    limit=payload.limit,
+                    offset=payload.offset,
+                )
+            except Exception as e:
+                raise AppError(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    message=CompanyResponseMessages.ROLE_RETRIEVAL_FAILED.value,
+                    error=str(e),
+                )
 
     def delete_role(self, payload: RoleDelete, deleted_by: UserRead) -> dict:
         """
