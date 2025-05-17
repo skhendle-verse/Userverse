@@ -15,7 +15,7 @@ from sqlalchemy.orm import joinedload
 
 
 # models
-from app.models.company.company import CompanyRead, CompanyCreate, CompanyUpdate
+from app.models.company.company import CompanyQueryParams, CompanyRead, CompanyCreate, CompanyUpdate
 from app.models.user.user import UserQueryParams, UserRead
 from app.models.company.roles import CompanyDefaultRoles
 
@@ -178,6 +178,62 @@ class CompanyRepository:
                 )
 
             return CompanyRead(**self._get_registered_company(session, company["id"]))
+
+    def get_user_companies(
+        self, user_id: int, params: CompanyQueryParams
+    ) -> PaginatedResponse[CompanyRead]:
+        """
+        Return companies linked to a user with optional search on role/company metadata.
+        """
+        with self.db_manager.session_object() as session:
+            query = (
+                session.query(AssociationUserCompany)
+                .join(AssociationUserCompany.company)
+                .filter(
+                    AssociationUserCompany.user_id == user_id,
+                    AssociationUserCompany._closed_at.is_(None),
+                    Company._closed_at.is_(None),
+                )
+            )
+
+            if params.role_name:
+                query = query.filter(
+                    AssociationUserCompany.role_name.ilike(f"%{params.role_name}%")
+                )
+            if params.name:
+                query = query.filter(Company.name.ilike(f"%{params.name}%"))
+            if params.description:
+                query = query.filter(
+                    Company.description.ilike(f"%{params.description}%")
+                )
+            if params.industry:
+                query = query.filter(Company.industry.ilike(f"%{params.industry}%"))
+            if params.email:
+                query = query.filter(Company.email.ilike(f"%{params.email}%"))
+
+            total = query.count()
+
+            results = (
+                query.options(joinedload(AssociationUserCompany.company))
+                .offset(params.offset)
+                .limit(params.limit)
+                .all()
+            )
+
+            companies = [
+                CompanyRead(**Company.to_dict(assoc.company)) for assoc in results
+            ]
+
+            return PaginatedResponse[CompanyRead](
+                records=companies,
+                pagination=PaginationMeta(
+                    total_records=total,
+                    limit=params.limit,
+                    offset=params.offset,
+                    current_page=params.offset // params.limit + 1,
+                    total_pages=(total + params.limit - 1) // params.limit,
+                ),
+            )
 
     def _create_company_record(self, session, payload: CompanyCreate) -> dict:
         """Create the company record in the database"""

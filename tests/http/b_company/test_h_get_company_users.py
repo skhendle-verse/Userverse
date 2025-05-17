@@ -3,25 +3,41 @@ from app.models.company.response_messages import CompanyResponseMessages
 from tests.http.conftest import (
     client,
     test_company_data,
-    login_token,           # Token for user.one@email.com (User 1, company 1)
+    login_token,  # Token for user.one@email.com (User 1, company 1)
     login_token_user_two,  # Token for user.two@email.com (User 2, company 2)
 )
+
 
 @pytest.mark.parametrize(
     "login_token_key, company_id, query_params, expected_emails, expected_status",
     [
         # ✅ User 1 accessing own company
         ("login_token", 1, "limit=10&offset=0", {"user.one@email.com"}, 200),
-        ("login_token", 1, "limit=10&offset=0&role_name=Admin", {"user.one@email.com"}, 200),
-        ("login_token", 1, "limit=10&offset=0&email=user.one@email.com", {"user.one@email.com"}, 200),
-
+        (
+            "login_token",
+            1,
+            "limit=10&offset=0&role_name=Admin",
+            {"user.one@email.com"},
+            200,
+        ),
+        (
+            "login_token",
+            1,
+            "limit=10&offset=0&email=user.one@email.com",
+            {"user.one@email.com"},
+            200,
+        ),
         # ❌ User 1 accessing company 2
         ("login_token", 2, "limit=10&offset=0", set(), 403),
-
         # ✅ User 2 accessing own company
         ("login_token_user_two", 2, "limit=10&offset=0", {"user.two@email.com"}, 200),
-        ("login_token_user_two", 2, "limit=10&offset=0&first_name=Jane", {"user.two@email.com"}, 200),
-
+        (
+            "login_token_user_two",
+            2,
+            "limit=10&offset=0&first_name=Jane",
+            {"user.two@email.com"},
+            200,
+        ),
         # ❌ User 2 accessing company 1
         ("login_token_user_two", 1, "limit=10&offset=0", set(), 403),
     ],
@@ -51,7 +67,9 @@ def test_get_users_for_company(
         "accept": "application/json",
     }
 
-    response = client.get(f"/company/{company_id}/users?{query_params}", headers=headers)
+    response = client.get(
+        f"/company/{company_id}/users?{query_params}", headers=headers
+    )
     assert response.status_code == expected_status
 
     if expected_status == 200:
