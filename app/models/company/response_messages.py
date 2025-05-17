@@ -18,7 +18,7 @@ class CompanyResponseMessages(str, Enum):
     COMPANY_DELETED = "Company deleted successfully"
     COMPANY_DELETION_FAILED = "Company deletion failed"
     # Company users
-    COMPANY_USERS_GET = 'Users retrieved successfully'
+    COMPANY_USERS_GET = "Users retrieved successfully"
     # Role creation
     ROLE_CREATION_SUCCESS = "Role created successfully"
     ROLE_CREATION_FORBIDDEN = "Role creation is forbidden"
