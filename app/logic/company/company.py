@@ -1,6 +1,7 @@
 from fastapi import status
 
 # utils
+from app.models.company.user import CompanyUserAdd, CompanyUserRead
 from app.models.generic_pagination import PaginatedResponse
 from app.security.jwt import JWTManager
 from app.utils.app_error import AppError
@@ -11,7 +12,7 @@ from app.logic.company.repository.company import CompanyRepository
 # database
 from app.database import DatabaseSessionManager
 from app.database.association_user_company import AssociationUserCompany
-
+from app.database.user import User
 
 # models
 from app.models.company.company import (
@@ -46,11 +47,26 @@ class CompanyService:
         return company
 
     @staticmethod
+    def add_user(
+        company_id: int, payload: CompanyUserAdd, added_by: UserRead
+    ) -> CompanyUserRead:
+        CompanyService.check_if_user_is_in_company(
+            user_id=added_by.id,
+            company_id=company_id,
+            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
+        )
+        repository = CompanyRepository()
+        return repository.add_user_to_company(
+            company_id=company_id,
+            payload=payload,
+        )
+
+    @staticmethod
     def get_company_user(
         company_id: int,
         params: UserQueryParams,
         user: UserRead,
-    ) -> PaginatedResponse[UserRead]:
+    ) -> PaginatedResponse[CompanyUserRead]:
         CompanyService.check_if_user_is_in_company(
             user_id=user.id,
             company_id=company_id,

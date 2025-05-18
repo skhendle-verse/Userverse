@@ -2,6 +2,7 @@ from app.models.company.address import CompanyAddress
 from fastapi import status
 
 # utils
+from app.models.company.user import CompanyUserAdd, CompanyUserRead, CompanyUserRead
 from app.models.generic_pagination import PaginatedResponse, PaginationMeta
 from app.utils.app_error import AppError
 
@@ -104,7 +105,7 @@ class CompanyRepository:
 
     def get_company_users(
         self, company_id: int, params: UserQueryParams
-    ) -> PaginatedResponse[UserRead]:
+    ) -> PaginatedResponse[CompanyUserRead]:
         """
         Get all users in a company with optional filters and pagination.
         """
@@ -139,10 +140,14 @@ class CompanyRepository:
                 .limit(params.limit)
                 .all()
             )
+            print()
 
-            users = [UserRead(**User.to_dict(assoc.user)) for assoc in results]
+            users = [
+                CompanyUserRead(**User.to_dict(assoc.user), role_name=assoc.role_name)
+                for assoc in results
+            ]
 
-            return PaginatedResponse[UserRead](
+            return PaginatedResponse[CompanyUserRead](
                 records=users,
                 pagination=PaginationMeta(
                     total_records=total,
@@ -152,6 +157,44 @@ class CompanyRepository:
                     total_pages=(total + params.limit - 1) // params.limit,
                 ),
             )
+
+    def add_user_to_company(self, company_id: int, payload: CompanyUserAdd) -> CompanyUserRead:
+        """
+        Add user to company with specified role.
+        """
+        with self.db_manager.session_object() as session:
+            # check if the user being added  is registered exists
+            user = User.get_user_by_email(session=session, email=payload.email)
+            user_id = user.get("id")
+            # check if role is valid and belongs to company
+            role = Role.role_belongs_to_company(
+                session=session, company_id=company_id, role_name=payload.role
+            )
+            if not role:
+                raise ValueError("Role: %s is not linked to company", payload.role)
+            role_name = role.get("name")
+            # Check for existing association
+            exists = (
+                session.query(AssociationUserCompany)
+                .filter_by(user_id=user_id, company_id=company_id, _closed_at=None)
+                .first()
+            )
+
+            if exists:
+                raise AppError(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    message="User is already linked to the company.",
+                )
+
+            # Create association
+            link = AssociationUserCompany(
+                user_id=user_id,
+                company_id=company_id,
+                role_name=role_name,
+            )
+            session.add(link)
+            session.commit()
+            return CompanyUserRead(**user, role_name=role_name)
 
     def update_company(
         self, payload: CompanyUpdate, company_id: str, user: UserRead

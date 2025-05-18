@@ -67,6 +67,8 @@ TODO: Setup a testing config, to avoid comflicts with dev db
 (userverse) $: pytest -v tests/http/b_company/test_h_get_company_users.py
 # Get roles
 (userverse) $: pytest -v tests/http/b_company/test_i_get_user_companies.py
+# Add user to company
+(userverse) $: pytest -v tests/http/b_company/test_j_add_user_to_company.py
 
 
 ```

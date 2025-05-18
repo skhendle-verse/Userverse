@@ -64,6 +64,37 @@ def test_b_create_user_two_success_and_unique_key_fail(client, test_user_data):
     assert user_data["last_name"] == use_two["last_name"]
 
 
+def test_c_create_user_three_success(client, test_user_data):
+    """Test user creation with valid payload (user one)"""
+    use_one = test_user_data["user_three"]
+    payload = {
+        "first_name": use_one["first_name"],
+        "last_name": use_one["last_name"],
+        "phone_number": use_one["phone_number"],
+    }
+    response = client.post(
+        "/user",
+        json=payload,
+        headers=get_basic_auth_header(
+            username=use_one["email"],
+            password=use_one["password"],
+        ),
+    )
+    assert response.status_code in [200, 201]
+    json_data = response.json()
+
+    # Adjusted based on your actual API response structure
+    assert "message" in json_data
+    assert json_data["message"] == UserResponseMessages.USER_CREATED.value
+
+    user_data = json_data["data"]
+    assert "id" in user_data
+    assert user_data["email"] == use_one["email"]
+    assert user_data["first_name"] == use_one["first_name"]
+    assert user_data["last_name"] == use_one["last_name"]
+
+
+
 def test_c_create_user_two_fail(client, test_user_data):
     """Test user creation failure when the same user is created again"""
     use_two = test_user_data["user_two"]
