@@ -181,8 +181,8 @@ def get_user_companies_api(
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
     """
-    `    Get all companies the authenticated user is linked to.
-        Supports filtering by role and company details.`
+    Get all companies the authenticated user is linked to.
+    Supports filtering by role and company details.
     """
     try:
         user_service = UserService()
