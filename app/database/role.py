@@ -2,8 +2,11 @@ from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from sqlalchemy.orm.exc import NoResultFound
+from fastapi import status
 
+from app.models.company.response_messages import CompanyResponseMessages
 from app.models.user.user import UserRead
+from app.utils.app_error import AppError
 from .base_model import BaseModel
 
 
@@ -19,6 +22,38 @@ class Role(BaseModel):
     company = relationship("Company", back_populates="roles", overlaps="users")
     users = relationship(
         "AssociationUserCompany", back_populates="role", overlaps="company,users"
+    )
+
+    @classmethod
+    def role_belongs_to_company(cls, session, company_id: int, role_name: str) -> bool:
+        """
+        Check if a role belongs to a specific company.
+
+        Args:
+            session: SQLAlchemy session.
+            company_id: ID of the company to check.
+            role_name: Name of the role to check.
+
+        Returns:
+            bool: True if the role belongs to the company, False otherwise.
+        """
+        role = (
+            session.query(cls)
+            .filter_by(
+                company_id=company_id,
+                name=role_name,
+                _closed_at=None,  # Only consider active roles
+            )
+            .one_or_none()
+        )
+
+        if role:
+            return cls.to_dict(role)
+        
+        raise AppError(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        message=CompanyResponseMessages.ADD_USER_FAILED.value,
+        error=f"Role: {role_name} is not linked to the company"
     )
 
     @classmethod

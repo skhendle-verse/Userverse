@@ -31,3 +31,6 @@ class CompanyResponseMessages(str, Enum):
     ROLE_UPDATED = "Role updated successfully"
     ROLE_UPDATE_FAILED = "Role update failed"
     ROLE_ALREADY_EXISTS = "Role already exists"
+    # User
+    ADD_USER_SUCCESS = "User added to company"
+    ADD_USER_FAILED = "Failed to add user to company"
