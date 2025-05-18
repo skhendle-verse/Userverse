@@ -14,7 +14,6 @@ from app.models.company.response_messages import CompanyResponseMessages
             201,
             CompanyResponseMessages.ADD_USER_SUCCESS.value,
         ),
-
         # ❌ Non-admin tries to add a user to company 1
         (
             "login_token_user_two",
@@ -23,7 +22,6 @@ from app.models.company.response_messages import CompanyResponseMessages
             403,
             CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value,
         ),
-
         # ❌ Admin tries to add a user with an invalid role
         (
             "login_token",
@@ -61,11 +59,12 @@ def test_add_user_to_company(
         "Content-Type": "application/json",
     }
 
-    response = client.post(f"/company/{company_id}/users", json=payload, headers=headers)
+    response = client.post(
+        f"/company/{company_id}/users", json=payload, headers=headers
+    )
     assert response.status_code == expected_status
     json_data = response.json()
 
     if expected_status == 201:
         assert "data" in json_data
         assert json_data["message"] == expected_message
-

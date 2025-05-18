@@ -49,12 +49,12 @@ class Role(BaseModel):
 
         if role:
             return cls.to_dict(role)
-        
+
         raise AppError(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        message=CompanyResponseMessages.ADD_USER_FAILED.value,
-        error=f"Role: {role_name} is not linked to the company"
-    )
+            status_code=status.HTTP_400_BAD_REQUEST,
+            message=CompanyResponseMessages.ADD_USER_FAILED.value,
+            error=f"Role: {role_name} is not linked to the company",
+        )
 
     @classmethod
     def update_role(

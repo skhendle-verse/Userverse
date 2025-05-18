@@ -94,7 +94,6 @@ def test_c_create_user_three_success(client, test_user_data):
     assert user_data["last_name"] == use_one["last_name"]
 
 
-
 def test_c_create_user_two_fail(client, test_user_data):
     """Test user creation failure when the same user is created again"""
     use_two = test_user_data["user_two"]

@@ -158,7 +158,9 @@ class CompanyRepository:
                 ),
             )
 
-    def add_user_to_company(self, company_id: int, payload: CompanyUserAdd) -> CompanyUserRead:
+    def add_user_to_company(
+        self, company_id: int, payload: CompanyUserAdd
+    ) -> CompanyUserRead:
         """
         Add user to company with specified role.
         """
