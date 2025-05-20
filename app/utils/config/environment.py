@@ -7,40 +7,33 @@ class EnvironmentManager:
     @classmethod
     def get_environment(cls, config_data: Optional[dict] = None) -> str:
         """
-        Determines the current environment based on the TEST_ENVIRONMENT variable
-        or the provided configuration data.
+        Determines the current environment based on the TEST_ENVIRONMENT variable,
+        configuration data, or environment variables.
 
         Args:
-            config_data (Optional[dict]): A dictionary containing configuration data.
-                                          Defaults to None.
+            config_data (Optional[dict]): Optional configuration dictionary.
 
         Returns:
-            str: The current environment (e.g., 'development', 'production', 'stagging','testing').
-
+            str: The current environment ('test_environment', 'development', 'production', etc.).
         """
-        # Check for TEST_ENVIRONMENT in environment variables
-        test_environment = os.getenv("TEST_ENVIRONMENT", "").lower() == "true"
-
-        if test_environment:
+        if os.getenv("TEST_ENVIRONMENT", "").strip().lower() == "true":
             return "test_environment"
 
-        # Check for ENVIRONMENT
-        # In the provided configuration data
-        # or in the environment variables
+        # Priority-ordered list of environment keys to check
+        env_keys = ["env", "environment"]
 
+        # Check in config_data
         if config_data:
-            env = config_data.get("env", "").lower()
-            if env:
-                return env
-            env = config_data.get("environment", "").lower()
-            if env:
-                return env
+            for key in env_keys:
+                value = config_data.get(key)
+                if value:
+                    return value.strip().lower()
 
-        env = os.getenv("env", "").lower()
-        if env:
-            return env
-        env = os.getenv("environment", "").lower()
-        if env:
-            return env
+        # Check in environment variables
+        for key in env_keys:
+            value = os.getenv(key, "").strip().lower()
+            if value:
+                return value
 
+        # Default fallback
         return "development"
