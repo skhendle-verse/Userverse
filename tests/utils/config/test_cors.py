@@ -18,26 +18,22 @@ class TestCorsConfig(unittest.TestCase):
         config = {
             "cors": {
                 "allowed": ["https://example.com"],
-                "blocked": ["http://bad-site.com"]
+                "blocked": ["http://bad-site.com"],
             }
         }
         result = CorsConfig.get_cors(config, environment="production")
         expected = {
             "allowed": ["https://example.com"],
-            "blocked": ["http://bad-site.com"]
+            "blocked": ["http://bad-site.com"],
         }
         self.assertEqual(result, expected)
 
     def test_partial_custom_config_falls_back_to_default(self):
-        config = {
-            "cors": {
-                "allowed": ["https://good-site.com"]
-            }
-        }
+        config = {"cors": {"allowed": ["https://good-site.com"]}}
         result = CorsConfig.get_cors(config, environment="production")
         expected = {
             "allowed": ["https://good-site.com"],
-            "blocked": CorsConfig.CORS_DEFAULT["blocked"]
+            "blocked": CorsConfig.CORS_DEFAULT["blocked"],
         }
         self.assertEqual(result, expected)
 
@@ -47,5 +43,5 @@ class TestCorsConfig(unittest.TestCase):
         self.assertEqual(result, CorsConfig.CORS_DEFAULT)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

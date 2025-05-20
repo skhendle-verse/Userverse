@@ -64,10 +64,14 @@ class ConfigLoader:
         with open(pyproject_path, "rb") as f:
             pyproject_data = tomllib.load(f)
 
-        app_config = pyproject_data.get("tool", {}).get("userverse", {}).get("config", {})
+        app_config = (
+            pyproject_data.get("tool", {}).get("userverse", {}).get("config", {})
+        )
 
         if not app_config:
-            logger.warning("Missing config section in pyproject.toml — using default test config.")
+            logger.warning(
+                "Missing config section in pyproject.toml — using default test config."
+            )
             return self._default_test_config()
 
         return self._build_config_dict(app_config)
@@ -76,7 +80,9 @@ class ConfigLoader:
         environment = self._set_environment(config_data)
         return {
             "environment": environment,
-            "database_url": DatabaseConfig.get_connection_string(config_data, environment),
+            "database_url": DatabaseConfig.get_connection_string(
+                config_data, environment
+            ),
             "cor_origins": CorsConfig.get_cors(config_data, environment),
             "jwt": config_data.get("jwt", {}),
             "email": config_data.get("email", {}),

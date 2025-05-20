@@ -11,7 +11,9 @@ def send_email(to: str, subject: str, html_body: str):
 
     if not email_settings:
         soup = BeautifulSoup(html_body, "html.parser")
-        click.echo(click.style("Email config not available. Showing plain text:", fg="yellow"))
+        click.echo(
+            click.style("Email config not available. Showing plain text:", fg="yellow")
+        )
         click.echo(soup.get_text(separator="\n", strip=True))
         return
 
@@ -26,7 +28,6 @@ def send_email(to: str, subject: str, html_body: str):
         server.starttls()
         server.login(email_settings.username, email_settings.password)
         server.send_message(msg)
-
 
 
 if __name__ == "__main__":

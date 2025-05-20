@@ -7,8 +7,12 @@ def test_send_email_in_test_environment(capfd):
     """Should print email body in plain text when environment is test"""
     fake_config = {"environment": "test_environment", "email": {}}
 
-    with patch("app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config):
-        send_email("test@example.com", "Test Subject", "<h1>Hello</h1><p>This is a test</p>")
+    with patch(
+        "app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config
+    ):
+        send_email(
+            "test@example.com", "Test Subject", "<h1>Hello</h1><p>This is a test</p>"
+        )
         out, _ = capfd.readouterr()
         assert "Hello" in out
         assert "This is a test" in out
@@ -21,7 +25,9 @@ def test_send_email_missing_username(capfd):
         "email": {"PASSWORD": "pass", "HOST": "smtp.test.com", "PORT": 587},
     }
 
-    with patch("app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config):
+    with patch(
+        "app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config
+    ):
         send_email("to@example.com", "Subject", "<h1>Missing</h1><p>User field</p>")
         out, _ = capfd.readouterr()
         assert "Email config not available" in out
@@ -35,7 +41,9 @@ def test_send_email_missing_password(capfd):
         "email": {"USERNAME": "user@test.com", "HOST": "smtp.test.com", "PORT": 587},
     }
 
-    with patch("app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config):
+    with patch(
+        "app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config
+    ):
         send_email("to@example.com", "Subject", "<h1>Missing</h1><p>Password</p>")
         out, _ = capfd.readouterr()
         assert "Email config not available" in out
@@ -49,7 +57,9 @@ def test_send_email_missing_host_or_port(capfd):
         "email": {"USERNAME": "user@test.com", "PASSWORD": "secure"},
     }
 
-    with patch("app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config):
+    with patch(
+        "app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config
+    ):
         send_email("to@example.com", "Subject", "<h1>Missing</h1><p>SMTP config</p>")
         out, _ = capfd.readouterr()
         assert "Email config not available" in out
@@ -68,7 +78,9 @@ def test_send_email_success():
         },
     }
 
-    with patch("app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config):
+    with patch(
+        "app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config
+    ):
         with patch("smtplib.SMTP") as mock_smtp:
             mock_server = MagicMock()
             mock_smtp.return_value.__enter__.return_value = mock_server

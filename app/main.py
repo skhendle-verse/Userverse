@@ -25,13 +25,13 @@ from app.utils.config.loader import ConfigLoader
 from app.utils.logging import logger, get_uvicorn_log_config
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("🚀 Application starting up")
     # Optionally: setup_otel(app)
     yield
     logger.info("🛑 Application shutting down")
+
 
 def create_app() -> FastAPI:
     loader = ConfigLoader()
@@ -60,6 +60,7 @@ def create_app() -> FastAPI:
     app.include_router(password.router)
     app.include_router(company.router)
     app.include_router(roles.router)
+
     @app.get("/")
     async def root():
         from opentelemetry import trace
@@ -78,7 +79,6 @@ def create_app() -> FastAPI:
                 },
             )
 
-
     @app.exception_handler(Exception)
     async def app_error_handler(request: Request, exc: Exception):
         logger.error(
@@ -88,9 +88,9 @@ def create_app() -> FastAPI:
                     "method": request.method,
                     "url": str(request.url),
                     "error": str(exc),
-                    "trace": traceback.format_exc()
+                    "trace": traceback.format_exc(),
                 }
-            }
+            },
         )
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -144,8 +144,6 @@ def main(
         )
         workers = 1
 
-    
-
     # Silence all Uvicorn-related logs
     logging.getLogger("uvicorn").setLevel(logging.CRITICAL)
     logging.getLogger("uvicorn.error").setLevel(logging.CRITICAL)
@@ -161,7 +159,7 @@ def main(
             host=host,
             port=port,
             reload=True,
-            log_config = log_config
+            log_config=log_config,
         )
     else:
         config = Config(
@@ -171,7 +169,7 @@ def main(
             port=port,
             workers=workers,
             use_colors=False,
-            log_config = log_config
+            log_config=log_config,
         )
         server = Server(config)
         server.run()
