@@ -5,7 +5,7 @@ import traceback
 from typing import Optional
 
 
-from app.utils.config.logging import logger
+from app.utils.logging import logger
 
 
 class AppError(HTTPException):

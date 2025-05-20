@@ -1,4 +1,4 @@
-from app.utils.config.logging import logger
+from app.utils.logging import logger
 
 
 class CorsConfig:
@@ -8,7 +8,7 @@ class CorsConfig:
 
     CORS_DEFAULT = {
         "allowed": ["*"],
-        "blocked": ["http://localhost:30XX"],
+        "blocked": ["http://localhost:3000"],
     }
 
     @classmethod
