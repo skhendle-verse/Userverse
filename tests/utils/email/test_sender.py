@@ -1,63 +1,59 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from app.utils.email.sender import send_email  # Adjust if your file path is different
+from app.utils.email.sender import send_email  # Adjust if your import path differs
 
 
 def test_send_email_in_test_environment(capfd):
     """Should print email body in plain text when environment is test"""
     fake_config = {"environment": "test_environment", "email": {}}
 
-    with patch(
-        "app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config
-    ):
-        send_email(
-            "test@example.com", "Test Subject", "<h1>Hello</h1><p>This is a test</p>"
-        )
+    with patch("app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config):
+        send_email("test@example.com", "Test Subject", "<h1>Hello</h1><p>This is a test</p>")
         out, _ = capfd.readouterr()
         assert "Hello" in out
         assert "This is a test" in out
 
 
-def test_send_email_missing_username():
-    """Should raise error if email username is missing"""
+def test_send_email_missing_username(capfd):
+    """Should print fallback text if username is missing"""
     fake_config = {
         "environment": "prod",
         "email": {"PASSWORD": "pass", "HOST": "smtp.test.com", "PORT": 587},
     }
 
-    with patch(
-        "app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config
-    ):
-        with pytest.raises(ValueError, match="Email address not found"):
-            send_email("to@example.com", "Subject", "<p>body</p>")
+    with patch("app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config):
+        send_email("to@example.com", "Subject", "<h1>Missing</h1><p>User field</p>")
+        out, _ = capfd.readouterr()
+        assert "Email config not available" in out
+        assert "User field" in out
 
 
-def test_send_email_missing_password():
-    """Should raise error if password is missing"""
+def test_send_email_missing_password(capfd):
+    """Should print fallback text if password is missing"""
     fake_config = {
         "environment": "prod",
         "email": {"USERNAME": "user@test.com", "HOST": "smtp.test.com", "PORT": 587},
     }
 
-    with patch(
-        "app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config
-    ):
-        with pytest.raises(ValueError, match="username or password"):
-            send_email("to@example.com", "Subject", "<p>body</p>")
+    with patch("app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config):
+        send_email("to@example.com", "Subject", "<h1>Missing</h1><p>Password</p>")
+        out, _ = capfd.readouterr()
+        assert "Email config not available" in out
+        assert "Password" in out
 
 
-def test_send_email_missing_host_or_port():
-    """Should raise error if host or port is missing"""
+def test_send_email_missing_host_or_port(capfd):
+    """Should print fallback text if host or port is missing"""
     fake_config = {
         "environment": "prod",
         "email": {"USERNAME": "user@test.com", "PASSWORD": "secure"},
     }
 
-    with patch(
-        "app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config
-    ):
-        with pytest.raises(ValueError, match="host or port"):
-            send_email("to@example.com", "Subject", "<p>body</p>")
+    with patch("app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config):
+        send_email("to@example.com", "Subject", "<h1>Missing</h1><p>SMTP config</p>")
+        out, _ = capfd.readouterr()
+        assert "Email config not available" in out
+        assert "SMTP config" in out
 
 
 def test_send_email_success():
@@ -72,9 +68,7 @@ def test_send_email_success():
         },
     }
 
-    with patch(
-        "app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config
-    ):
+    with patch("app.utils.config.loader.ConfigLoader.get_config", return_value=fake_config):
         with patch("smtplib.SMTP") as mock_smtp:
             mock_server = MagicMock()
             mock_smtp.return_value.__enter__.return_value = mock_server

@@ -11,7 +11,7 @@ from sqlalchemy.ext.mutable import MutableDict
 
 
 from . import Base  # Ensure this points to your declarative base
-from app.utils.config.logging import logger
+from app.utils.logging import logger
 
 
 class RecordNotFoundError(Exception):

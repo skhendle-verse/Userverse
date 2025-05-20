@@ -5,7 +5,7 @@ from pathlib import Path
 from app.utils.config.cors import CorsConfig
 from app.utils.config.database import DatabaseConfig
 from app.utils.config.environment import EnvironmentManager
-from app.utils.config.logging import logger
+from app.utils.logging import logger
 
 if sys.version_info >= (3, 11):
     import tomllib

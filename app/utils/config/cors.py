@@ -1,4 +1,4 @@
-from app.utils.config.logging import logger
+from app.utils.logging import logger
 
 
 class CorsConfig:
