@@ -25,7 +25,7 @@ class LogMiddleware(BaseHTTPMiddleware):
                         "status_code": 500,
                         "error": str(exc),
                     }
-                }
+                },
             )
             raise
 
@@ -41,6 +41,6 @@ class LogMiddleware(BaseHTTPMiddleware):
                     "status_code": response.status_code,
                     "duration_ms": round(process_time, 2),
                 }
-            }
+            },
         )
         return response

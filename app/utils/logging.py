@@ -3,6 +3,7 @@ import logging
 import json
 from datetime import datetime
 
+
 class JsonFormatter(logging.Formatter):
     def format(self, record):
         log = {
@@ -19,6 +20,7 @@ class JsonFormatter(logging.Formatter):
             log.update(record.extra)
         return json.dumps(log)
 
+
 logger = logging.getLogger("app")
 handler = logging.StreamHandler()
 handler.setFormatter(JsonFormatter())
@@ -34,29 +36,28 @@ def get_uvicorn_log_config(*, reload: bool = False, verbose: bool = False) -> di
     return {
         "version": 1,
         "disable_existing_loggers": False,
-        "formatters": {
-            "default": {  # Changed from "json" to "default"
-                "()": JsonFormatter
-            },
-            "access": {  # Added access formatter
-                "()": JsonFormatter
-            }
-        },
+        "formatters": {"json": {"()": JsonFormatter}},
         "handlers": {
-            "default": {
-                "class": "logging.StreamHandler",
-                "formatter": "default"  # Updated to match formatter name
-            }
+            "default": {"class": "logging.StreamHandler", "formatter": "json"}
         },
-        "root": {
-            "level": level,
-            "handlers": ["default"]
-        },
+        "root": {"level": level, "handlers": ["default"]},
         "loggers": {
-            "uvicorn": {"handlers": ["default"], "level": uvicorn_level, "propagate": False},
-            "uvicorn.error": {"handlers": ["default"], "level": uvicorn_level, "propagate": False},
-            "uvicorn.access": {"handlers": ["default"], "level": uvicorn_level, "propagate": False},
+            "uvicorn": {
+                "handlers": ["default"],
+                "level": uvicorn_level,
+                "propagate": False,
+            },
+            "uvicorn.error": {
+                "handlers": ["default"],
+                "level": uvicorn_level,
+                "propagate": False,
+            },
+            "uvicorn.access": {
+                "handlers": ["default"],
+                "level": uvicorn_level,
+                "propagate": False,
+            },
             "watchfiles": {"level": "WARNING"},
-            "app": {"handlers": ["default"], "level": level, "propagate": False}
-        }
+            "app": {"handlers": ["default"], "level": level, "propagate": False},
+        },
     }

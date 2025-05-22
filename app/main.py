@@ -34,6 +34,7 @@ async def lifespan(app: FastAPI):
     yield
     logger.info("🛑 Application shutting down")
 
+
 def create_app() -> FastAPI:
     loader = ConfigLoader()
     configs = loader.get_config()
@@ -61,6 +62,7 @@ def create_app() -> FastAPI:
     app.include_router(password.router)
     app.include_router(company.router)
     app.include_router(roles.router)
+
     @app.get("/")
     async def root():
         from opentelemetry import trace
@@ -79,7 +81,6 @@ def create_app() -> FastAPI:
                 },
             )
 
-
     @app.exception_handler(Exception)
     async def app_error_handler(request: Request, exc: Exception):
         logger.error(
@@ -89,9 +90,9 @@ def create_app() -> FastAPI:
                     "method": request.method,
                     "url": str(request.url),
                     "error": str(exc),
-                    "trace": traceback.format_exc()
+                    "trace": traceback.format_exc(),
                 }
-            }
+            },
         )
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -144,8 +145,6 @@ def main(
             "Reload mode does not support multiple workers. Using a single worker."
         )
         workers = 1
-
-    
 
     # Silence all Uvicorn-related logs
     logging.getLogger("uvicorn").setLevel(logging.CRITICAL)

@@ -9,7 +9,9 @@ class DatabaseConfig:
     REQUIRED_FIELDS = ["TYPE", "HOST", "PORT", "USER", "PASSWORD", "NAME"]
 
     @classmethod
-    def get_connection_string(cls, configs: dict, environment: str = "development") -> str:
+    def get_connection_string(
+        cls, configs: dict, environment: str = "development"
+    ) -> str:
         """
         Returns the connection string for the database.
 
@@ -32,9 +34,13 @@ class DatabaseConfig:
 
         # Only enforce required fields if not SQLite
         if db_type != "sqlite":
-            missing_fields = [field for field in cls.REQUIRED_FIELDS if not db_config.get(field)]
+            missing_fields = [
+                field for field in cls.REQUIRED_FIELDS if not db_config.get(field)
+            ]
             if missing_fields:
-                logger.warning(f"Missing database config fields: {missing_fields}. Falling back to SQLite.")
+                logger.warning(
+                    f"Missing database config fields: {missing_fields}. Falling back to SQLite."
+                )
                 return f"sqlite:///{environment}.db"
 
         host = db_config.get("HOST", "")
@@ -50,5 +56,7 @@ class DatabaseConfig:
         elif db_type == "sqlite":
             return f"sqlite:///{db_name or f'{environment}.db'}"
         else:
-            logger.warning(f"Unsupported database type: '{db_type}'. Falling back to SQLite.")
+            logger.warning(
+                f"Unsupported database type: '{db_type}'. Falling back to SQLite."
+            )
             return f"sqlite:///{environment}.db"
