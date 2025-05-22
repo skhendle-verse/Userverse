@@ -35,14 +35,17 @@ def get_uvicorn_log_config(*, reload: bool = False, verbose: bool = False) -> di
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            "json": {
+            "default": {  # Changed from "json" to "default"
+                "()": JsonFormatter
+            },
+            "access": {  # Added access formatter
                 "()": JsonFormatter
             }
         },
         "handlers": {
             "default": {
                 "class": "logging.StreamHandler",
-                "formatter": "json"
+                "formatter": "default"  # Updated to match formatter name
             }
         },
         "root": {
