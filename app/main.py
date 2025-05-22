@@ -26,7 +26,6 @@ from app.utils.logging import logger, get_uvicorn_log_config
 import logging.config
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("🚀 Application starting up")
@@ -162,7 +161,7 @@ def main(
             host=host,
             port=port,
             reload=True,
-            log_config = logging_config
+            log_config=logging_config,
         )
     else:
         config = Config(
@@ -172,7 +171,7 @@ def main(
             port=port,
             workers=workers,
             use_colors=False,
-            log_config = None
+            log_config=None,
         )
         server = Server(config)
         server.run()
