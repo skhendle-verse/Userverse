@@ -23,6 +23,7 @@ from app.routers.company import company
 from app.routers.company import roles
 from app.utils.config.loader import ConfigLoader
 from app.utils.logging import logger, get_uvicorn_log_config
+import logging.config
 
 
 @asynccontextmanager
@@ -151,7 +152,8 @@ def main(
     logging.getLogger("watchfiles.main").setLevel(logging.WARNING)
     logger.info(f"🚀 Starting Userverse API on http://{host}:{port} [env={env}]")
     #
-    log_config = get_uvicorn_log_config(reload=reload, verbose=verbose)
+    logging_config = get_uvicorn_log_config(reload=reload, verbose=verbose)
+    logging.config.dictConfig(logging_config)
     if reload:
         uvicorn.run(
             "app.main:create_app",
@@ -159,7 +161,7 @@ def main(
             host=host,
             port=port,
             reload=True,
-            log_config=log_config,
+            log_config=logging_config,
         )
     else:
         config = Config(
@@ -169,7 +171,7 @@ def main(
             port=port,
             workers=workers,
             use_colors=False,
-            log_config=log_config,
+            log_config=None,
         )
         server = Server(config)
         server.run()
