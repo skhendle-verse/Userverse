@@ -14,6 +14,13 @@ from app.models.company.response_messages import CompanyResponseMessages
             201,
             CompanyResponseMessages.ADD_USER_SUCCESS.value,
         ),
+        (
+            "login_token_user_two",
+            2,
+            {"email": "user.three@email.com", "role": "Viewer"},
+            201,
+            CompanyResponseMessages.ADD_USER_SUCCESS.value,
+        ),
         # ❌ Non-admin tries to add a user to company 1
         (
             "login_token_user_two",
