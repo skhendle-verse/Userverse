@@ -5,7 +5,7 @@
 
 import logging
 import pytest
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import CompanyResponseMessages, CompanyRoleResponseMessages
 from app.database.base_model import RecordNotFoundError
 from tests.http.conftest import (
     client,
@@ -30,7 +30,7 @@ def test_a_create_company_one_roles_success(client, login_token, test_company_da
         #
         assert "message" in json_data
         assert (
-            json_data["message"] == CompanyResponseMessages.ROLE_CREATION_SUCCESS.value
+            json_data["message"] == CompanyRoleResponseMessages.ROLE_CREATION_SUCCESS.value
         )
         assert "data" in json_data
         assert json_data["data"]["name"] == role_value["name"]
@@ -54,7 +54,7 @@ def test_a_create_company_two_roles_success(
         #
         assert "message" in json_data
         assert (
-            json_data["message"] == CompanyResponseMessages.ROLE_CREATION_SUCCESS.value
+            json_data["message"] == CompanyRoleResponseMessages.ROLE_CREATION_SUCCESS.value
         )
         assert "data" in json_data
         assert json_data["data"]["name"] == role_value["name"]
@@ -101,5 +101,5 @@ def test_c_create_company_roles_failure(
         assert "detail" in json_data
         assert (
             json_data["detail"]["message"]
-            == CompanyResponseMessages.ROLE_CREATION_FAILED.value
+            == CompanyRoleResponseMessages.ROLE_CREATION_FAILED.value
         )

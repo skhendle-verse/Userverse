@@ -4,7 +4,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm.exc import NoResultFound
 from fastapi import status
 
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import CompanyResponseMessages, CompanyUserResponseMessages
 from app.models.user.user import UserRead
 from app.utils.app_error import AppError
 from .base_model import BaseModel
@@ -52,7 +52,7 @@ class Role(BaseModel):
 
         raise AppError(
             status_code=status.HTTP_400_BAD_REQUEST,
-            message=CompanyResponseMessages.ADD_USER_FAILED.value,
+            message=CompanyUserResponseMessages.ADD_USER_FAILED.value,
             error=f"Role: {role_name} is not linked to the company",
         )
 

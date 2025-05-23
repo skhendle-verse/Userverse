@@ -10,17 +10,15 @@ from app.models.company.roles import (
     RoleQueryParams,
     RoleRead,
     RoleUpdate,
-    CompanyDefaultRoles,
 )
 from app.models.app_error import AppErrorResponseModel
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import CompanyResponseMessages, CompanyRoleResponseMessages
 
 # Auth
 from app.security.jwt import get_current_user_from_jwt_token
 from app.models.user.user import UserRead
 
 # Logic
-from app.logic.company.company import CompanyService
 from app.logic.company.role import RoleService
 
 
@@ -60,7 +58,7 @@ def create_role_api(
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
             content={
-                "message": CompanyResponseMessages.ROLE_CREATION_SUCCESS.value,
+                "message": CompanyRoleResponseMessages.ROLE_CREATION_SUCCESS.value,
                 "data": response.model_dump(),
             },
         )
@@ -102,7 +100,7 @@ def update_role_api(
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
             content={
-                "message": CompanyResponseMessages.ROLE_UPDATED.value,
+                "message": CompanyRoleResponseMessages.ROLE_UPDATED.value,
                 "data": response.model_dump(),
             },
         )
@@ -141,7 +139,7 @@ def delete_role_api(
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
             content={
-                "message": CompanyResponseMessages.ROLE_DELETED.value,
+                "message": CompanyRoleResponseMessages.ROLE_DELETED.value,
                 "data": response,
             },
         )
@@ -177,7 +175,7 @@ def get_company_roles_api(
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=GenericResponseModel(
-                message=CompanyResponseMessages.ROLE_GET_SUCCESS.value,
+                message=CompanyRoleResponseMessages.ROLE_GET_SUCCESS.value,
                 data=response,
             ).model_dump(),
         )

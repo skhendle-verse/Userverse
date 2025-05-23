@@ -28,6 +28,7 @@ class CompanyUserResponseMessages(str, Enum):
     # Add user
     ADD_USER_SUCCESS = "User has been successfully added to the company."
     ADD_USER_FAILED = "Failed to add user to the company. Please verify the input."
+    ADD_EXISTING_USER_FAILRE = "This user is already associated with the specified company."
 
     # Remove user
     REMOVE_USER_SUCCESS = "User has been successfully removed from the company."

@@ -25,7 +25,7 @@ from app.models.company.company import (
 from app.models.user.user import UserQueryParams, UserRead
 from app.models.company.roles import CompanyDefaultRoles
 
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import CompanyResponseMessages, CompanyUserResponseMessages
 
 
 class CompanyRepository:
@@ -185,7 +185,7 @@ class CompanyRepository:
             if exists:
                 raise AppError(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    message="User is already linked to the company.",
+                    message=CompanyUserResponseMessages.ADD_EXISTING_USER_FAILRE.value,
                 )
 
             # Create association

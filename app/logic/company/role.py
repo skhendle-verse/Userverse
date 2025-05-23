@@ -10,7 +10,6 @@ from app.logic.company.repository.role import RoleRepository
 
 
 # models
-from app.models.company.company import CompanyRead
 from app.models.company.roles import CompanyDefaultRoles, RoleDelete, RoleQueryParams
 from app.models.company.roles import (
     RoleCreate,
@@ -19,7 +18,7 @@ from app.models.company.roles import (
     CompanyDefaultRoles,
 )
 from app.models.user.user import UserRead
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import CompanyResponseMessages, CompanyRoleResponseMessages
 
 
 class RoleService:
@@ -44,7 +43,7 @@ class RoleService:
         if not role:
             raise AppError(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                message=CompanyResponseMessages.ROLE_UPDATE_FAILED.value,
+                message=CompanyRoleResponseMessages.ROLE_UPDATE_FAILED.value,
             )
         return role
 
@@ -65,7 +64,7 @@ class RoleService:
         if not role:
             raise AppError(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                message=CompanyResponseMessages.ROLE_CREATION_FAILED.value,
+                message=CompanyRoleResponseMessages.ROLE_CREATION_FAILED.value,
             )
         return role
 

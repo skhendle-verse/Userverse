@@ -7,7 +7,7 @@ from app.models.generic_pagination import PaginatedResponse
 from app.models.generic_response import GenericResponseModel
 from app.models.company.company import CompanyCreate, CompanyRead, CompanyUpdate
 from app.models.app_error import AppErrorResponseModel
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import CompanyResponseMessages, CompanyUserResponseMessages
 
 # Auth
 from app.security.jwt import get_current_user_from_jwt_token
@@ -170,7 +170,7 @@ def get_company_users_api(
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=GenericResponseModel(
-                message=CompanyResponseMessages.GET_COMPANY_USERS.value,
+                message=CompanyUserResponseMessages.GET_COMPANY_USERS.value,
                 data=response.model_dump(),
             ).model_dump(),
         )
@@ -205,7 +205,7 @@ def add_user_to_company_api(
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
             content=GenericResponseModel(
-                message=CompanyResponseMessages.ADD_USER_SUCCESS.value,
+                message=CompanyUserResponseMessages.ADD_USER_SUCCESS.value,
                 data=response.model_dump(),
             ).model_dump(),
         )

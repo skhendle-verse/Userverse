@@ -3,7 +3,6 @@ from fastapi import status
 # utils
 from app.models.company.user import CompanyUserAdd, CompanyUserRead
 from app.models.generic_pagination import PaginatedResponse
-from app.security.jwt import JWTManager
 from app.utils.app_error import AppError
 
 # repository
@@ -12,7 +11,6 @@ from app.logic.company.repository.company import CompanyRepository
 # database
 from app.database import DatabaseSessionManager
 from app.database.association_user_company import AssociationUserCompany
-from app.database.user import User
 
 # models
 from app.models.company.company import (
