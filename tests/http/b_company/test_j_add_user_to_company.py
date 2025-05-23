@@ -1,6 +1,6 @@
 import pytest
 from tests.http.conftest import client, login_token, login_token_user_two
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import CompanyResponseMessages, CompanyUserResponseMessages
 
 
 @pytest.mark.parametrize(
@@ -12,14 +12,14 @@ from app.models.company.response_messages import CompanyResponseMessages
             1,
             {"email": "user.three@email.com", "role": "Viewer"},
             201,
-            CompanyResponseMessages.ADD_USER_SUCCESS.value,
+            CompanyUserResponseMessages.ADD_USER_SUCCESS.value,
         ),
         (
             "login_token_user_two",
             2,
             {"email": "user.three@email.com", "role": "Viewer"},
             201,
-            CompanyResponseMessages.ADD_USER_SUCCESS.value,
+            CompanyUserResponseMessages.ADD_USER_SUCCESS.value,
         ),
         # ❌ Non-admin tries to add a user to company 1
         (
@@ -35,7 +35,7 @@ from app.models.company.response_messages import CompanyResponseMessages
             1,
             {"email": "user.three@email.com", "role": "NotARealRole"},
             400,
-            CompanyResponseMessages.ADD_USER_FAILED.value,
+            CompanyUserResponseMessages.ADD_USER_FAILED.value,
         ),
     ],
 )
