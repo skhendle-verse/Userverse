@@ -34,7 +34,7 @@ class CompanyUserResponseMessages(str, Enum):
     # Add user
     ADD_USER_SUCCESS = "User has been successfully added to the company."
     ADD_USER_FAILED = "Failed to add user to the company. Please verify the input."
-    ADD_EXISTING_USER_FAILRE = (
+    ADD_EXISTING_USER_FAILED = (
         "This user is already associated with the specified company."
     )
 
@@ -42,6 +42,7 @@ class CompanyUserResponseMessages(str, Enum):
     REMOVE_USER_SUCCESS = "User has been successfully removed from the company."
     REMOVE_USER_FAILED = "Failed to remove user from the company. Try again later."
     LAST_ADMIN_REMOVE_FORBIDDEN = ""
+    USER_ALREADY_REMOVED = "User is already removed from company."
 
 
 class CompanyRoleResponseMessages(str, Enum):
