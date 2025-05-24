@@ -15,6 +15,7 @@ from app.middleware.otel import setup_otel
 from app.middleware.logging import LogMiddleware
 
 # user
+from app.models.tags import UserverseApiTag
 from app.routers.user import user
 from app.routers.user import password
 
@@ -46,7 +47,13 @@ def create_app() -> FastAPI:
         origin for origin in cor_origins_allowed if origin not in cor_origins_blocked
     ]
 
-    app = FastAPI(lifespan=lifespan)
+    app = FastAPI(
+        lifespan=lifespan,
+        title=configs.get("name"),
+        version=configs.get("version"),
+        description=configs.get("description"),
+        openapi_tags=UserverseApiTag.list(),
+    )
 
     # setup_otel(app)
     app.add_middleware(LogMiddleware)

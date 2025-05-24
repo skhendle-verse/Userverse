@@ -18,18 +18,18 @@ from app.models.company.response_messages import (
 )
 
 # Auth
+from app.models.tags import UserverseApiTag
 from app.security.jwt import get_current_user_from_jwt_token
 from app.models.user.user import UserRead
 
-# Logic
+# Business Logic
 from app.logic.company.role import RoleService
 
-
-# Utils
+# Utilities
 from app.utils.app_error import AppError
 
 router = APIRouter()
-tag = "Company Role Management"
+tag = UserverseApiTag.COMPANY_MANAGEMENT.name
 
 
 @router.post(
@@ -44,20 +44,20 @@ tag = "Company Role Management"
 )
 def create_role_api(
     payload: RoleCreate,
-    company_id: int = Path(..., description="Company ID to update"),
+    company_id: int = Path(..., description="The unique identifier of the company"),
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
     """
-    Register a new role.
+    Create a new role for the specified company.
+
+    - **Requires**: Authenticated user
+    - **Returns**: The created role
     """
     try:
         role_service = RoleService()
         response = role_service.create_role(
-            payload=payload,
-            created_by=user,
-            company_id=company_id,
+            payload=payload, created_by=user, company_id=company_id
         )
-
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
             content={
@@ -65,9 +65,7 @@ def create_role_api(
                 "data": response.model_dump(),
             },
         )
-    except AppError as e:
-        raise e
-    except Exception as e:
+    except (AppError, Exception) as e:
         raise e
 
 
@@ -76,7 +74,7 @@ def create_role_api(
     tags=[tag],
     status_code=status.HTTP_200_OK,
     responses={
-        201: {"model": GenericResponseModel[RoleRead]},
+        200: {"model": GenericResponseModel[RoleRead]},
         400: {"model": AppErrorResponseModel},
         404: {"model": AppErrorResponseModel},
         500: {"model": AppErrorResponseModel},
@@ -84,32 +82,29 @@ def create_role_api(
 )
 def update_role_api(
     payload: RoleUpdate,
-    company_id: int = Path(..., description="Company ID to update"),
-    name: str = Path(..., description="Role name to update"),
+    company_id: int = Path(..., description="The company ID associated with the role"),
+    name: str = Path(..., description="The name of the role to update"),
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
     """
-    Update the description of a role by name for a company.
-    Requires the user to be an administrator of the company.
+    Update a role's description by its name.
+
+    - **Requires**: Authenticated user
+    - **Returns**: Updated role data
     """
     try:
         role_service = RoleService()
         response = role_service.update_role(
-            updated_by=user,
-            company_id=company_id,
-            name=name,
-            payload=payload,
+            updated_by=user, company_id=company_id, name=name, payload=payload
         )
         return JSONResponse(
-            status_code=status.HTTP_201_CREATED,
+            status_code=status.HTTP_200_OK,
             content={
                 "message": CompanyRoleResponseMessages.ROLE_UPDATED.value,
                 "data": response.model_dump(),
             },
         )
-    except AppError as e:
-        raise e
-    except Exception as e:
+    except (AppError, Exception) as e:
         raise e
 
 
@@ -118,7 +113,7 @@ def update_role_api(
     tags=[tag],
     status_code=status.HTTP_200_OK,
     responses={
-        201: {"model": GenericResponseModel[dict]},
+        200: {"model": GenericResponseModel[dict]},
         400: {"model": AppErrorResponseModel},
         404: {"model": AppErrorResponseModel},
         500: {"model": AppErrorResponseModel},
@@ -126,29 +121,27 @@ def update_role_api(
 )
 def delete_role_api(
     payload: RoleDelete,
-    company_id: int = Path(..., description="Company ID to update"),
+    company_id: int = Path(..., description="Company ID to delete role from"),
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
     """
-    Delete a role and reassign all users to a replacement role (same company).
+    Delete a role from a company and reassign affected users to a replacement role.
+
+    - **Requires**: Authenticated user
+    - **Returns**: Success message with result info
     """
     try:
         response = RoleService.delete_role(
-            payload=payload,
-            deleted_by=user,
-            company_id=company_id,
+            payload=payload, deleted_by=user, company_id=company_id
         )
-
         return JSONResponse(
-            status_code=status.HTTP_201_CREATED,
+            status_code=status.HTTP_200_OK,
             content={
                 "message": CompanyRoleResponseMessages.ROLE_DELETED.value,
                 "data": response,
             },
         )
-    except AppError as e:
-        raise e
-    except Exception as e:
+    except (AppError, Exception) as e:
         raise e
 
 
@@ -163,18 +156,20 @@ def delete_role_api(
     },
 )
 def get_company_roles_api(
-    company_id: int,
+    company_id: int = Path(..., description="ID of the company whose roles to fetch"),
     query_params: RoleQueryParams = Depends(),
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
     """
-    Get paginated roles for a company.
+    Get a paginated list of all roles associated with a specific company.
+
+    - **Supports**: Filtering, pagination
+    - **Requires**: Authenticated user
     """
     try:
         response = RoleService.get_company_roles(
             payload=query_params, company_id=company_id, user=user
         )
-
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=GenericResponseModel(
@@ -182,7 +177,5 @@ def get_company_roles_api(
                 data=response,
             ).model_dump(),
         )
-    except AppError as e:
-        raise e
-    except Exception as e:
+    except (AppError, Exception) as e:
         raise e
