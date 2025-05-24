@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class CompanyResponseMessages(str, Enum):
     # Company creation
     COMPANY_CREATED = "Company has been created successfully."
@@ -9,8 +10,12 @@ class CompanyResponseMessages(str, Enum):
     # Company retrieval
     COMPANY_NOT_FOUND = "No company found matching the provided criteria."
     COMPANY_FOUND = "Company details retrieved successfully."
-    UNAUTHORIZED_COMPANY_ACCESS = "Access denied. You are not authorized to access this company."
-    COMPANY_ID_OR_EMAIL_REQUIRED = "Please provide either a company ID or an email address."
+    UNAUTHORIZED_COMPANY_ACCESS = (
+        "Access denied. You are not authorized to access this company."
+    )
+    COMPANY_ID_OR_EMAIL_REQUIRED = (
+        "Please provide either a company ID or an email address."
+    )
 
     # Company update
     COMPANY_UPDATED = "Company information updated successfully."
@@ -20,6 +25,7 @@ class CompanyResponseMessages(str, Enum):
     COMPANY_DELETED = "Company has been deleted successfully."
     COMPANY_DELETION_FAILED = "Unable to delete company. Please try again later."
 
+
 class CompanyUserResponseMessages(str, Enum):
     # Company users
     GET_COMPANY_USERS = "Company users retrieved successfully."
@@ -28,7 +34,9 @@ class CompanyUserResponseMessages(str, Enum):
     # Add user
     ADD_USER_SUCCESS = "User has been successfully added to the company."
     ADD_USER_FAILED = "Failed to add user to the company. Please verify the input."
-    ADD_EXISTING_USER_FAILRE = "This user is already associated with the specified company."
+    ADD_EXISTING_USER_FAILRE = (
+        "This user is already associated with the specified company."
+    )
 
     # Remove user
     REMOVE_USER_SUCCESS = "User has been successfully removed from the company."
@@ -40,7 +48,9 @@ class CompanyRoleResponseMessages(str, Enum):
     # Role creation
     ROLE_CREATION_SUCCESS = "Role has been created successfully."
     ROLE_CREATION_FORBIDDEN = "You are not allowed to create roles."
-    ROLE_CREATION_FAILED = "Unable to create role. Please verify the data and try again."
+    ROLE_CREATION_FAILED = (
+        "Unable to create role. Please verify the data and try again."
+    )
 
     # Role retrieval
     ROLE_GET_SUCCESS = "Roles retrieved successfully."
@@ -56,5 +66,3 @@ class CompanyRoleResponseMessages(str, Enum):
 
     # Role existence
     ROLE_ALREADY_EXISTS = "A role with the same name already exists."
-
-

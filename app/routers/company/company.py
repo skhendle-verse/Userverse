@@ -7,7 +7,10 @@ from app.models.generic_pagination import PaginatedResponse
 from app.models.generic_response import GenericResponseModel
 from app.models.company.company import CompanyCreate, CompanyRead, CompanyUpdate
 from app.models.app_error import AppErrorResponseModel
-from app.models.company.response_messages import CompanyResponseMessages, CompanyUserResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyUserResponseMessages,
+)
 
 # Auth
 from app.security.jwt import get_current_user_from_jwt_token
@@ -110,7 +113,7 @@ def get_company_api(
         500: {"model": AppErrorResponseModel},
     },
 )
-def update_user_api(
+def update_company_api(
     company_updates: CompanyUpdate,
     company_id: int = Path(..., description="Company ID to update"),
     user: UserRead = Depends(get_current_user_from_jwt_token),
@@ -180,36 +183,4 @@ def get_company_users_api(
         raise e
 
 
-@router.post(
-    "/company/{company_id}/users",
-    tags=[tag],
-    status_code=status.HTTP_201_CREATED,
-    responses={
-        201: {"model": GenericResponseModel[PaginatedResponse[CompanyRead]]},
-        400: {"model": AppErrorResponseModel},
-        500: {"model": AppErrorResponseModel},
-    },
-)
-def add_user_to_company_api(
-    company_id: int,
-    payload: CompanyUserAdd,
-    user: UserRead = Depends(get_current_user_from_jwt_token),
-):
-    """
-    Register a user to a company with a rrole available in the company.
-    """
-    try:
-        response = CompanyService().add_user(
-            company_id=company_id, payload=payload, added_by=user
-        )
-        return JSONResponse(
-            status_code=status.HTTP_201_CREATED,
-            content=GenericResponseModel(
-                message=CompanyUserResponseMessages.ADD_USER_SUCCESS.value,
-                data=response.model_dump(),
-            ).model_dump(),
-        )
-    except AppError as e:
-        raise e
-    except Exception as e:
-        raise e
+

@@ -21,6 +21,7 @@ from app.routers.user import password
 # company
 from app.routers.company import company
 from app.routers.company import roles
+from app.routers.company import users as company_users
 from app.utils.config.loader import ConfigLoader
 from app.utils.logging import logger, get_uvicorn_log_config
 import logging.config
@@ -61,6 +62,7 @@ def create_app() -> FastAPI:
     app.include_router(password.router)
     app.include_router(company.router)
     app.include_router(roles.router)
+    app.include_router(company_users.router)
 
     @app.get("/")
     async def root():

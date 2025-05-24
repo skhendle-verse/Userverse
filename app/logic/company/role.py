@@ -18,7 +18,10 @@ from app.models.company.roles import (
     CompanyDefaultRoles,
 )
 from app.models.user.user import UserRead
-from app.models.company.response_messages import CompanyResponseMessages, CompanyRoleResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyRoleResponseMessages,
+)
 
 
 class RoleService:

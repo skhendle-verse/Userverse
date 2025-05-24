@@ -13,6 +13,7 @@ from app.database.user import User
 from app.database.role import Role
 from app.database.association_user_company import AssociationUserCompany
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import func
 
 
 # models
@@ -25,7 +26,10 @@ from app.models.company.company import (
 from app.models.user.user import UserQueryParams, UserRead
 from app.models.company.roles import CompanyDefaultRoles
 
-from app.models.company.response_messages import CompanyResponseMessages, CompanyUserResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyUserResponseMessages,
+)
 
 
 class CompanyRepository:
@@ -198,6 +202,41 @@ class CompanyRepository:
             session.commit()
             return CompanyUserRead(**user, role_name=role_name)
 
+    def remove_user_from_company(
+        self,
+        company_id: int,
+        user_id: int,
+        removed_by: UserRead,
+    ) -> CompanyUserRead:
+        with self.db_manager.session_object() as session:
+            assoc = session.query(AssociationUserCompany).filter_by(
+                user_id=user_id,
+                company_id=company_id,
+                _closed_at=None
+            ).first()
+
+            if not assoc:
+                raise AppError(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    message=CompanyUserResponseMessages.REMOVE_USER_FAILED.value,
+                )
+            
+            role_name = assoc.role_name
+
+            column_name ="primary_meta_data"
+            json_column = getattr(assoc, column_name)
+            if not isinstance(json_column, dict):
+                raise ValueError(f"Column '{column_name}' is not a JSON field.")
+
+            json_column["removed_by"] = removed_by.model_dump()
+            setattr(assoc, column_name, json_column)
+
+            assoc._closed_at = func.now()
+            session.commit()
+            user = User.get_by_id(session=session, record_id=user_id)
+
+            return CompanyUserRead(**user, role_name=role_name)
+        
     def update_company(
         self, payload: CompanyUpdate, company_id: str, user: UserRead
     ) -> CompanyRead:

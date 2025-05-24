@@ -4,7 +4,10 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm.exc import NoResultFound
 from fastapi import status
 
-from app.models.company.response_messages import CompanyResponseMessages, CompanyUserResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyUserResponseMessages,
+)
 from app.models.user.user import UserRead
 from app.utils.app_error import AppError
 from .base_model import BaseModel

@@ -12,7 +12,10 @@ from app.models.company.roles import (
     RoleUpdate,
 )
 from app.models.app_error import AppErrorResponseModel
-from app.models.company.response_messages import CompanyResponseMessages, CompanyRoleResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyRoleResponseMessages,
+)
 
 # Auth
 from app.security.jwt import get_current_user_from_jwt_token

@@ -45,7 +45,7 @@ class CompanyService:
         return company
 
     @staticmethod
-    def add_user(
+    def add_user_to_company(
         company_id: int, payload: CompanyUserAdd, added_by: UserRead
     ) -> CompanyUserRead:
         CompanyService.check_if_user_is_in_company(
@@ -57,6 +57,24 @@ class CompanyService:
         return repository.add_user_to_company(
             company_id=company_id,
             payload=payload,
+        )
+
+    @staticmethod
+    def remove_user_from_company(
+        company_id: int,
+        user_id: int,
+        removed_by: UserRead,
+    ) -> CompanyUserRead:
+        CompanyService.check_if_user_is_in_company(
+            user_id=removed_by.id,
+            company_id=company_id,
+            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
+        )
+        repository = CompanyRepository()
+        return repository.remove_user_from_company(
+            company_id=company_id,
+            user_id=user_id,
+            removed_by=removed_by,
         )
 
     @staticmethod

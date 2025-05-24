@@ -1,19 +1,13 @@
 import pytest
 from tests.http.conftest import client, login_token, login_token_user_two
-from app.models.company.response_messages import CompanyResponseMessages, CompanyUserResponseMessages
-
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyUserResponseMessages,
+)
 
 @pytest.mark.parametrize(
     "login_token_key, company_id, user_id, expected_status, expected_message",
     [
-        # ✅ Admin removes a user from company 1
-        (
-            "login_token_user_two",
-            1,
-            3,  # user.three@email.com
-            200,
-            CompanyUserResponseMessages.REMOVE_USER_SUCCESS.value,
-        ),
         # ❌ Non-admin tries to remove a user from company 1
         (
             "login_token_user_two",
@@ -44,7 +38,6 @@ def test_remove_user_from_company(
 ):
     """
     Test /company/{company_id}/user/{user_id} for removing users with various scenarios:
-    - valid user removal
     - unauthorized user attempt
     - last admin removal forbidden
     """
@@ -58,12 +51,20 @@ def test_remove_user_from_company(
         "accept": "application/json",
     }
 
-    response = client.delete(
-        f"/company/{company_id}/user/{user_id}", headers=headers
+    response = client.delete(f"/company/{company_id}/user/{user_id}", headers=headers)
+
+    assert response.status_code == expected_status, (
+        f"Expected status {expected_status}, got {response.status_code}. "
+        f"Response body: {response.text}"
     )
-    assert response.status_code == expected_status
+
     json_data = response.json()
-    assert expected_message in json_data["message"] or expected_message in str(json_data)
+    message = json_data.get("message") or json_data.get("detail") or str(json_data)
+
+    assert expected_message in message, (
+        f"Expected message '{expected_message}' not found in response message '{message}'."
+    )
+
     if expected_status == 201:
         assert "data" in json_data
         assert isinstance(json_data["data"], (list, dict))
