@@ -5,7 +5,8 @@ from app.models.company.user import CompanyUserAdd, CompanyUserRead
 from app.models.generic_pagination import PaginatedResponse
 from app.utils.app_error import AppError
 
-# repository
+# service and repository
+from app.logic.company.user import CompanyUserService
 from app.logic.company.repository.company import CompanyRepository
 
 # database
@@ -45,56 +46,6 @@ class CompanyService:
         return company
 
     @staticmethod
-    def add_user_to_company(
-        company_id: int, payload: CompanyUserAdd, added_by: UserRead
-    ) -> CompanyUserRead:
-        CompanyService.check_if_user_is_in_company(
-            user_id=added_by.id,
-            company_id=company_id,
-            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
-        )
-        repository = CompanyRepository()
-        return repository.add_user_to_company(
-            company_id=company_id,
-            payload=payload,
-        )
-
-    @staticmethod
-    def remove_user_from_company(
-        company_id: int,
-        user_id: int,
-        removed_by: UserRead,
-    ) -> CompanyUserRead:
-        CompanyService.check_if_user_is_in_company(
-            user_id=removed_by.id,
-            company_id=company_id,
-            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
-        )
-        repository = CompanyRepository()
-        return repository.remove_user_from_company(
-            company_id=company_id,
-            user_id=user_id,
-            removed_by=removed_by,
-        )
-
-    @staticmethod
-    def get_company_user(
-        company_id: int,
-        params: UserQueryParams,
-        user: UserRead,
-    ) -> PaginatedResponse[CompanyUserRead]:
-        CompanyService.check_if_user_is_in_company(
-            user_id=user.id,
-            company_id=company_id,
-            role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
-        )
-        repository = CompanyRepository()
-        return repository.get_company_users(
-            company_id=company_id,
-            params=params,
-        )
-
-    @staticmethod
     def get_company(
         user: UserRead, company_id: str = None, email: str = None
     ) -> CompanyRead:
@@ -114,7 +65,7 @@ class CompanyService:
         if email:
             company = company_repository.get_company_by_email(email)
 
-        CompanyService.check_if_user_is_in_company(
+        CompanyUserService.check_if_user_is_in_company(
             user_id=user.id,
             company_id=company.id,
         )
@@ -128,7 +79,7 @@ class CompanyService:
         """
         Update a company by its ID.
         """
-        CompanyService.check_if_user_is_in_company(
+        CompanyUserService.check_if_user_is_in_company(
             user_id=user.id,
             company_id=company_id,
             role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
@@ -142,27 +93,3 @@ class CompanyService:
                 message=CompanyResponseMessages.COMPANY_UPDATE_FAILED.value,
             )
         return company
-
-    @staticmethod
-    def check_if_user_is_in_company(
-        user_id: str, company_id: str, role: str = None
-    ) -> bool:
-        """
-        Check if the user is linked to the company.
-        If a role is provided, check if the user has that role.
-        """
-        with DatabaseSessionManager().session_object() as session:
-            # Check if the user is linked to the company
-            linked_company = AssociationUserCompany.is_user_linked_to_company(
-                session=session,
-                user_id=int(user_id),
-                company_id=int(company_id),
-                role_name=role,
-            )
-            if not linked_company:
-                raise AppError(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    message=CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value,
-                )
-
-            return linked_company

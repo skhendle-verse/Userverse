@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, Query, Path
 from fastapi.responses import JSONResponse
 
 # Models
-from app.models.company.user import CompanyUserAdd, CompanyUserRead, CompanyUserRead
+from app.models.company.user import  CompanyUserRead, CompanyUserRead
 from app.models.generic_pagination import PaginatedResponse
 from app.models.generic_response import GenericResponseModel
 from app.models.company.company import CompanyCreate, CompanyRead, CompanyUpdate
@@ -18,6 +18,7 @@ from app.models.user.user import UserQueryParams, UserRead
 
 # Logic
 from app.logic.company.company import CompanyService
+from app.logic.company.user import CompanyUserService
 
 # Utils
 from app.utils.app_error import AppError
@@ -163,8 +164,8 @@ def get_company_users_api(
     Priority: email > company_id.
     """
     try:
-        company_service = CompanyService()
-        response = company_service.get_company_user(
+        company_user_service = CompanyUserService()
+        response = company_user_service.get_company_user(
             company_id=company_id,
             params=params,
             user=user,
@@ -181,6 +182,3 @@ def get_company_users_api(
         raise e
     except Exception as e:
         raise e
-
-
-

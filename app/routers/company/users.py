@@ -14,7 +14,7 @@ from app.security.jwt import get_current_user_from_jwt_token
 from app.models.user.user import UserQueryParams, UserRead
 
 # Logic
-from app.logic.company.company import CompanyService
+from app.logic.company.user import CompanyUserService
 
 # Utils
 from app.utils.app_error import AppError
@@ -43,7 +43,7 @@ def get_company_users_api(
     Retrieve company users.
     """
     try:
-        company_service = CompanyService()
+        company_service = CompanyUserService()
         response = company_service.get_company_user(
             company_id=company_id,
             params=params,
@@ -82,7 +82,7 @@ def add_user_to_company_api(
     Register a user to a company with a role available within in the company.
     """
     try:
-        response = CompanyService().add_user_to_company(
+        response = CompanyUserService().add_user_to_company(
             company_id=company_id, payload=payload, added_by=user
         )
         return JSONResponse(
@@ -103,7 +103,7 @@ def add_user_to_company_api(
     tags=[tag],
     status_code=status.HTTP_201_CREATED,
     responses={
-        201: {"model": GenericResponseModel[PaginatedResponse[CompanyRead]]},
+        201: {"model": GenericResponseModel[CompanyUserRead]},
         400: {"model": AppErrorResponseModel},
         500: {"model": AppErrorResponseModel},
     },
@@ -117,13 +117,13 @@ def delete_user_from_company_api(
     Remove a user from a company.
     """
     try:
-        response = CompanyService().remove_user_from_company(
+        response = CompanyUserService().remove_user_from_company(
             company_id=company_id, user_id=user_id, removed_by=user
         )
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
             content=GenericResponseModel(
-                message=CompanyUserResponseMessages.ADD_USER_SUCCESS.value,
+                message=CompanyUserResponseMessages.REMOVE_USER_SUCCESS.value,
                 data=response.model_dump(),
             ).model_dump(),
         )

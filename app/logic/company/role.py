@@ -1,7 +1,7 @@
 from fastapi import status
 
 # utils
-from app.logic.company.company import CompanyService
+from app.logic.company.user import CompanyUserService
 from app.models.generic_pagination import PaginatedResponse, PaginationMeta
 from app.utils.app_error import AppError
 
@@ -19,7 +19,7 @@ from app.models.company.roles import (
 )
 from app.models.user.user import UserRead
 from app.models.company.response_messages import (
-    CompanyResponseMessages,
+
     CompanyRoleResponseMessages,
 )
 
@@ -33,7 +33,7 @@ class RoleService:
         """
         Update the description of a role for a company.
         """
-        CompanyService.check_if_user_is_in_company(
+        CompanyUserService.check_if_user_is_in_company(
             user_id=updated_by.id,
             company_id=company_id,
             role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
@@ -57,7 +57,7 @@ class RoleService:
         """
         Create a new company role and store its creator in primary_meta_data.
         """
-        CompanyService.check_if_user_is_in_company(
+        CompanyUserService.check_if_user_is_in_company(
             user_id=created_by.id,
             company_id=company_id,
             role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
@@ -73,7 +73,7 @@ class RoleService:
 
     @staticmethod
     def delete_role(payload: RoleDelete, deleted_by: UserRead, company_id: int) -> dict:
-        CompanyService.check_if_user_is_in_company(
+        CompanyUserService.check_if_user_is_in_company(
             user_id=deleted_by.id,
             company_id=company_id,
             role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
@@ -88,7 +88,7 @@ class RoleService:
         """
         Get company roles with pagination and optional filtering.
         """
-        CompanyService.check_if_user_is_in_company(
+        CompanyUserService.check_if_user_is_in_company(
             user_id=user.id,
             company_id=company_id,
             role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
