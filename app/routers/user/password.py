@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
 # Tags & Models
+from app.models.app_error import AppErrorResponseModel
+from app.models.generic_response import GenericResponseModel
 from app.models.tags import UserverseApiTag
 from app.models.user.user import UserLogin
 from app.models.user.password import PasswordResetRequest, OTPValidationRequest
@@ -20,8 +22,11 @@ tag = UserverseApiTag.USER_PASSWORD_MANAGEMENT.name
 @router.patch(
     "/password-reset/request",
     tags=[tag],
-    response_model=str,
-    status_code=status.HTTP_202_ACCEPTED,
+    responses={
+        202: {"model": GenericResponseModel},
+        400: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
+    },
 )
 def password_reset_request_api(
     input: PasswordResetRequest,
@@ -45,8 +50,11 @@ def password_reset_request_api(
 @router.patch(
     "/password-reset/validate-otp",
     tags=[tag],
-    response_model=str,
-    status_code=status.HTTP_202_ACCEPTED,
+    responses={
+        202: {"model": GenericResponseModel},
+        400: {"model": AppErrorResponseModel},
+        500: {"model": AppErrorResponseModel},
+    },
 )
 def password_reset_validate_otp_api(
     input: OTPValidationRequest,

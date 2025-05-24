@@ -74,7 +74,7 @@ def create_role_api(
     tags=[tag],
     status_code=status.HTTP_200_OK,
     responses={
-        200: {"model": GenericResponseModel[RoleRead]},
+        201: {"model": GenericResponseModel[RoleRead]},
         400: {"model": AppErrorResponseModel},
         404: {"model": AppErrorResponseModel},
         500: {"model": AppErrorResponseModel},
@@ -98,7 +98,7 @@ def update_role_api(
             updated_by=user, company_id=company_id, name=name, payload=payload
         )
         return JSONResponse(
-            status_code=status.HTTP_200_OK,
+            status_code=status.HTTP_201_CREATED,
             content={
                 "message": CompanyRoleResponseMessages.ROLE_UPDATED.value,
                 "data": response.model_dump(),
@@ -113,7 +113,7 @@ def update_role_api(
     tags=[tag],
     status_code=status.HTTP_200_OK,
     responses={
-        200: {"model": GenericResponseModel[dict]},
+        201: {"model": GenericResponseModel[dict]},
         400: {"model": AppErrorResponseModel},
         404: {"model": AppErrorResponseModel},
         500: {"model": AppErrorResponseModel},
@@ -135,7 +135,7 @@ def delete_role_api(
             payload=payload, deleted_by=user, company_id=company_id
         )
         return JSONResponse(
-            status_code=status.HTTP_200_OK,
+            status_code=status.HTTP_201_CREATED,
             content={
                 "message": CompanyRoleResponseMessages.ROLE_DELETED.value,
                 "data": response,

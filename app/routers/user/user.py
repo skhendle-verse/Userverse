@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 
 # Tags & Models
 from app.models.tags import UserverseApiTag
+from app.models.user.response_messages import UserResponseMessages
 from app.models.user.user import (
     TokenResponseModel,
     UserLogin,
@@ -132,7 +133,7 @@ def get_user_api(
     tags=[tag],
     status_code=status.HTTP_200_OK,
     responses={
-        200: {"model": GenericResponseModel[UserRead]},
+        201: {"model": GenericResponseModel[UserRead]},
         400: {"model": AppErrorResponseModel},
         500: {"model": AppErrorResponseModel},
     },
@@ -151,7 +152,7 @@ def update_user_api(
             user_data=user_updates,
         )
         return JSONResponse(
-            status_code=status.HTTP_200_OK,
+            status_code=status.HTTP_201_CREATED,
             content={
                 "message": UserResponseMessages.USER_UPDATED.value,
                 "data": response.model_dump(),
