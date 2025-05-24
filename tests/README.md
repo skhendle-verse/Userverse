@@ -111,15 +111,45 @@ pytest -v tests/http/d_company_users/test_i_get_user_companies.py
 pytest -v tests/http/d_company_users/test_j_add_user_to_company.py
 pytest -v tests/http/d_company_users/test_k_remove_user_from_company.py
 ```
-## Utils
 
-Unit testing for app Utils
 
+
+## 🧰 Utility Testing
+
+### 📂 Directory Structure
+
+```
+tests/utils/
+├── basic_auth.py
+├── config/
+│   ├── test_cors.py
+│   ├── test_database_config.py
+│   └── test_environment_manager.py
+├── email/
+│   ├── __init__.py
+│   ├── test_renderer.py
+│   └── test_sender.py
+└── __init__.py
+```
+
+---
+
+### 🚀 Running Utility Tests
+
+#### 🔐 Basic Auth Utilities
 ```bash
-# Render templates testing
-(userverse) $: pytest -v tests/utils/email/test_renderer.py -s
+pytest -v tests/utils/basic_auth.py
+```
 
-# Send email testing
-(userverse) $: pytest -v tests/utils/email/test_sender.py -s
+#### ⚙️ Configuration Tests
+```bash
+pytest -v tests/utils/config/test_cors.py
+pytest -v tests/utils/config/test_database_config.py
+pytest -v tests/utils/config/test_environment_manager.py
+```
 
+#### 📧 Email Utilities
+```bash
+pytest -v tests/utils/email/test_renderer.py
+pytest -v tests/utils/email/test_sender.py
 ```
