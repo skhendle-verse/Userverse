@@ -22,6 +22,7 @@ from app.utils.app_error import AppError
 
 router = APIRouter()
 tag = UserverseApiTag.COMPANY_USER_MANAGEMENT.name
+company_id_description = "The ID of the company"
 
 
 @router.get(
@@ -36,7 +37,7 @@ tag = UserverseApiTag.COMPANY_USER_MANAGEMENT.name
     },
 )
 def get_company_users_api(
-    company_id: int = Path(..., description="The ID of the company"),
+    company_id: int = Path(..., description=company_id_description),
     params: UserQueryParams = Depends(),
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
@@ -74,7 +75,7 @@ def get_company_users_api(
     },
 )
 def add_user_to_company_api(
-    company_id: int = Path(..., description="The ID of the company"),
+    company_id: int = Path(..., description=company_id_description),
     payload: CompanyUserAdd = ...,
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
@@ -105,13 +106,13 @@ def add_user_to_company_api(
     tags=[tag],
     status_code=status.HTTP_200_OK,
     responses={
-        200: {"model": GenericResponseModel[CompanyUserRead]},
+        201: {"model": GenericResponseModel[CompanyUserRead]},
         400: {"model": AppErrorResponseModel},
         500: {"model": AppErrorResponseModel},
     },
 )
 def delete_user_from_company_api(
-    company_id: int = Path(..., description="The ID of the company"),
+    company_id: int = Path(..., description=company_id_description),
     user_id: int = Path(..., description="The ID of the user to remove"),
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
@@ -127,7 +128,7 @@ def delete_user_from_company_api(
         )
 
         return JSONResponse(
-            status_code=status.HTTP_200_OK,
+            status_code=status.HTTP_201_CREATED,
             content=GenericResponseModel(
                 message=CompanyUserResponseMessages.REMOVE_USER_SUCCESS.value,
                 data=response.model_dump(),

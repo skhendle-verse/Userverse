@@ -65,7 +65,9 @@ class ConfigLoader:
             pyproject_data = tomllib.load(f)
 
         # Extract sections
-        userverse_config = pyproject_data.get("tool", {}).get("userverse", {}).get("config", {})
+        userverse_config = (
+            pyproject_data.get("tool", {}).get("userverse", {}).get("config", {})
+        )
         project_config = pyproject_data.get("project", {})
 
         logger.info("📦 [project] section loaded from pyproject.toml:")
@@ -76,7 +78,8 @@ class ConfigLoader:
         config_data = {
             "name": project_config.get("name") or userverse_config.get("name"),
             "version": project_config.get("version") or userverse_config.get("version"),
-            "description": project_config.get("description") or userverse_config.get("description"),
+            "description": project_config.get("description")
+            or userverse_config.get("description"),
             "database": userverse_config.get("database", {}),
             "cor_origins": userverse_config.get("cor_origins", {}),
             "jwt": userverse_config.get("jwt", {}),
@@ -85,7 +88,6 @@ class ConfigLoader:
 
         return self._build_config_dict(config_data)
 
-
     def _build_config_dict(self, config_data: dict):
         if not isinstance(config_data, dict):
             raise TypeError("Expected config_data to be a dict")
@@ -93,7 +95,9 @@ class ConfigLoader:
         environment = self._set_environment(config_data)
         return {
             "environment": environment,
-            "database_url": DatabaseConfig.get_connection_string(config_data, environment),
+            "database_url": DatabaseConfig.get_connection_string(
+                config_data, environment
+            ),
             "cor_origins": CorsConfig.get_cors(config_data, environment),
             "jwt": config_data.get("jwt", {}),
             "email": config_data.get("email", {}),
