@@ -101,21 +101,3 @@ uv run -m app.main --port 8500 \
 ✅ This mode supports scaling with Uvicorn workers and does not enable reload.
 
 ---
-
-
-## 📁 Config Example
-
-Your JSON config should look like:
-
-```json
-{
-  "environment": "development",
-  "cor_origins": {
-    "allowed": ["*"],
-    "blocked": []
-  },
-  "version": "1.0.0",
-  "name": "Userverse",
-  "description": "Backend API"
-}
-```
