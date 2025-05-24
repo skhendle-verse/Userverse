@@ -1,5 +1,5 @@
 import pytest
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import CompanyRoleResponseMessages
 from tests.http.conftest import client, login_token, test_company_data
 
 
@@ -31,7 +31,7 @@ def test_get_company_roles(
     json_data = response.json()
 
     assert "message" in json_data
-    assert json_data["message"] == "Roles retrieved successfully"
+    assert json_data["message"] == CompanyRoleResponseMessages.ROLE_GET_SUCCESS.value
     assert "data" in json_data
     assert "records" in json_data["data"]
     assert "pagination" in json_data["data"]
@@ -58,7 +58,7 @@ def test_get_roles_with_invalid_filter(client, login_token, test_company_data):
     assert response.status_code == 200
 
     json_data = response.json()
-    assert json_data["message"] == "Roles retrieved successfully"
+    assert json_data["message"] == CompanyRoleResponseMessages.ROLE_GET_SUCCESS.value
     assert json_data["data"]["records"] == []
     assert json_data["data"]["pagination"]["total_records"] == 0
 
@@ -76,7 +76,7 @@ def test_get_roles_with_pagination(client, login_token, test_company_data):
     assert response.status_code == 200
 
     json_data = response.json()
-    assert json_data["message"] == "Roles retrieved successfully"
+    assert json_data["message"] == CompanyRoleResponseMessages.ROLE_GET_SUCCESS.value
     assert len(json_data["data"]["records"]) == 1
 
     pagination = json_data["data"]["pagination"]

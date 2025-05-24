@@ -59,9 +59,7 @@ class JWTManager:
 
     def decode_token(self, token: str) -> UserRead:
         try:
-            decoded = jwt.decode(
-                token, self.JWT_SECRET, algorithms=[self.JWT_ALGORITHM]
-            )
+            decoded = jwt.decode(token, self.JWT_SECRET, algorithms=[self.JWT_ALGORITHM])
             user = decoded.get("user")
             if not user:
                 raise AppError(
@@ -71,10 +69,10 @@ class JWTManager:
             if decoded.get("type") != "access":
                 raise AppError(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    message=SecurityResponseMessages.INVALID_TOKEN.value
-                    + " for access token",
+                    message=SecurityResponseMessages.INVALID_TOKEN.value + " for access token",
                 )
             return UserRead(**user)
+
         except jwt.ExpiredSignatureError:
             raise AppError(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -85,12 +83,15 @@ class JWTManager:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 message=SecurityResponseMessages.INVALID_TOKEN.value,
             )
-        except Exception:
-            traceback.print_exc()
+        except AppError:
+            raise  # ⬅️ This ensures your own exceptions aren't re-wrapped
+        except Exception as e:
             raise AppError(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 message=SecurityResponseMessages.ERROR_DECODING.value,
+                error=str(e),
             )
+
 
     def refresh_token(self, refresh_token: str) -> TokenResponseModel:
         try:

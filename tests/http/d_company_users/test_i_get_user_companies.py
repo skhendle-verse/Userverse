@@ -1,6 +1,9 @@
 import pytest
 from tests.http.conftest import client, login_token, login_token_user_two
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyUserResponseMessages,
+)
 
 
 @pytest.mark.parametrize(
@@ -46,7 +49,9 @@ def test_get_user_companies(
 
     if expected_status == 200:
         json_data = response.json()
-        assert json_data["message"] == CompanyResponseMessages.GET_COMPANY_USERS.value
+        assert (
+            json_data["message"] == CompanyUserResponseMessages.GET_COMPANY_USERS.value
+        )
         company_ids = {company["id"] for company in json_data["data"]["records"]}
         assert company_ids == expected_company_ids
 

@@ -1,5 +1,8 @@
 import pytest
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyUserResponseMessages,
+)
 from tests.http.conftest import (
     client,
     test_company_data,
@@ -74,7 +77,9 @@ def test_get_users_for_company(
 
     if expected_status == 200:
         json_data = response.json()
-        assert json_data["message"] == CompanyResponseMessages.GET_COMPANY_USERS.value
+        assert (
+            json_data["message"] == CompanyUserResponseMessages.GET_COMPANY_USERS.value
+        )
         records = json_data["data"]["records"]
         actual_emails = {user["email"] for user in records}
         assert actual_emails == expected_emails
@@ -85,4 +90,7 @@ def test_get_users_for_company(
     elif expected_status == 403:
         json_data = response.json()
         assert "detail" in json_data
-        assert json_data["detail"]["message"] == "Unauthorized access to company"
+        assert (
+            json_data["detail"]["message"]
+            == CompanyResponseMessages.UNAUTHORIZED_COMPANY_ACCESS.value
+        )

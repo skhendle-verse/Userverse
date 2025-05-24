@@ -1,4 +1,3 @@
-from app.models.company.address import CompanyAddress
 from fastapi import status
 
 # utils
@@ -19,9 +18,10 @@ from app.models.company.roles import (
     RoleDelete,
 )
 from app.models.user.user import UserRead
-from app.models.company.roles import CompanyDefaultRoles
-
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyRoleResponseMessages,
+)
 
 
 class RoleRepository:
@@ -60,7 +60,7 @@ class RoleRepository:
             except Exception as e:
                 raise AppError(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    message=CompanyResponseMessages.ROLE_RETRIEVAL_FAILED.value,
+                    message=CompanyRoleResponseMessages.ROLE_NOT_FOUND.value,
                     error=str(e),
                 )
 
@@ -81,7 +81,7 @@ class RoleRepository:
             except Exception as e:
                 raise AppError(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    message=CompanyResponseMessages.ROLE_UPDATE_FAILED.value,
+                    message=CompanyRoleResponseMessages.ROLE_UPDATE_FAILED.value,
                     error=str(e),
                 )
 
@@ -102,7 +102,7 @@ class RoleRepository:
             except Exception as e:
                 raise AppError(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    message=CompanyResponseMessages.ROLE_UPDATE_FAILED.value,
+                    message=CompanyRoleResponseMessages.ROLE_UPDATE_FAILED.value,
                     error=str(e),
                 )
 
@@ -170,7 +170,7 @@ class RoleRepository:
         except Exception as e:
             raise AppError(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                message=CompanyResponseMessages.ROLE_CREATION_FAILED.value,
+                message=CompanyRoleResponseMessages.ROLE_CREATION_FAILED.value,
                 error=str(e),
             ) from e
 
@@ -191,7 +191,7 @@ class RoleRepository:
             if not role:
                 raise AppError(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    message=CompanyResponseMessages.ROLE_NOT_FOUND.value,
+                    message=CompanyRoleResponseMessages.ROLE_NOT_FOUND.value,
                 )
             return role.to_dict(role)
         except Exception as e:

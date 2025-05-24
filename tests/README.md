@@ -25,63 +25,131 @@ Unit testing for db models
 
 ```
 
-## HTTP integration testing
 
-TODO: Setup a testing config, to avoid comflicts with dev db
+## 📡 HTTP Integration Testing
+
+### ⚙️ Setup
+
+Ensure your environment uses a **dedicated test database** to avoid conflicts with development data.
 
 ```bash
-# assign a value to TEST_ENVIRONMENT, which help trigger creation of testing.db
-(userverse) $: export TEST_ENVIRONMENT=True
-#
-# Main route testing
-(userverse) $: pytest -v tests/http/test_main.py
-# Security testing
-(userverse) $: pytest -v tests/http/test_security.py
-# Create user testing
-(userverse) $: pytest -v tests/http/a_user/test_a_create_user_api.py
-# User login testing
-(userverse) $: pytest -v tests/http/a_user/test_b_user_login_api.py
-# Get user testing
-(userverse) $: pytest -v tests/http/a_user/test_c_get_user.py
-# Update user testing
-(userverse) $: pytest -v tests/http/a_user/test_d_update_user_api.py
-# Reset Password: Get OTP
-(userverse) $: pytest -v tests/http/a_user/test_e_password_reset_request.py
-# Validate OTP
-(userverse) $: pytest -v tests/http/a_user/test_f_password_otp_verify.py
-# testing company routes
-(userverse) $: pytest -v tests/http/b_company/test_a_create_company.py
-# testing company routes
-(userverse) $: pytest -v tests/http/b_company/test_b_get_company.py
-# Update company
-(userverse) $: pytest -v tests/http/b_company/test_c_update_company.py
-# Create role
-(userverse) $: pytest -v tests/http/b_company/test_d_create_role.py
-# Update role
-(userverse) $: pytest -v tests/http/b_company/test_e_update_role.py
-# Delete role
-(userverse) $: pytest -v tests/http/b_company/test_f_delete_role.py
-# Get roles
-(userverse) $: pytest -v tests/http/b_company/test_g_get_roles.py
-# Get roles
-(userverse) $: pytest -v tests/http/b_company/test_h_get_company_users.py
-# Get roles
-(userverse) $: pytest -v tests/http/b_company/test_i_get_user_companies.py
-# Add user to company
-(userverse) $: pytest -v tests/http/b_company/test_j_add_user_to_company.py
-
-
+# Activate testing environment flag
+export TEST_ENVIRONMENT=True
 ```
 
-## Utils
+---
 
-Unit testing for app Utils
+### 🌲 Directory Structure (3 Levels)
 
+```
+tests/http/
+├── a_user/
+│   ├── test_a_create_user_api.py
+│   ├── test_b_user_login_api.py
+│   ├── test_c_get_user.py
+│   ├── test_d_update_user_api.py
+│   ├── test_e_password_reset_request.py
+│   └── test_f_password_otp_verify.py
+├── b_company/
+│   ├── test_a_create_company.py
+│   ├── test_b_get_company.py
+│   └── test_c_update_company.py
+├── c_company_roles/
+│   ├── test_d_create_role.py
+│   ├── test_e_update_role.py
+│   ├── test_f_delete_role.py
+│   └── test_g_get_roles.py
+├── d_company_users/
+│   ├── test_h_get_company_users.py
+│   ├── test_i_get_user_companies.py
+│   ├── test_j_add_user_to_company.py
+│   └── test_k_remove_user_from_company.py
+├── test_main.py
+├── test_security.py
+└── conftest.py
+```
+
+---
+
+### 🚀 Running Tests
+
+#### 🧪 Main & Security
 ```bash
-# Render templates testing
-(userverse) $: pytest -v tests/utils/email/test_renderer.py -s
+pytest -v tests/http/test_main.py
+pytest -v tests/http/test_security.py
+```
 
-# Send email testing
-(userverse) $: pytest -v tests/utils/email/test_sender.py -s
+#### 👤 User APIs
+```bash
+pytest -v tests/http/a_user/test_a_create_user_api.py
+pytest -v tests/http/a_user/test_b_user_login_api.py
+pytest -v tests/http/a_user/test_c_get_user.py
+pytest -v tests/http/a_user/test_d_update_user_api.py
+pytest -v tests/http/a_user/test_e_password_reset_request.py
+pytest -v tests/http/a_user/test_f_password_otp_verify.py
+```
 
+#### 🏢 Company APIs
+```bash
+pytest -v tests/http/b_company/test_a_create_company.py
+pytest -v tests/http/b_company/test_b_get_company.py
+pytest -v tests/http/b_company/test_c_update_company.py
+```
+
+#### 🧑‍💼 Company Role APIs
+```bash
+pytest -v tests/http/c_company_roles/test_d_create_role.py
+pytest -v tests/http/c_company_roles/test_e_update_role.py
+pytest -v tests/http/c_company_roles/test_f_delete_role.py
+pytest -v tests/http/c_company_roles/test_g_get_roles.py
+```
+
+#### 👥 Company User APIs
+```bash
+pytest -v tests/http/d_company_users/test_h_get_company_users.py
+pytest -v tests/http/d_company_users/test_i_get_user_companies.py
+pytest -v tests/http/d_company_users/test_j_add_user_to_company.py
+pytest -v tests/http/d_company_users/test_k_remove_user_from_company.py
+```
+
+
+
+## 🧰 Utility Testing
+
+### 📂 Directory Structure
+
+```
+tests/utils/
+├── basic_auth.py
+├── config/
+│   ├── test_cors.py
+│   ├── test_database_config.py
+│   └── test_environment_manager.py
+├── email/
+│   ├── __init__.py
+│   ├── test_renderer.py
+│   └── test_sender.py
+└── __init__.py
+```
+
+---
+
+### 🚀 Running Utility Tests
+
+#### 🔐 Basic Auth Utilities
+```bash
+pytest -v tests/utils/basic_auth.py
+```
+
+#### ⚙️ Configuration Tests
+```bash
+pytest -v tests/utils/config/test_cors.py
+pytest -v tests/utils/config/test_database_config.py
+pytest -v tests/utils/config/test_environment_manager.py
+```
+
+#### 📧 Email Utilities
+```bash
+pytest -v tests/utils/email/test_renderer.py
+pytest -v tests/utils/email/test_sender.py
 ```

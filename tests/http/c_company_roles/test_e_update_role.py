@@ -1,6 +1,9 @@
 import logging
 import pytest
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyRoleResponseMessages,
+)
 from tests.http.conftest import client, test_company_data, login_token
 
 
@@ -23,7 +26,7 @@ def test_a_update_role_description_success(client, login_token, test_company_dat
         json_data = response.json()
         #
         assert "message" in json_data
-        assert json_data["message"] == CompanyResponseMessages.ROLE_UPDATED.value
+        assert json_data["message"] == CompanyRoleResponseMessages.ROLE_UPDATED.value
         assert "data" in json_data
         assert json_data["data"]["name"] == data["name"]
         assert json_data["data"]["description"] == data["description"]
@@ -65,7 +68,7 @@ def test_c_update_role_description_not_found(client, login_token):
     assert "detail" in json_data
     assert (
         json_data["detail"]["message"]
-        == CompanyResponseMessages.ROLE_UPDATE_FAILED.value
+        == CompanyRoleResponseMessages.ROLE_UPDATE_FAILED.value
     )
     assert (
         json_data["detail"]["error"]

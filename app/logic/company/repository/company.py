@@ -1,31 +1,25 @@
-from app.models.company.address import CompanyAddress
 from fastapi import status
-
 # utils
-from app.models.company.user import CompanyUserAdd, CompanyUserRead, CompanyUserRead
-from app.models.generic_pagination import PaginatedResponse, PaginationMeta
 from app.utils.app_error import AppError
 
 # database
 from app.database import DatabaseSessionManager
 from app.database.company import Company
-from app.database.user import User
 from app.database.role import Role
 from app.database.association_user_company import AssociationUserCompany
 from sqlalchemy.orm import joinedload
 
-
 # models
+from app.models.company.address import CompanyAddress
 from app.models.company.company import (
     CompanyQueryParams,
     CompanyRead,
     CompanyCreate,
     CompanyUpdate,
 )
-from app.models.user.user import UserQueryParams, UserRead
 from app.models.company.roles import CompanyDefaultRoles
-
 from app.models.company.response_messages import CompanyResponseMessages
+from app.models.generic_pagination import PaginatedResponse, PaginationMeta
 
 
 class CompanyRepository:
@@ -33,40 +27,29 @@ class CompanyRepository:
         self.db_manager = DatabaseSessionManager()
 
     def create_company(
-        self, payload: CompanyCreate, created_by: UserRead
+        self, payload: CompanyCreate, created_by
     ) -> CompanyRead:
         with self.db_manager.session_object() as session:
-            # 1. Create company
             company = self._create_company_record(session, payload)
+            company_id = company["id"]
 
-            # 2. Add address to primary_meta_data
             if payload.address:
-                self._add_company_address(session, company["id"], payload.address)
+                self._add_company_address(session, company_id, payload.address)
 
-            # 3. Create default roles
-            self._create_default_roles(session, company["id"])
+            self._create_default_roles(session, company_id)
 
-            # 4. Associate creator as Administrator
-            self._associate_creator(session, created_by, company["id"])
+            AssociationUserCompany.link_user(
+                session,
+                user_id=created_by.id,
+                company_id=company_id,
+                role_name=CompanyDefaultRoles.ADMINISTRATOR.name_value,
+                added_by=created_by,
+            )
 
-            # 5. Get the registered company with complete data
-            registered_company = self._get_registered_company(session, company["id"])
-
+            registered_company = self._get_registered_company(session, company_id)
             return CompanyRead(**registered_company)
 
     def get_company_by_id(self, company_id: str) -> CompanyRead:
-        """
-        Retrieve a company by its ID.
-
-        Args:
-            company_id: The unique identifier of the company
-
-        Returns:
-            CompanyRead: The company data
-
-        Raises:
-            AppError: If company not found
-        """
         with self.db_manager.session_object() as session:
             company = self._get_registered_company(session, company_id)
 
@@ -79,18 +62,6 @@ class CompanyRepository:
             return CompanyRead(**company)
 
     def get_company_by_email(self, email: str) -> CompanyRead:
-        """
-        Retrieve a company by its email address.
-
-        Args:
-            email: The email address of the company
-
-        Returns:
-            CompanyRead: The company data
-
-        Raises:
-            AppError: If company not found
-        """
         with self.db_manager.session_object() as session:
             company = Company.get_company_by_email(session, email)
 
@@ -100,124 +71,14 @@ class CompanyRepository:
                     message=CompanyResponseMessages.COMPANY_NOT_FOUND.value,
                 )
 
-            # Reuse the method to get complete company data
             return CompanyRead(**self._get_registered_company(session, company["id"]))
 
-    def get_company_users(
-        self, company_id: int, params: UserQueryParams
-    ) -> PaginatedResponse[CompanyUserRead]:
-        """
-        Get all users in a company with optional filters and pagination.
-        """
-        with self.db_manager.session_object() as session:
-            query = (
-                session.query(AssociationUserCompany)
-                .join(AssociationUserCompany.user)
-                .filter(
-                    AssociationUserCompany.company_id == company_id,
-                    AssociationUserCompany._closed_at.is_(None),
-                    User._closed_at.is_(None),
-                )
-            )
-
-            # Apply filters
-            if params.role_name:
-                query = query.filter(
-                    AssociationUserCompany.role_name.ilike(f"%{params.role_name}%")
-                )
-            if params.first_name:
-                query = query.filter(User.first_name.ilike(f"%{params.first_name}%"))
-            if params.last_name:
-                query = query.filter(User.last_name.ilike(f"%{params.last_name}%"))
-            if params.email:
-                query = query.filter(User.email.ilike(f"%{params.email}%"))
-
-            total = query.count()
-
-            results = (
-                query.options(joinedload(AssociationUserCompany.user))
-                .offset(params.offset)
-                .limit(params.limit)
-                .all()
-            )
-            print()
-
-            users = [
-                CompanyUserRead(**User.to_dict(assoc.user), role_name=assoc.role_name)
-                for assoc in results
-            ]
-
-            return PaginatedResponse[CompanyUserRead](
-                records=users,
-                pagination=PaginationMeta(
-                    total_records=total,
-                    limit=params.limit,
-                    offset=params.offset,
-                    current_page=params.offset // params.limit + 1,
-                    total_pages=(total + params.limit - 1) // params.limit,
-                ),
-            )
-
-    def add_user_to_company(
-        self, company_id: int, payload: CompanyUserAdd
-    ) -> CompanyUserRead:
-        """
-        Add user to company with specified role.
-        """
-        with self.db_manager.session_object() as session:
-            # check if the user being added  is registered exists
-            user = User.get_user_by_email(session=session, email=payload.email)
-            user_id = user.get("id")
-            # check if role is valid and belongs to company
-            role = Role.role_belongs_to_company(
-                session=session, company_id=company_id, role_name=payload.role
-            )
-            if not role:
-                raise ValueError("Role: %s is not linked to company", payload.role)
-            role_name = role.get("name")
-            # Check for existing association
-            exists = (
-                session.query(AssociationUserCompany)
-                .filter_by(user_id=user_id, company_id=company_id, _closed_at=None)
-                .first()
-            )
-
-            if exists:
-                raise AppError(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    message="User is already linked to the company.",
-                )
-
-            # Create association
-            link = AssociationUserCompany(
-                user_id=user_id,
-                company_id=company_id,
-                role_name=role_name,
-            )
-            session.add(link)
-            session.commit()
-            return CompanyUserRead(**user, role_name=role_name)
-
     def update_company(
-        self, payload: CompanyUpdate, company_id: str, user: UserRead
+        self, payload: CompanyUpdate, company_id: str, user
     ) -> CompanyRead:
-        """
-        Update a company by its ID.
-
-        Args:
-            payload: The updated company data
-            company_id: The unique identifier of the company
-            user: The user making the update
-
-        Returns:
-            CompanyRead: The updated company data
-
-        Raises:
-            AppError: If update fails
-        """
         with self.db_manager.session_object() as session:
-            # Update the company record
             company = Company.update(session, company_id, **payload.model_dump())
+
             if payload.address:
                 self._add_company_address(session, company_id, payload.address)
 
@@ -232,9 +93,6 @@ class CompanyRepository:
     def get_user_companies(
         self, user_id: int, params: CompanyQueryParams
     ) -> PaginatedResponse[CompanyRead]:
-        """
-        Return companies linked to a user with optional search on role/company metadata.
-        """
         with self.db_manager.session_object() as session:
             query = (
                 session.query(AssociationUserCompany)
@@ -253,9 +111,7 @@ class CompanyRepository:
             if params.name:
                 query = query.filter(Company.name.ilike(f"%{params.name}%"))
             if params.description:
-                query = query.filter(
-                    Company.description.ilike(f"%{params.description}%")
-                )
+                query = query.filter(Company.description.ilike(f"%{params.description}%"))
             if params.industry:
                 query = query.filter(Company.industry.ilike(f"%{params.industry}%"))
             if params.email:
@@ -293,7 +149,6 @@ class CompanyRepository:
             )
 
     def _create_company_record(self, session, payload: CompanyCreate) -> dict:
-        """Create the company record in the database"""
         company = Company.create(session, **payload.model_dump(exclude={"address"}))
 
         if not company:
@@ -307,7 +162,6 @@ class CompanyRepository:
     def _add_company_address(
         self, session, company_id: str, address: CompanyAddress
     ) -> None:
-        """Add address to the company's primary_meta_data"""
         Company.update_json_field(
             session,
             record_id=company_id,
@@ -317,7 +171,6 @@ class CompanyRepository:
         )
 
     def _create_default_roles(self, session, company_id: str) -> None:
-        """Create default roles for the company"""
         for role in CompanyDefaultRoles:
             Role.create(
                 session,
@@ -326,19 +179,7 @@ class CompanyRepository:
                 description=role.description,
             )
 
-    def _associate_creator(
-        self, session, created_by: UserRead, company_id: str
-    ) -> None:
-        """Associate the creator as Administrator of the company"""
-        AssociationUserCompany.create(
-            session,
-            user_id=created_by.id,
-            company_id=company_id,
-            role_name=CompanyDefaultRoles.ADMINISTRATOR.name_value,
-        )
-
     def _get_registered_company(self, session, company_id: str) -> dict:
-        """Get the registered company with complete data"""
         registered_company = Company.get_by_id(session, company_id)
 
         if "primary_meta_data" in registered_company:

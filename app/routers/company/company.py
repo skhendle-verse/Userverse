@@ -2,12 +2,15 @@ from fastapi import APIRouter, Depends, status, Query, Path
 from fastapi.responses import JSONResponse
 
 # Models
-from app.models.company.user import CompanyUserAdd, CompanyUserRead, CompanyUserRead
+from app.models.company.user import  CompanyUserRead, CompanyUserRead
 from app.models.generic_pagination import PaginatedResponse
 from app.models.generic_response import GenericResponseModel
 from app.models.company.company import CompanyCreate, CompanyRead, CompanyUpdate
 from app.models.app_error import AppErrorResponseModel
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyUserResponseMessages,
+)
 
 # Auth
 from app.security.jwt import get_current_user_from_jwt_token
@@ -15,6 +18,7 @@ from app.models.user.user import UserQueryParams, UserRead
 
 # Logic
 from app.logic.company.company import CompanyService
+from app.logic.company.user import CompanyUserService
 
 # Utils
 from app.utils.app_error import AppError
@@ -110,7 +114,7 @@ def get_company_api(
         500: {"model": AppErrorResponseModel},
     },
 )
-def update_user_api(
+def update_company_api(
     company_updates: CompanyUpdate,
     company_id: int = Path(..., description="Company ID to update"),
     user: UserRead = Depends(get_current_user_from_jwt_token),
@@ -160,8 +164,8 @@ def get_company_users_api(
     Priority: email > company_id.
     """
     try:
-        company_service = CompanyService()
-        response = company_service.get_company_user(
+        company_user_service = CompanyUserService()
+        response = company_user_service.get_company_user(
             company_id=company_id,
             params=params,
             user=user,
@@ -170,42 +174,7 @@ def get_company_users_api(
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=GenericResponseModel(
-                message=CompanyResponseMessages.GET_COMPANY_USERS.value,
-                data=response.model_dump(),
-            ).model_dump(),
-        )
-    except AppError as e:
-        raise e
-    except Exception as e:
-        raise e
-
-
-@router.post(
-    "/company/{company_id}/users",
-    tags=[tag],
-    status_code=status.HTTP_201_CREATED,
-    responses={
-        201: {"model": GenericResponseModel[PaginatedResponse[CompanyRead]]},
-        400: {"model": AppErrorResponseModel},
-        500: {"model": AppErrorResponseModel},
-    },
-)
-def add_user_to_company_api(
-    company_id: int,
-    payload: CompanyUserAdd,
-    user: UserRead = Depends(get_current_user_from_jwt_token),
-):
-    """
-    Register a user to a company with a rrole available in the company.
-    """
-    try:
-        response = CompanyService().add_user(
-            company_id=company_id, payload=payload, added_by=user
-        )
-        return JSONResponse(
-            status_code=status.HTTP_201_CREATED,
-            content=GenericResponseModel(
-                message=CompanyResponseMessages.ADD_USER_SUCCESS.value,
+                message=CompanyUserResponseMessages.GET_COMPANY_USERS.value,
                 data=response.model_dump(),
             ).model_dump(),
         )

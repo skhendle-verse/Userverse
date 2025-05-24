@@ -5,7 +5,10 @@ from fastapi.responses import JSONResponse
 # Models
 from app.models.app_error import AppErrorResponseModel
 from app.models.company.company import CompanyQueryParams, CompanyRead
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyUserResponseMessages,
+)
 from app.models.generic_pagination import PaginatedResponse
 from app.models.generic_response import GenericResponseModel
 from app.models.user.user import (
@@ -194,7 +197,7 @@ def get_user_companies_api(
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=GenericResponseModel(
-                message=CompanyResponseMessages.GET_COMPANY_USERS.value,
+                message=CompanyUserResponseMessages.GET_COMPANY_USERS.value,
                 data=response.model_dump(),
             ).model_dump(),
         )

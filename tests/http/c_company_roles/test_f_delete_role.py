@@ -1,6 +1,9 @@
 import json
 import pytest
-from app.models.company.response_messages import CompanyResponseMessages
+from app.models.company.response_messages import (
+    CompanyResponseMessages,
+    CompanyRoleResponseMessages,
+)
 from tests.http.conftest import client, test_company_data, login_token
 
 
@@ -27,7 +30,7 @@ def test_a_delete_role_success(client, login_token, test_company_data):
     assert response.status_code == 201  # Ensure this matches actual API response
     json_data = response.json()
     assert "message" in json_data
-    assert json_data["message"] == CompanyResponseMessages.ROLE_DELETED.value
+    assert json_data["message"] == CompanyRoleResponseMessages.ROLE_DELETED.value
     assert "data" in json_data
     assert "message" in json_data["data"]
     assert payload["role_name_to_delete"] in json_data["data"]["message"]
@@ -91,7 +94,7 @@ def test_c_delete_role_not_found(client, login_token):
     assert "Role 'NonExistentRole' not found." == json_data["detail"]["error"]
     assert (
         json_data["detail"]["message"]
-        == CompanyResponseMessages.ROLE_UPDATE_FAILED.value
+        == CompanyRoleResponseMessages.ROLE_UPDATE_FAILED.value
     )
 
 
@@ -123,5 +126,5 @@ def test_d_delete_role_self_replacement_forbidden(client, login_token):
     assert "Cannot replace a role with itself." == json_data["detail"]["error"]
     assert (
         json_data["detail"]["message"]
-        == CompanyResponseMessages.ROLE_UPDATE_FAILED.value
+        == CompanyRoleResponseMessages.ROLE_UPDATE_FAILED.value
     )
