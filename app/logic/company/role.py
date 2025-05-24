@@ -19,7 +19,6 @@ from app.models.company.roles import (
 )
 from app.models.user.user import UserRead
 from app.models.company.response_messages import (
-
     CompanyRoleResponseMessages,
 )
 

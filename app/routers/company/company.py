@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, Query, Path
 from fastapi.responses import JSONResponse
 
 # Models
-from app.models.company.user import  CompanyUserRead, CompanyUserRead
+from app.models.company.user import CompanyUserRead, CompanyUserRead
 from app.models.generic_pagination import PaginatedResponse
 from app.models.generic_response import GenericResponseModel
 from app.models.company.company import CompanyCreate, CompanyRead, CompanyUpdate

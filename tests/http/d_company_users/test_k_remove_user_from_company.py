@@ -9,7 +9,7 @@ from app.models.company.response_messages import (
 @pytest.mark.parametrize(
     "login_token_key, company_id, user_id, expected_status, expected_message",
     [
-                # Admin removes non-Admin user
+        # Admin removes non-Admin user
         (
             "login_token",
             1,
@@ -68,7 +68,6 @@ def test_remove_user_from_company(
     )
 
     json_data = response.json()
-
 
     if expected_status == 201:
         assert "message" in json_data

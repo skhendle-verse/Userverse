@@ -1,4 +1,5 @@
 from fastapi import status
+
 # utils
 from app.utils.app_error import AppError
 
@@ -26,9 +27,7 @@ class CompanyRepository:
     def __init__(self):
         self.db_manager = DatabaseSessionManager()
 
-    def create_company(
-        self, payload: CompanyCreate, created_by
-    ) -> CompanyRead:
+    def create_company(self, payload: CompanyCreate, created_by) -> CompanyRead:
         with self.db_manager.session_object() as session:
             company = self._create_company_record(session, payload)
             company_id = company["id"]
@@ -111,7 +110,9 @@ class CompanyRepository:
             if params.name:
                 query = query.filter(Company.name.ilike(f"%{params.name}%"))
             if params.description:
-                query = query.filter(Company.description.ilike(f"%{params.description}%"))
+                query = query.filter(
+                    Company.description.ilike(f"%{params.description}%")
+                )
             if params.industry:
                 query = query.filter(Company.industry.ilike(f"%{params.industry}%"))
             if params.email:

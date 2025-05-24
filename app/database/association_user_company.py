@@ -91,14 +91,17 @@ class AssociationUserCompany(BaseModel):
         if not assoc:
             raise AppError(
                 status_code=status.HTTP_403_FORBIDDEN,
-                message=CompanyUserResponseMessages.USER_ALREADY_REMOVED.value
+                message=CompanyUserResponseMessages.USER_ALREADY_REMOVED.value,
             )
 
         # Ensure the user being removed is not super admin
-        if assoc.primary_meta_data.get("added_by" ) ==  removed_by.model_dump() and assoc.user_id == removed_by.id:
+        if (
+            assoc.primary_meta_data.get("added_by") == removed_by.model_dump()
+            and assoc.user_id == removed_by.id
+        ):
             raise AppError(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                message=CompanyUserResponseMessages.SUPER_ADMIN_REMOVE_FORBIDDEN.value
+                message=CompanyUserResponseMessages.SUPER_ADMIN_REMOVE_FORBIDDEN.value,
             )
 
         assoc.primary_meta_data["removed_by"] = removed_by.model_dump()
