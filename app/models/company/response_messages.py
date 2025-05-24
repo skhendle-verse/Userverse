@@ -41,7 +41,7 @@ class CompanyUserResponseMessages(str, Enum):
     # Remove user
     REMOVE_USER_SUCCESS = "User has been successfully removed from the company."
     REMOVE_USER_FAILED = "Failed to remove user from the company. Try again later."
-    LAST_ADMIN_REMOVE_FORBIDDEN = ""
+    SUPER_ADMIN_REMOVE_FORBIDDEN = "You cannot remove super admin from company."
     USER_ALREADY_REMOVED = "User is already removed from company."
 
 

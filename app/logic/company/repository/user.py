@@ -32,7 +32,10 @@ class CompanyUserRepository:
                 session=session, company_id=company_id, role_name=payload.role
             )
             if not role:
-                raise ValueError(f"Role: {payload.role} is not linked to company")
+                raise AppError(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    message=f"Role: {payload.role} is not linked to company"
+                )
 
             assoc = AssociationUserCompany.link_user(
                 session=session,
