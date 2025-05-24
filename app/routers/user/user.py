@@ -1,16 +1,8 @@
-import traceback
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
-# Models
-from app.models.app_error import AppErrorResponseModel
-from app.models.company.company import CompanyQueryParams, CompanyRead
-from app.models.company.response_messages import (
-    CompanyResponseMessages,
-    CompanyUserResponseMessages,
-)
-from app.models.generic_pagination import PaginatedResponse
-from app.models.generic_response import GenericResponseModel
+# Tags & Models
+from app.models.tags import UserverseApiTag
 from app.models.user.user import (
     TokenResponseModel,
     UserLogin,
@@ -18,20 +10,25 @@ from app.models.user.user import (
     UserRead,
     UserUpdate,
 )
-from app.models.user.response_messages import UserResponseMessages
+from app.models.company.company import CompanyQueryParams, CompanyRead
+from app.models.company.response_messages import (
+    CompanyUserResponseMessages,
+    CompanyResponseMessages,
+)
+from app.models.generic_response import GenericResponseModel
+from app.models.generic_pagination import PaginatedResponse
+from app.models.app_error import AppErrorResponseModel
 
-# security
+# Security & Utils
 from app.security.basic_auth import get_basic_auth_credentials
 from app.security.jwt import get_current_user_from_jwt_token
-
-# utils
 from app.utils.app_error import AppError
 
-# logic
+# Logic
 from app.logic.user.user import UserService
 
 router = APIRouter()
-tag = "User Management"
+tag = UserverseApiTag.USER_MANAGEMENT.name
 
 
 @router.patch(
@@ -48,7 +45,9 @@ def user_login_api(
     credentials: UserLogin = Depends(get_basic_auth_credentials),
 ):
     """
-    User login.
+    Authenticate user using basic auth credentials.
+
+    - **Returns**: Access token for future authenticated requests
     """
     try:
         response = UserService().user_login(user_credentials=credentials)
@@ -59,9 +58,7 @@ def user_login_api(
                 "data": response.model_dump(),
             },
         )
-    except AppError as e:
-        raise e
-    except Exception as e:
+    except (AppError, Exception) as e:
         raise e
 
 
@@ -80,7 +77,10 @@ def create_user_api(
     credentials: UserLogin = Depends(get_basic_auth_credentials),
 ):
     """
-    Create a new user.
+    Create a new user account.
+
+    - **Requires**: Valid basic auth credentials
+    - **Returns**: Created user details
     """
     try:
         response = UserService().create_user(
@@ -94,13 +94,10 @@ def create_user_api(
                 "data": response.model_dump(),
             },
         )
-    except AppError as e:
-        raise e
-    except Exception as e:
+    except (AppError, Exception) as e:
         raise e
 
 
-# This must use thr jwt token
 @router.get(
     "/user",
     tags=[tag],
@@ -115,7 +112,7 @@ def get_user_api(
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
     """
-    Get user details.
+    Retrieve current authenticated user's details.
     """
     try:
         response = UserService().get_user(user_email=user.email)
@@ -126,9 +123,7 @@ def get_user_api(
                 "data": response.model_dump(),
             },
         )
-    except AppError as e:
-        raise e
-    except Exception as e:
+    except (AppError, Exception) as e:
         raise e
 
 
@@ -137,7 +132,7 @@ def get_user_api(
     tags=[tag],
     status_code=status.HTTP_200_OK,
     responses={
-        201: {"model": GenericResponseModel[UserRead]},
+        200: {"model": GenericResponseModel[UserRead]},
         400: {"model": AppErrorResponseModel},
         500: {"model": AppErrorResponseModel},
     },
@@ -147,7 +142,7 @@ def update_user_api(
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
     """
-    Update user details.
+    Update current authenticated user's profile.
     """
     try:
         user_db = UserService().get_user(user_email=user.email)
@@ -156,15 +151,13 @@ def update_user_api(
             user_data=user_updates,
         )
         return JSONResponse(
-            status_code=status.HTTP_201_CREATED,
+            status_code=status.HTTP_200_OK,
             content={
                 "message": UserResponseMessages.USER_UPDATED.value,
                 "data": response.model_dump(),
             },
         )
-    except AppError as e:
-        raise e
-    except Exception as e:
+    except (AppError, Exception) as e:
         raise e
 
 
@@ -184,16 +177,13 @@ def get_user_companies_api(
     user: UserRead = Depends(get_current_user_from_jwt_token),
 ):
     """
-    Get all companies the authenticated user is linked to.
-    Supports filtering by role and company details.
+    Get all companies the authenticated user is associated with.
+
+    - **Supports**: Filtering by role, name, industry, etc.
+    - **Returns**: Paginated list of companies
     """
     try:
-        user_service = UserService()
-        response = user_service.get_user_companies(
-            params=params,
-            user=user,
-        )
-
+        response = UserService().get_user_companies(params=params, user=user)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=GenericResponseModel(
@@ -201,7 +191,5 @@ def get_user_companies_api(
                 data=response.model_dump(),
             ).model_dump(),
         )
-    except AppError as e:
-        raise e
-    except Exception as e:
+    except (AppError, Exception) as e:
         raise e

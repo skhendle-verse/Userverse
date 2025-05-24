@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: write  # Required for pushing tags
+  contents: write  # Required to push tags and commits
 
 jobs:
   release:
@@ -24,7 +24,7 @@ jobs:
           git fetch --tags
           latest_tag=$(git tag --sort=-v:refname | head -n 1)
           echo "Latest tag: $latest_tag"
-          echo "tag=${latest_tag:-0.1.0}" >> "$GITHUB_OUTPUT"
+          echo "tag=${latest_tag:-v0.1.0}" >> "$GITHUB_OUTPUT"
 
       - name: Determine Version Bump
         id: version
@@ -38,7 +38,6 @@ jobs:
             bump="minor"
           fi
 
-          echo "Bump type: $bump"
           echo "bump=$bump" >> "$GITHUB_OUTPUT"
 
       - name: Calculate Next Version
@@ -69,8 +68,17 @@ jobs:
           git config user.email "github-actions@github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
+      - name: Update version in pyproject.toml
+        run: |
+          new_version=${{ steps.semver.outputs.new_version }}
+          sed -i -E '/^\[project\]/,/^\[.*\]/ s/^version = ".*"/version = "'"$new_version"'"/' pyproject.toml
+
+          git add pyproject.toml
+          git commit -m "chore: bump version to v${new_version}"
+
       - name: Create and Push Tag
         run: |
           new_tag="v${{ steps.semver.outputs.new_version }}"
           git tag "$new_tag"
           git push origin "$new_tag"
+          git push origin main

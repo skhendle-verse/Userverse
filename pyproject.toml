@@ -1,9 +1,10 @@
 [project]
 name = "userverse"
 version = "0.1.0"
-description = "Add your description here"
+description = "Userverse is an open-source platform designed to make managing users, organizations, and their relationships simple and efficient."
 readme = "README.md"
 requires-python = ">=3.12"
+
 dependencies = [
     "alembic>=1.15.2",
     "beautifulsoup4>=4.13.4",
@@ -25,24 +26,20 @@ dependencies = [
     "sqlalchemy-utils>=0.41.2",
 ]
 
-[tool.uv.workspace]
-members = []
+[tool.userverse.config]
+
+# General metadata
+name = "Userverse"
+version = "0.1.0"
+description = "Userverse backend API"
 
 [tool.userverse.config.database]
-# Database configuration
 HOST = "localhost"
 PORT = 5432
 USERNAME = "sandile"
 PASSWORD = "Password123"
 NAME = "userverse"
-# Database type
-# Supported types: postgresql, mysql, sqlite
-# Example: postgresql://sandile:Password123@localhost:5432/userverse
-# Example: mysql://username:password@localhost:3306/dbname
-# Example: sqlite:///path/to/database.db
-# Example: sqlite:///:memory:
 TYPE = "postgresql"
-
 
 [tool.userverse.config.cor_origins]
 allowed = ["*"]

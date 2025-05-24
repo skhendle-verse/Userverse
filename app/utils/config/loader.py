@@ -55,7 +55,7 @@ class ConfigLoader:
 
     def _load_from_toml(self):
         logger.info("Loading configuration from pyproject.toml")
-        pyproject_path = Path(__file__).resolve().parents[2] / "pyproject.toml"
+        pyproject_path = Path(__file__).resolve().parents[3] / "pyproject.toml"
 
         if not pyproject_path.exists():
             logger.warning("pyproject.toml not found — using default test config.")
@@ -64,30 +64,41 @@ class ConfigLoader:
         with open(pyproject_path, "rb") as f:
             pyproject_data = tomllib.load(f)
 
-        app_config = (
-            pyproject_data.get("tool", {}).get("userverse", {}).get("config", {})
-        )
+        # Extract sections
+        userverse_config = pyproject_data.get("tool", {}).get("userverse", {}).get("config", {})
+        project_config = pyproject_data.get("project", {})
 
-        if not app_config:
-            logger.warning(
-                "Missing config section in pyproject.toml — using default test config."
-            )
-            return self._default_test_config()
+        logger.info("📦 [project] section loaded from pyproject.toml:")
+        for key, val in project_config.items():
+            logger.info(f"  {key} = {val}")
 
-        return self._build_config_dict(app_config)
+        # Merge configuration
+        config_data = {
+            "name": project_config.get("name") or userverse_config.get("name"),
+            "version": project_config.get("version") or userverse_config.get("version"),
+            "description": project_config.get("description") or userverse_config.get("description"),
+            "database": userverse_config.get("database", {}),
+            "cor_origins": userverse_config.get("cor_origins", {}),
+            "jwt": userverse_config.get("jwt", {}),
+            "email": userverse_config.get("email", {}),
+        }
+
+        return self._build_config_dict(config_data)
+
 
     def _build_config_dict(self, config_data: dict):
+        if not isinstance(config_data, dict):
+            raise TypeError("Expected config_data to be a dict")
+
         environment = self._set_environment(config_data)
         return {
             "environment": environment,
-            "database_url": DatabaseConfig.get_connection_string(
-                config_data, environment
-            ),
+            "database_url": DatabaseConfig.get_connection_string(config_data, environment),
             "cor_origins": CorsConfig.get_cors(config_data, environment),
             "jwt": config_data.get("jwt", {}),
             "email": config_data.get("email", {}),
-            "version": config_data.get("version", "0.1.0"),
             "name": config_data.get("name", "Userverse"),
+            "version": config_data.get("version", "0.1.0"),
             "description": config_data.get("description", "Userverse backend API"),
         }
 
