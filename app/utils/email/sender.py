@@ -54,11 +54,3 @@ def send_email(to: str, subject: str, html_body: str):
     except Exception as e:
         logger.error(f"Unexpected error sending email: {str(e)}")
         raise
-
-
-if __name__ == "__main__":
-    # Example usage
-    to = "as@fg.dsfgd"
-    subject = "Test Email"
-    html_body = "<h1>Hello</h1><p>This is a test email.</p>"
-    send_email(to, subject, html_body)

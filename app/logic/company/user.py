@@ -41,9 +41,7 @@ class CompanyUserService:
         user = repository.add_user_to_company(
             company_id=company_id, payload=payload, added_by=added_by
         )
-        company = CompanyRepository().get_company_by_id(
-            company_id=company_id
-        )
+        company = CompanyRepository().get_company_by_id(company_id=company_id)
         # Send invite email,
         MailService.send_template_email(
             to=user.email,
