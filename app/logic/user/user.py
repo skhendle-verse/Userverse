@@ -60,7 +60,9 @@ class UserService:
             )
 
     @classmethod
-    def create_user(cls, user_credentials: UserLogin, user_data: UserCreate) -> UserRead:
+    def create_user(
+        cls, user_credentials: UserLogin, user_data: UserCreate
+    ) -> UserRead:
         user_repository = UserRepository()
         data = {
             "first_name": user_data.first_name,
