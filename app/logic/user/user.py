@@ -2,6 +2,7 @@ from fastapi import status
 
 # utils
 from app.logic.company.repository.company import CompanyRepository
+from app.logic.mailer import MailService
 from app.models.company.company import CompanyQueryParams
 from app.security.jwt import JWTManager
 from app.utils.app_error import AppError
@@ -21,6 +22,8 @@ from app.models.user.response_messages import UserResponseMessages
 
 
 class UserService:
+    ACCOUNT_REGISTRATION_TEMPLATE = "user_registration.html"
+    ACCOUNT_REGISTRATION_SUBJECT = "User Account Registration"
 
     @staticmethod
     def user_login(user_credentials: UserLogin) -> TokenResponseModel:
@@ -56,8 +59,8 @@ class UserService:
                 message=UserResponseMessages.USER_NOT_FOUND.value,
             )
 
-    @staticmethod
-    def create_user(user_credentials: UserLogin, user_data: UserCreate) -> UserRead:
+    @classmethod
+    def create_user(cls, user_credentials: UserLogin, user_data: UserCreate) -> UserRead:
         user_repository = UserRepository()
         data = {
             "first_name": user_data.first_name,
@@ -66,7 +69,22 @@ class UserService:
             "phone_number": user_data.phone_number,
             "password": user_credentials.password,
         }
-        return user_repository.create_user(data)
+        user = user_repository.create_user(data)
+        # TODO: User verification functionality
+        verification_link = "https://github.com/SoftwareVerse"
+        # send email
+        MailService.send_template_email(
+            to=user.email,
+            subject=cls.ACCOUNT_REGISTRATION_SUBJECT,
+            template_name=cls.ACCOUNT_REGISTRATION_TEMPLATE,
+            context={
+                "template_name": cls.ACCOUNT_REGISTRATION_SUBJECT,
+                "user_name": user.first_name + " " + user.last_name,
+                "verification_link": verification_link,
+            },
+        )
+
+        return user
 
     @classmethod
     def update_user(cls, user_id, user_data: UserUpdate):

@@ -1,5 +1,4 @@
 {
-
     "cor_origins": {
         "allowed": [
             "*"
@@ -13,5 +12,11 @@
         "ALGORITHM": "HS256",
         "TIMEOUT": 30,
         "REFRESH_TIMEOUT": 60
+    },
+    "email": {
+        "HOST": "mail.example.com",
+        "PORT": 587,
+        "USERNAME": "your_email@example.com",
+        "PASSWORD": "your_email_password"
     }
 }
