@@ -22,8 +22,8 @@ from app.models.user.response_messages import UserResponseMessages
 
 
 class UserService:
-    ACC_REGISTRATION_TEMPLATE = "user_registration.html"
-    ACC_REGISTRATION_SUBJECT = "User Account Registration"
+    ACCOUNT_REGISTRATION_TEMPLATE = "user_registration.html"
+    ACCOUNT_REGISTRATION_SUBJECT = "User Account Registration"
 
     @staticmethod
     def user_login(user_credentials: UserLogin) -> TokenResponseModel:
@@ -75,10 +75,10 @@ class UserService:
         # send email
         MailService.send_template_email(
             to=user.email,
-            subject=cls.ACC_REGISTRATION_SUBJECT,
-            template_name=cls.ACC_REGISTRATION_TEMPLATE,
+            subject=cls.ACCOUNT_REGISTRATION_SUBJECT,
+            template_name=cls.ACCOUNT_REGISTRATION_TEMPLATE,
             context={
-                "template_name": cls.ACC_REGISTRATION_SUBJECT,
+                "template_name": cls.ACCOUNT_REGISTRATION_SUBJECT,
                 "user_name": user.first_name + " " + user.last_name,
                 "verification_link": verification_link,
             },

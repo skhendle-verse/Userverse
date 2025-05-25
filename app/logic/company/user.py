@@ -1,6 +1,8 @@
 from fastapi import status
 
 # utils
+from app.logic.company.repository.company import CompanyRepository
+from app.logic.mailer import MailService
 from app.models.company.user import CompanyUserAdd, CompanyUserRead
 from app.models.generic_pagination import PaginatedResponse
 from app.utils.app_error import AppError
@@ -23,10 +25,12 @@ from app.models.company.response_messages import CompanyResponseMessages
 
 
 class CompanyUserService:
+    COMPANY_REGISTRATION_TEMPLATE = "company_invite.html"
+    COMPANY_REGISTRATION_SUBJECT = "Company Invite"
 
-    @staticmethod
+    @classmethod
     def add_user_to_company(
-        company_id: int, payload: CompanyUserAdd, added_by: UserRead
+        cls, company_id: int, payload: CompanyUserAdd, added_by: UserRead
     ) -> CompanyUserRead:
         CompanyUserService.check_if_user_is_in_company(
             user_id=added_by.id,
@@ -34,9 +38,24 @@ class CompanyUserService:
             role=CompanyDefaultRoles.ADMINISTRATOR.name_value,
         )
         repository = CompanyUserRepository()
-        return repository.add_user_to_company(
+        user = repository.add_user_to_company(
             company_id=company_id, payload=payload, added_by=added_by
         )
+        company = CompanyRepository().get_company_by_id(
+            company_id=company_id
+        )
+        # Send invite email,
+        MailService.send_template_email(
+            to=user.email,
+            subject=cls.COMPANY_REGISTRATION_SUBJECT,
+            template_name=cls.COMPANY_REGISTRATION_TEMPLATE,
+            context={
+                "invitee": user.first_name + " " + user.last_name,
+                "company": company.name,
+                "role": user.role_name,
+            },
+        )
+        return user
 
     @staticmethod
     def remove_user_from_company(
