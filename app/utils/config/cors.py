@@ -24,7 +24,7 @@ class CorsConfig:
         if environment == "test_environment":
             return cls.CORS_DEFAULT
 
-        cors_config = configs.get("cors", {})
+        cors_config = configs.get("cors") or configs.get("cor_origins") or {}
         if cors_config:
             allowed = cors_config.get("allowed", cls.CORS_DEFAULT["allowed"])
             blocked = cors_config.get("blocked", cls.CORS_DEFAULT["blocked"])

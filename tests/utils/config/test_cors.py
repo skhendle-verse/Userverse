@@ -42,6 +42,20 @@ class TestCorsConfig(unittest.TestCase):
         result = CorsConfig.get_cors(config, environment="staging")
         self.assertEqual(result, CorsConfig.CORS_DEFAULT)
 
+    def test_cor_origins_key_supported(self):
+        config = {
+            "cor_origins": {
+                "allowed": ["https://example.org"],
+                "blocked": ["http://bad.example.org"],
+            }
+        }
+        result = CorsConfig.get_cors(config, environment="production")
+        expected = {
+            "allowed": ["https://example.org"],
+            "blocked": ["http://bad.example.org"],
+        }
+        self.assertEqual(result, expected)
+
 
 if __name__ == "__main__":
     unittest.main()
