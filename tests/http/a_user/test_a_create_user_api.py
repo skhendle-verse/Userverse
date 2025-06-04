@@ -102,17 +102,28 @@ def test_c_create_user_two_fail(client, test_user_data):
         "last_name": use_two["last_name"],
         "phone_number": use_two["phone_number"],
     }
-    # Attempt to create the same user again
-    with pytest.raises(ValueError):
 
-        client.post(
-            "/user",
-            json=payload,
-            headers=get_basic_auth_header(
-                username=use_two["email"],
-                password=use_two["password"],
-            ),
-        )
+    # Attempt to create the same user again
+    response = client.post(
+        "/user",
+        json=payload,
+        headers=get_basic_auth_header(
+            username=use_two["email"],
+            password=use_two["password"],
+        ),
+    )
+
+    assert response.status_code in [400, 422]
+
+    json_data = response.json()
+    assert "message" in json_data or "detail" in json_data
+
+    message = (
+        json_data.get("message")
+        if "message" in json_data
+        else json_data["detail"].get("message")
+    )
+    assert message == UserResponseMessages.USER_ALREADY_EXISTS.value
 
 
 def test_d_create_user_invalid_phone_should_fail(client, test_user_data):
